@@ -18,7 +18,6 @@ require 'rubygems'
 require 'gli'
 require 'English'
 require 'open4'
-require 'awesome_print'
 require 'smithy'
 include GLI
 include Smithy
@@ -32,7 +31,7 @@ if File.exists? sysconfig_path
   @sysconfig_hash = YAML.load_file(sysconfig_path)
 end
 
-version Smith::VERSION
+version Smithy::VERSION
 
 config_file File.expand_path(File.join(@smithy_bin_root,@system_config_file))
 
@@ -124,11 +123,12 @@ command ['build','b'] do |c|
     #TODO check for valid arch
 
     #puts "GLOBAL_OPTIONS"
-    #ap global_options
+    #puts global_options
     #puts "OPTIONS"
-    #ap options
+    #puts options
     #puts "ARGS"
-    #ap options
+    #puts options
+    #exit 1
 
     raise "You must supply a package to build" if args.empty?
 
@@ -140,54 +140,34 @@ command ['build','b'] do |c|
       end
     end
 
+    ENV['SW_BLDDIR'] = prefix
+
     rebuild_script = File.join(prefix,"rebuild")
-    if File.exist? rebuild_script
-      ENV['SW_BLDDIR'] = prefix
+    raise "Cannot locate rebuild script #{}" unless File.exist? rebuild_script
 
-      unless options[:"disable-log"]
-        if options[:log]
-          log_file_path = File.join(prefix,options[:log])
-          log_file = File.open(log_file_path, 'w')
-        end
+    unless options[:"disable-log"]
+      if options[:log]
+        log_file_path = File.join(prefix,options[:log])
+        log_file = File.open(log_file_path, 'w')
       end
-
-      notice "Building #{prefix}"
-      notice "Logging to #{log_file_path}" unless log_file.nil?
-
-      stdout, stderr = '',''
-      t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
-      while t.status do
-        unless stdout.empty?
-          puts stdout if options["send-to-stdout"]
-          log_file.puts stdout unless log_file.nil?
-          stdout.replace("")
-        end
-        unless stderr.empty?
-          puts stderr if options["send-to-stdout"]
-          log_file.puts stderr unless log_file.nil?
-          stderr.replace("")
-        end
-        sleep 0.25
-      end
-
-      build_exit_status = t.exitstatus
-
-      unless stdout.empty?
-        puts stdout if options["send-to-stdout"]
-        log_file.puts stdout unless log_file.nil?
-        stdout.replace("")
-      end
-      unless stderr.empty?
-        puts stderr if options["send-to-stdout"]
-        log_file.puts stderr unless log_file.nil?
-        stderr.replace("")
-      end
-
-      log_file.close unless log_file.nil?
-
-      notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
     end
 
+    notice "Building #{prefix}"
+    notice "Logging to #{log_file_path}" unless log_file.nil?
+
+    stdout, stderr = '',''
+    t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
+    while t.status do
+      process_ouput(stdout, stderr, global_options[:"send-to-stdout"], log_file)
+      sleep 0.25
+    end
+
+    build_exit_status = t.exitstatus
+    process_ouput(stdout, stderr, global_options[:"send-to-stdout"], log_file)
+
+    log_file.close unless log_file.nil?
+
+    notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
   end
 end
 

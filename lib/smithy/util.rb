@@ -17,4 +17,17 @@ module Smithy
 	def notice(message)
 		STDOUT.puts "==> "+message
 	end
+
+	def process_ouput(stdout, stderr, print_stdout = false, log_file = nil)
+		unless stdout.empty?
+			puts stdout if print_stdout
+			log_file.puts stdout unless log_file.nil?
+			stdout.replace("")
+		end
+		unless stderr.empty?
+			puts stderr if print_stdout
+			log_file.puts stderr unless log_file.nil?
+			stderr.replace("")
+		end
+	end
 end
