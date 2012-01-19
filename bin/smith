@@ -134,7 +134,7 @@ command ['build','b'] do |c|
 
     prefix = args.first
     unless Dir.exist? prefix
-      prefix = File.join(global_options[:'software-root'], global_options[:arch], args.first)
+      prefix = File.join(global_options[:"software-root"], global_options[:arch], args.first)
       unless Dir.exist? prefix
         raise "Cannot determine which software to build"
       end
