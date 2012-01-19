@@ -55,32 +55,6 @@ flag [:arch]
 
 desc 'Mapping of hostnames to architecure names'
 arg_name 'STRING'
-# hostnames = {
-#   "arthur-login"   => "xk6",
-#   "chester-login"  => "xk6",
-#   "eugene"         => "bgp",
-#   "everest"        => "analysis-x64",
-#   "ewok"           => "sith",
-#   "fatman"         => "scibox",
-#   "frost"          => "frost",
-#   "jaguar-ext"     => "xt5",
-#   "jaguar"         => "xk6",
-#   "jaguarpf-login" => "xk6",
-#   "lens-login"     => "analysis-x64",
-#   "lens"           => "analysis-x64",
-#   "rizzo"          => "xt5",
-#   "sith-login"     => "sith",
-#   "sith"           => "sith",
-#   "smoky-login"    => "smoky",
-#   "smoky"          => "smoky",
-#   "smokylogin"     => "smoky",
-#   "yona-login"     => "yona",
-#   "yona"           => "yona"
-# }
-# File.open('smithyrc', 'w') do |f|
-#   f.puts hostnames.to_yaml
-# end
-# default_value hostnames
 flag ['hostname-architectures']
 
 desc 'The root level directory for software'
@@ -93,11 +67,9 @@ default_value true
 switch [:s, 'send-to-stdout']
 
 desc 'Search currently installed software'
-#long_desc """"""
 arg_name 'name'
 command ['search','s'] do |c|
   c.action do |global_options,options,args|
-
   end
 end
 
@@ -118,9 +90,6 @@ command ['build','b'] do |c|
   c.switch ["disable-build-log"]
 
   c.action do |global_options,options,args|
-
-    global_options[:arch] = @arch if global_options[:arch].nil?
-    #TODO check for valid arch
 
     #puts "GLOBAL_OPTIONS"
     #puts global_options
@@ -197,6 +166,12 @@ end
 #end
 
 pre do |global,command,options,args|
+  # If an architecture was not specified, set it based on the mapped value
+  global[:arch] = @arch if global[:arch].nil?
+
+  swroot = File.join(global[:"software-root"], global[:arch])
+  raise "The software-root directory #{swroot} is not valid" unless Dir.exist?(swroot)
+
   # Pre logic here
   # Return true to proceed; false to abourt and not call the
   # chosen command

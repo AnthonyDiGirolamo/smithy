@@ -14,6 +14,7 @@ class NilClass #:nodoc:
 end
 
 module Smithy
+
 	def notice(message)
 		STDOUT.puts "==> "+message
 	end
