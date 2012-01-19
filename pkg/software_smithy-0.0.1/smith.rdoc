@@ -1,5 +1,0 @@
-= smith
-
-Generate this with
-    smith rdoc
-After you have described your command line interface
