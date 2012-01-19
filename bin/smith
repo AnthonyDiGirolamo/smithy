@@ -13,13 +13,15 @@ end
 
 @smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
 $: << File.expand_path(@smithy_bin_root + '/lib')
-require 'smith_version'
+#require 'ruby-debug'
 require 'rubygems'
 require 'gli'
 require 'English'
 require 'open4'
 require 'awesome_print'
+require 'smithy'
 include GLI
+include Smithy
 
 @system_config_file = 'etc/smithyrc'
 
@@ -28,12 +30,11 @@ include GLI
 sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@system_config_file))
 if File.exists? sysconfig_path
   @sysconfig_hash = YAML.load_file(sysconfig_path)
-  ap @sysconfig_hash
 end
 
 version Smith::VERSION
 
-config_file File.join(ENV['HOME'],'.smithy.rc.yaml')
+config_file File.expand_path(File.join(@smithy_bin_root,@system_config_file))
 
 #desc 'Be verbose'
 #switch [:v,:verbose]
@@ -41,6 +42,7 @@ config_file File.join(ENV['HOME'],'.smithy.rc.yaml')
 if @hostname =~ /(.*)(\d)+/
   @machine = $1
   @arch = @sysconfig_hash[:"hostname-architectures"][@machine]
+  @sysconfig_hash[:arch] = @arch
 else
   raise "Cannot determine which architecture to build for, please specify using --arch"
 end
@@ -49,6 +51,7 @@ program_desc 'Smithy will help you build, test, and distribute software with eas
 
 desc "Machine architecure to operate on (default: #{@arch})"
 arg_name 'NAME'
+default_value nil
 flag [:arch]
 
 desc 'Mapping of hostnames to architecure names'
@@ -87,6 +90,7 @@ arg_name 'PATH'
 flag ['software-root']
 
 desc 'Send messages from underlying commands to standard output.'
+default_value true
 switch [:s, 'send-to-stdout']
 
 desc 'Search currently installed software'
@@ -94,6 +98,7 @@ desc 'Search currently installed software'
 arg_name 'name'
 command ['search','s'] do |c|
   c.action do |global_options,options,args|
+
   end
 end
 
@@ -104,17 +109,32 @@ software. Version numbers and build names may be appended to the name.
 """
 arg_name 'path'
 command ['build','b'] do |c|
-  c.desc 'Log file'
+
+  c.desc 'Build log output file name located within the software prefix.'
   c.arg_name 'FILE'
   c.default_value 'build.log'
-  c.flag ["l", "build-log"]
+  c.flag ["log"]
+
+  c.desc "Disable build logging"
+  c.switch ["disable-build-log"]
 
   c.action do |global_options,options,args|
+
+    global_options[:arch] = @arch if global_options[:arch].nil?
+    #TODO check for valid arch
+
+    #puts "GLOBAL_OPTIONS"
+    #ap global_options
+    #puts "OPTIONS"
+    #ap options
+    #puts "ARGS"
+    #ap options
+
     raise "You must supply a package to build" if args.empty?
 
     prefix = args.first
     unless Dir.exist? prefix
-      prefix = File.join(options[:'software-root'], options[:arch], args.first)
+      prefix = File.join(global_options[:'software-root'], global_options[:arch], args.first)
       unless Dir.exist? prefix
         raise "Cannot determine which software to build"
       end
@@ -124,27 +144,27 @@ command ['build','b'] do |c|
     if File.exist? rebuild_script
       ENV['SW_BLDDIR'] = prefix
 
-      if options["build-log"]
-        if Dir.exist? File.dirname(options["build-log"])
-          log_file_path = options["build-log"]
-        else
-          log_file_path = File.join(prefix,options["build-log"])
+      unless options[:"disable-log"]
+        if options[:log]
+          log_file_path = File.join(prefix,options[:log])
+          log_file = File.open(log_file_path, 'w')
         end
-        log_file = File.open(log_file_path, 'w')
       end
+
+      notice "Building #{prefix}"
+      notice "Logging to #{log_file_path}" unless log_file.nil?
 
       stdout, stderr = '',''
       t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
-      puts t.pid
       while t.status do
         unless stdout.empty?
           puts stdout if options["send-to-stdout"]
-          log_file.puts stdout if options["log_file"]
+          log_file.puts stdout unless log_file.nil?
           stdout.replace("")
         end
         unless stderr.empty?
           puts stderr if options["send-to-stdout"]
-          log_file.puts stderr if options["log_file"]
+          log_file.puts stderr unless log_file.nil?
           stderr.replace("")
         end
         sleep 0.25
@@ -154,18 +174,18 @@ command ['build','b'] do |c|
 
       unless stdout.empty?
         puts stdout if options["send-to-stdout"]
-        log_file.puts stdout if options["log_file"]
+        log_file.puts stdout unless log_file.nil?
         stdout.replace("")
       end
       unless stderr.empty?
         puts stderr if options["send-to-stdout"]
-        log_file.puts stderr if options["log_file"]
+        log_file.puts stderr unless log_file.nil?
         stderr.replace("")
       end
 
-      log_file.close
+      log_file.close unless log_file.nil?
 
-      printf("%s %s", prefix, build_exit_status==0 ? "Success" : "Failed")
+      notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
     end
 
   end
@@ -197,9 +217,6 @@ end
 #end
 
 pre do |global,command,options,args|
-  user_global = global
-  global = @sysconfig_hash.merge(user_global)
-  #ap global
   # Pre logic here
   # Return true to proceed; false to abourt and not call the
   # chosen command
@@ -215,7 +232,6 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
-  ap exception
   # Error logic here
   # return false to skip default error handling
   true
