@@ -1,0 +1,23 @@
+---
+:"hostname-architectures":
+  arthur-login: xk6
+  chester-login: xk6
+  eugene: bgp
+  everest: analysis-x64
+  ewok: sith
+  fatman: scibox
+  frost: frost
+  jaguar-ext: xt5
+  jaguar: xk6
+  jaguarpf-login: xk6
+  lens-login: analysis-x64
+  lens: analysis-x64
+  rizzo: xt5
+  sith-login: sith
+  sith: sith
+  smoky-login: smoky
+  smoky: smoky
+  smokylogin: smoky
+  yona-login: yona
+  yona: yona
+:"software-root": /sw

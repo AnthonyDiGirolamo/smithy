@@ -1,0 +1,222 @@
+#!/usr/bin/env ruby
+# 1.9 adds realpath to resolve symlinks; 1.8 doesn't
+# have this method, so we add it so we get resolved symlinks
+# and compatibility
+unless File.respond_to? :realpath
+  class File #:nodoc:
+    def self.realpath path
+      return realpath(File.readlink(path)) if symlink?(path)
+      path
+    end
+  end
+end
+
+@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+$: << File.expand_path(@smithy_bin_root + '/lib')
+require 'smith_version'
+require 'rubygems'
+require 'gli'
+require 'English'
+require 'open4'
+require 'awesome_print'
+include GLI
+
+@system_config_file = 'etc/smithyrc'
+
+@hostname = `hostname`.chomp
+
+sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@system_config_file))
+if File.exists? sysconfig_path
+  @sysconfig_hash = YAML.load_file(sysconfig_path)
+  ap @sysconfig_hash
+end
+
+version Smith::VERSION
+
+config_file File.join(ENV['HOME'],'.smithy.rc.yaml')
+
+#desc 'Be verbose'
+#switch [:v,:verbose]
+
+if @hostname =~ /(.*)(\d)+/
+  @machine = $1
+  @arch = @sysconfig_hash[:"hostname-architectures"][@machine]
+end
+
+program_desc 'Smithy will help you build, test, and distribute software with ease.'
+
+desc "Machine architecure to operate on (default: #{@arch})"
+arg_name 'NAME'
+flag [:arch]
+
+desc 'Mapping of hostnames to architecure names'
+arg_name 'STRING'
+# hostnames = {
+#   "arthur-login"   => "xk6",
+#   "chester-login"  => "xk6",
+#   "eugene"         => "bgp",
+#   "everest"        => "analysis-x64",
+#   "ewok"           => "sith",
+#   "fatman"         => "scibox",
+#   "frost"          => "frost",
+#   "jaguar-ext"     => "xt5",
+#   "jaguar"         => "xk6",
+#   "jaguarpf-login" => "xk6",
+#   "lens-login"     => "analysis-x64",
+#   "lens"           => "analysis-x64",
+#   "rizzo"          => "xt5",
+#   "sith-login"     => "sith",
+#   "sith"           => "sith",
+#   "smoky-login"    => "smoky",
+#   "smoky"          => "smoky",
+#   "smokylogin"     => "smoky",
+#   "yona-login"     => "yona",
+#   "yona"           => "yona"
+# }
+# File.open('smithyrc', 'w') do |f|
+#   f.puts hostnames.to_yaml
+# end
+# default_value hostnames
+flag ['hostname-architectures']
+
+desc 'The root level directory for software'
+default_value '/sw'
+arg_name 'PATH'
+flag ['software-root']
+
+desc 'Send messages from underlying commands to standard output.'
+switch [:s, 'send-to-stdout']
+
+desc 'Search currently installed software'
+#long_desc """"""
+arg_name 'name'
+command ['search','s'] do |c|
+  c.action do |global_options,options,args|
+  end
+end
+
+desc 'Build software'
+long_desc """
+The software to build may be either the absolute path or simply the name of the
+software. Version numbers and build names may be appended to the name.
+"""
+arg_name 'path'
+command ['build','b'] do |c|
+  c.desc 'Log file'
+  c.arg_name 'FILE'
+  c.default_value 'build.log'
+  c.flag ["l", "build-log"]
+
+  c.action do |global_options,options,args|
+    raise "You must supply a package to build" if args.empty?
+
+    prefix = args.first
+    unless Dir.exist? prefix
+      prefix = File.join(options[:'software-root'], options[:arch], args.first)
+      unless Dir.exist? prefix
+        raise "Cannot determine which software to build"
+      end
+    end
+
+    rebuild_script = File.join(prefix,"rebuild")
+    if File.exist? rebuild_script
+      ENV['SW_BLDDIR'] = prefix
+
+      if options["build-log"]
+        if Dir.exist? File.dirname(options["build-log"])
+          log_file_path = options["build-log"]
+        else
+          log_file_path = File.join(prefix,options["build-log"])
+        end
+        log_file = File.open(log_file_path, 'w')
+      end
+
+      stdout, stderr = '',''
+      t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
+      puts t.pid
+      while t.status do
+        unless stdout.empty?
+          puts stdout if options["send-to-stdout"]
+          log_file.puts stdout if options["log_file"]
+          stdout.replace("")
+        end
+        unless stderr.empty?
+          puts stderr if options["send-to-stdout"]
+          log_file.puts stderr if options["log_file"]
+          stderr.replace("")
+        end
+        sleep 0.25
+      end
+
+      build_exit_status = t.exitstatus
+
+      unless stdout.empty?
+        puts stdout if options["send-to-stdout"]
+        log_file.puts stdout if options["log_file"]
+        stdout.replace("")
+      end
+      unless stderr.empty?
+        puts stderr if options["send-to-stdout"]
+        log_file.puts stderr if options["log_file"]
+        stderr.replace("")
+      end
+
+      log_file.close
+
+      printf("%s %s", prefix, build_exit_status==0 ? "Success" : "Failed")
+    end
+
+  end
+end
+
+#desc 'Describe create here'
+#arg_name 'Describe arguments to create here'
+#command :create do |c|
+  #c.desc 'Describe a switch to create'
+  #c.switch :s
+
+  #c.desc 'Describe a flag to create'
+  #c.default_value 'default'
+  #c.flag :f
+  #c.action do |global_options,options,args|
+
+    ## Your command logic here
+
+    ## If you have any errors, just raise them
+    ## raise "that command made no sense"
+  #end
+#end
+
+#desc 'Describe copy here'
+#arg_name 'Describe arguments to copy here'
+#command :copy do |c|
+  #c.action do |global_options,options,args|
+  #end
+#end
+
+pre do |global,command,options,args|
+  user_global = global
+  global = @sysconfig_hash.merge(user_global)
+  #ap global
+  # Pre logic here
+  # Return true to proceed; false to abourt and not call the
+  # chosen command
+  # Use skips_pre before a command to skip this block
+  # on that command only
+  true
+end
+
+post do |global,command,options,args|
+  # Post logic here
+  # Use skips_post before a command to skip this
+  # block on that command only
+end
+
+on_error do |exception|
+  ap exception
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+exit GLI.run(ARGV)

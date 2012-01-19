@@ -1,0 +1,6 @@
+= smith
+
+Describe your project here
+
+:include:smith.rdoc
+
