@@ -41,6 +41,8 @@ config_file File.join(ENV['HOME'],'.smithy.rc.yaml')
 if @hostname =~ /(.*)(\d)+/
   @machine = $1
   @arch = @sysconfig_hash[:"hostname-architectures"][@machine]
+else
+  raise "Cannot determine which architecture to build for, please specify using --arch"
 end
 
 program_desc 'Smithy will help you build, test, and distribute software with ease.'
