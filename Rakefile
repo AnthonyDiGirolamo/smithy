@@ -1,7 +1,15 @@
-require 'rake/clean'
 require 'rubygems'
-require 'rake/gempackagetask'
 require 'rdoc/task'
+require 'rake/clean'
+require 'rubygems/package_task'
+
+require 'cucumber'
+require 'cucumber/rake/task'
+
+Cucumber::Rake::Task.new(:features) do |t|
+  t.cucumber_opts = "features --format pretty -x"
+  t.fork = false
+end
 
 Rake::RDocTask.new do |rd|
   rd.main = "README.rdoc"
@@ -9,15 +17,16 @@ Rake::RDocTask.new do |rd|
   rd.title = 'Your application title'
 end
 
-spec = eval(File.read('smith.gemspec'))
+spec = eval(File.read('smithy.gemspec'))
 
-Rake::GemPackageTask.new(spec) do |pkg|
+Gem::PackageTask.new(spec) do |pkg|
 end
 
-require 'rake/testtask'
-Rake::TestTask.new do |t|
-  t.libs << "test"
-  t.test_files = FileList['test/tc_*.rb']
-end
+# Unit Tests
+# require 'rake/testtask'
+# Rake::TestTask.new do |t|
+#   t.libs << "test"
+#   t.test_files = FileList['test/tc_*.rb']
+# end
 
-task :default => :test
+task :default => :features

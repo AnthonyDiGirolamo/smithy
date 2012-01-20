@@ -1,6 +1,6 @@
-= smith
+= smithy
 
 Describe your project here
 
-:include:smith.rdoc
+:include:smithy.rdoc
 
