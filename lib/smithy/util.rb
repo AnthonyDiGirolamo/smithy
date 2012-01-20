@@ -16,7 +16,7 @@ end
 module Smithy
 
 	def notice(message)
-		STDOUT.puts "==> "+message
+		STDOUT.puts "==> "+message if STDOUT.tty?
 	end
 
 	def process_ouput(stdout, stderr, print_stdout = false, log_file = nil)

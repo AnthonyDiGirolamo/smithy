@@ -62,14 +62,17 @@ default_value '/sw'
 arg_name 'PATH'
 flag ['software-root']
 
-desc 'Send messages from underlying commands to standard output.'
-default_value true
-switch [:s, 'send-to-stdout']
-
 desc 'Search currently installed software'
 arg_name 'name'
 command ['search','s'] do |c|
   c.action do |global_options,options,args|
+    swroot = File.join(global_options[:"software-root"], global_options[:arch])
+    notice "Searching in #{swroot}"
+    software = Dir.glob(swroot+"/*/*/*/rebuild").sort
+
+    puts software if args.empty?
+
+    puts software.select { |s| s =~ /#{args.first}/ }
   end
 end
 
@@ -80,24 +83,27 @@ software. Version numbers and build names may be appended to the name.
 """
 arg_name 'path'
 command ['build','b'] do |c|
-
-  c.desc 'Build log output file name located within the software prefix.'
+  c.desc 'Build log file name located within the software prefix.'
   c.arg_name 'FILE'
   c.default_value 'build.log'
-  c.flag ["log"]
+  c.flag ["build-log-name"]
 
   c.desc "Disable build logging"
   c.switch ["disable-build-log"]
 
-  c.action do |global_options,options,args|
+  c.desc 'Send messages from underlying commands (configure, make, etc) to STDOUT.'
+  c.switch [:s, 'send-to-stdout']
 
-    #puts "GLOBAL_OPTIONS"
-    #puts global_options
-    #puts "OPTIONS"
-    #puts options
-    #puts "ARGS"
-    #puts options
-    #exit 1
+  c.action do |global_options,options,args|
+    #TODO check for .lock file, create and delete after complete
+
+    puts "GLOBAL_OPTIONS"
+    puts global_options
+    puts "OPTIONS"
+    puts options
+    puts "ARGS"
+    puts args
+    exit 1
 
     raise "You must supply a package to build" if args.empty?
 
@@ -115,8 +121,8 @@ command ['build','b'] do |c|
     raise "Cannot locate rebuild script #{}" unless File.exist? rebuild_script
 
     unless options[:"disable-log"]
-      if options[:log]
-        log_file_path = File.join(prefix,options[:log])
+      if options[:"build-log-name"]
+        log_file_path = File.join(prefix,options[:"build-log-name"])
         log_file = File.open(log_file_path, 'w')
       end
     end
@@ -127,7 +133,7 @@ command ['build','b'] do |c|
     stdout, stderr = '',''
     t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
     while t.status do
-      process_ouput(stdout, stderr, global_options[:"send-to-stdout"], log_file)
+      process_ouput(stdout, stderr, options[:"send-to-stdout"], log_file)
       sleep 0.25
     end
 
