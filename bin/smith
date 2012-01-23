@@ -70,9 +70,14 @@ command ['search','s'] do |c|
     notice "Searching in #{swroot}"
     software = Dir.glob(swroot+"/*/*/*/rebuild").sort
 
-    puts software if args.empty?
+    if args.empty?
+      puts software
+    else
+      software.select! { |s| s =~ /#{args.first}/ }
+      puts software
+    end
 
-    puts software.select { |s| s =~ /#{args.first}/ }
+    notice "#{software.count} Found"
   end
 end
 
@@ -172,6 +177,14 @@ end
 #end
 
 pre do |global,command,options,args|
+  puts global
+  if global[:"hostname-architectures"].class == String
+    h = {}
+    global[:"hostname-architectures"].split(',').each do |l|
+      h.merge! Hash[*l.split(':')]
+    end
+    puts h
+  end
   # If an architecture was not specified, set it based on the mapped value
   global[:arch] = @arch if global[:arch].nil?
 
