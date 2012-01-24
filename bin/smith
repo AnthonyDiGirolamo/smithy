@@ -90,10 +90,7 @@ command ['search','s'] do |c|
 end
 
 desc 'Build software'
-long_desc """
-The software to build may be either the absolute path or simply the name of the
-software. Version numbers and build names may be appended to the name.
-"""
+long_desc "The software to build may be either the absolute path or simply the name of the software. Version numbers and build names may be appended to the name using the format: NAME/VERSION/BUILD."
 arg_name 'path'
 command ['build','b'] do |c|
   c.desc 'Build log file name located within the software prefix.'
