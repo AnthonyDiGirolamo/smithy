@@ -33,10 +33,8 @@ end
 
 version Smithy::VERSION
 
-config_file File.expand_path(File.join(@smithy_bin_root,@system_config_file))
-
-#desc 'Be verbose'
-#switch [:v,:verbose]
+# GLI Config file method - Unnecessary
+# config_file File.expand_path(File.join(@smithy_bin_root,@system_config_file))
 
 if @hostname =~ /(.*)(\d)+/
   @machine = $1
@@ -53,9 +51,9 @@ arg_name 'NAME'
 default_value nil
 flag [:arch]
 
-desc 'Mapping of hostnames to architecure names'
-arg_name 'STRING'
-flag ['hostname-architectures']
+#desc 'Mapping of hostnames to architecure names'
+#arg_name 'STRING'
+#flag ['hostname-architectures']
 
 desc 'The root level directory for software'
 default_value '/sw'
@@ -65,6 +63,9 @@ flag ['software-root']
 desc 'Search currently installed software'
 arg_name 'name'
 command ['search','s'] do |c|
+  c.desc 'Turn autocomplete output on'
+  c.switch ['auto-complete']
+
   c.action do |global_options,options,args|
     swroot = File.join(global_options[:"software-root"], global_options[:arch])
     notice "Searching in #{swroot}"
@@ -177,14 +178,16 @@ end
 #end
 
 pre do |global,command,options,args|
-  puts global
-  if global[:"hostname-architectures"].class == String
-    h = {}
-    global[:"hostname-architectures"].split(',').each do |l|
-      h.merge! Hash[*l.split(':')]
-    end
-    puts h
-  end
+  # Parse a hostname-architectures string on the command line - unnecessary
+  # if global[:"hostname-architectures"].class == String
+  #   command_line_hostnames = {}
+  #   global[:"hostname-architectures"].split(',').each do |entry|
+  #     machine_arch = entry.split(':')
+  #     command_line_hostnames.merge! Hash[*machine_arch] if machine_arch.count==2
+  #   end
+  # end
+  # puts command_line_hostnames.try(:size)
+
   # If an architecture was not specified, set it based on the mapped value
   global[:arch] = @arch if global[:arch].nil?
 
