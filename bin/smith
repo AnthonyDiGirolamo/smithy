@@ -69,7 +69,14 @@ command ['search','s'] do |c|
   c.action do |global_options,options,args|
     swroot = File.join(global_options[:"software-root"], global_options[:arch])
     notice "Searching in #{swroot}"
+
+    # Array of full paths to rebuild scripts
     software = Dir.glob(swroot+"/*/*/*/rebuild").sort
+
+    if options[:"auto-complete"]
+      # Format complete options correctly
+      software.collect!{|s| s.gsub(/#{swroot}\/(.*)\/rebuild/, $1)}
+    end
 
     if args.empty?
       puts software
@@ -101,54 +108,19 @@ command ['build','b'] do |c|
   c.switch [:s, 'send-to-stdout']
 
   c.action do |global_options,options,args|
-    #TODO check for .lock file, create and delete after complete
-
-    puts "GLOBAL_OPTIONS"
-    puts global_options
-    puts "OPTIONS"
-    puts options
-    puts "ARGS"
-    puts args
-    exit 1
-
     raise "You must supply a package to build" if args.empty?
 
-    prefix = args.first
-    unless Dir.exist? prefix
-      prefix = File.join(global_options[:"software-root"], global_options[:arch], args.first)
-      unless Dir.exist? prefix
-        raise "Cannot determine which software to build"
+    args.each do |package|
+      p = Package.new(:root => global_options[:"software-root"],
+                      :arch => global_options[:arch],
+                      :path => package)
+
+      if p.valid?
+        p.run_rebuild_script(:disable_logging => options[:"disable-log"],
+                             :build_log_name => options[:"build-log-name"],
+                             :send_to_stdout => options[:"send-to-stdout"])
       end
     end
-
-    ENV['SW_BLDDIR'] = prefix
-
-    rebuild_script = File.join(prefix,"rebuild")
-    raise "Cannot locate rebuild script #{}" unless File.exist? rebuild_script
-
-    unless options[:"disable-log"]
-      if options[:"build-log-name"]
-        log_file_path = File.join(prefix,options[:"build-log-name"])
-        log_file = File.open(log_file_path, 'w')
-      end
-    end
-
-    notice "Building #{prefix}"
-    notice "Logging to #{log_file_path}" unless log_file.nil?
-
-    stdout, stderr = '',''
-    t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
-    while t.status do
-      process_ouput(stdout, stderr, options[:"send-to-stdout"], log_file)
-      sleep 0.25
-    end
-
-    build_exit_status = t.exitstatus
-    process_ouput(stdout, stderr, global_options[:"send-to-stdout"], log_file)
-
-    log_file.close unless log_file.nil?
-
-    notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
   end
 end
 

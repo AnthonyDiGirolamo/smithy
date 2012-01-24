@@ -17,6 +17,7 @@ bin/smith
   s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'smith'
+  s.add_development_dependency('ruby-debug19')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
