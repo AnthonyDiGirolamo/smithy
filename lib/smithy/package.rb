@@ -14,6 +14,9 @@ module Smithy
     end
 
     def valid?
+      if name.nil? || version.nil? || build_name.nil?
+        raise "Package names must be of the form: NAME/VERSION/BUILD"
+      end
       if name.include?('/') || version.include?('/') || build_name.include?('/')
         raise "Package names must be of the form: NAME/VERSION/BUILD"
       end
@@ -35,29 +38,34 @@ module Smithy
       raise "Cannot locate rebuild script #{rebuild_script}" unless File.exist? rebuild_script
       ENV['SW_BLDDIR'] = prefix
 
+      notice "Building #{prefix}"
+
       unless args[:disable_logging]
         if args[:build_log_name]
           log_file_path = File.join(prefix, args[:build_log_name])
-          log_file = File.open(log_file_path, 'w')
+          log_file = File.open(log_file_path, 'w') unless args[:dry_run]
+        end
+        if args[:dry_run] || log_file != nil
+          notice "Logging to #{log_file_path}"
         end
       end
 
-      notice "Building #{prefix}"
-      notice "Logging to #{log_file_path}" unless log_file.nil?
 
-      stdout, stderr = '',''
-      t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
-      while t.status do
+      unless args[:dry_run]
+        stdout, stderr = '',''
+        t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
+        while t.status do
+          process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
+          sleep 0.25
+        end
+
+        build_exit_status = t.exitstatus
         process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
-        sleep 0.25
+
+        log_file.close unless log_file.nil?
+
+        notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
       end
-
-      build_exit_status = t.exitstatus
-      process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
-
-      log_file.close unless log_file.nil?
-
-      notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
     end
   end
 end

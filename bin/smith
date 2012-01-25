@@ -72,20 +72,26 @@ command ['search','s'] do |c|
 
     # Array of full paths to rebuild scripts
     software = Dir.glob(swroot+"/*/*/*/rebuild").sort
+    software.collect!{|s| s.gsub(/\/rebuild$/, '')}
 
     if options[:"auto-complete"]
       # Format complete options correctly
       software.collect!{|s| s.gsub(/#{swroot}\/(.*)\/rebuild/, $1)}
     end
 
+    count = 0
     if args.empty?
       puts software
+      count += software.count
     else
-      software.select! { |s| s =~ /#{args.first}/ }
-      puts software
+      args.each do |a|
+        result = software.select { |s| s =~ /#{a}/ }
+        puts result
+        count += result.count
+      end
     end
 
-    notice "#{software.count} Found"
+    notice "#{count} Found"
   end
 end
 
@@ -104,18 +110,31 @@ command ['build','b'] do |c|
   c.desc 'Send messages from underlying commands (configure, make, etc) to STDOUT.'
   c.switch [:s, 'send-to-stdout']
 
-  c.action do |global_options,options,args|
-    raise "You must supply a package to build" if args.empty?
+  c.desc 'See what packages will be built but without building them'
+  c.switch [:n, 'dry-run']
 
-    args.each do |package|
-      p = Package.new(:root => global_options[:"software-root"],
-                      :arch => global_options[:arch],
-                      :path => package)
+  c.action do |global_options,options,args|
+    if args.empty?
+      notice "Reading package names from STDIN..."
+      packages = STDIN.readlines.map{|p| p.chomp}
+    else
+      packages = args
+    end
+
+    raise "You must supply at least one package to build" if packages.empty?
+
+    packages.each do |package|
+      p = Package.new(
+        :root => global_options[:"software-root"],
+        :arch => global_options[:arch],
+        :path => package)
 
       if p.valid?
-        p.run_rebuild_script(:disable_logging => options[:"disable-log"],
-                             :build_log_name => options[:"build-log-name"],
-                             :send_to_stdout => options[:"send-to-stdout"])
+        p.run_rebuild_script(
+          :disable_logging => options[:"disable-build-log"],
+          :build_log_name  => options[:"build-log-name"],
+          :dry_run         => options[:"dry-run"],
+          :send_to_stdout  => options[:"send-to-stdout"])
       end
     end
   end
