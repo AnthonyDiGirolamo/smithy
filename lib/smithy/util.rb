@@ -31,7 +31,7 @@ module Smithy
     if STDOUT.tty?
       STDOUT.puts "==> "+message.color(:green)
     else
-      STDOUT.puts "==> "+message
+      STDOUT.puts message
     end
   end
 
@@ -39,7 +39,7 @@ module Smithy
     if STDOUT.tty?
       STDOUT.puts "==> "+message.color(:red)
     else
-      STDOUT.puts "==> "+message
+      STDOUT.puts message
     end
   end
 

@@ -26,14 +26,12 @@ include Smithy
 
 version Smithy::VERSION
 @smithy_config_file = 'etc/smithyrc'
-
 # GLI Config file method - Unnecessary
 # config_file File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
 
 program_desc 'Smithy will help you build, test, and distribute software with ease.'
 
 desc "Machine architecure to operate on (default defined in: #{@smithy_bin_root}/#{@smithy_config_file})"
-#desc "Machine architecure to operate on (default: #{@arch})"
 arg_name 'NAME'
 default_value nil
 flag [:arch]
