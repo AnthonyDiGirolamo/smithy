@@ -11,9 +11,10 @@ unless File.respond_to? :realpath
   end
 end
 
+# Add the lib dir to the ruby library search path
 @smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
 $: << File.expand_path(@smithy_bin_root + '/lib')
-#require 'ruby-debug'
+
 require 'rubygems'
 require 'gli'
 require 'English'
@@ -22,38 +23,20 @@ require 'smithy'
 include GLI
 include Smithy
 
-@system_config_file = 'etc/smithyrc'
-
-@hostname = `hostname`.chomp
-
-sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@system_config_file))
-if File.exists? sysconfig_path
-  @sysconfig_hash = YAML.load_file(sysconfig_path)
-end
+@smithy_config_file = 'etc/smithyrc'
 
 version Smithy::VERSION
 
 # GLI Config file method - Unnecessary
-# config_file File.expand_path(File.join(@smithy_bin_root,@system_config_file))
-
-if @hostname =~ /(.*)(\d)+/
-  @machine = $1
-  @arch = @sysconfig_hash[:"hostname-architectures"][@machine]
-  @sysconfig_hash[:arch] = @arch
-else
-  raise "Cannot determine which architecture to build for, please specify using --arch"
-end
+# config_file File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
 
 program_desc 'Smithy will help you build, test, and distribute software with ease.'
 
-desc "Machine architecure to operate on (default: #{@arch})"
+desc "Machine architecure to operate on (default defined in: #{@smithy_bin_root}/#{@smithy_config_file})"
+#desc "Machine architecure to operate on (default: #{@arch})"
 arg_name 'NAME'
 default_value nil
 flag [:arch]
-
-#desc 'Mapping of hostnames to architecure names'
-#arg_name 'STRING'
-#flag ['hostname-architectures']
 
 desc 'The root level directory for software'
 default_value '/sw'
@@ -67,17 +50,15 @@ command ['search','s'] do |c|
   c.switch ['auto-complete']
 
   c.action do |global_options,options,args|
-    swroot = File.join(global_options[:"software-root"], global_options[:arch])
-    notice "Searching in #{swroot}"
+    @software_root = File.join(global_options[:"software-root"], global_options[:arch])
+    notice "Searching in #{@software_root}"
 
     # Array of full paths to rebuild scripts
-    software = Dir.glob(swroot+"/*/*/*/rebuild").sort
+    software = Dir.glob(@software_root+"/*/*/*/rebuild").sort
     software.collect!{|s| s.gsub(/\/rebuild$/, '')}
 
-    if options[:"auto-complete"]
-      # Format complete options correctly
-      software.collect!{|s| s.gsub(/#{swroot}\/(.*)\/rebuild/, $1)}
-    end
+    # Format complete options correctly
+    software.collect!{|s| s.gsub(/#{@software_root}\//, '')} if options[:"auto-complete"]
 
     count = 0
     if args.empty?
@@ -96,8 +77,8 @@ command ['search','s'] do |c|
 end
 
 desc 'Build software'
-long_desc "The software to build may be either the absolute path or simply the name of the software. Version numbers and build names may be appended to the name using the format: NAME/VERSION/BUILD."
-arg_name 'path'
+long_desc "The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD."
+arg_name 'PATH'
 command ['build','b'] do |c|
   c.desc 'Build log file name located within the software prefix.'
   c.arg_name 'FILE'
@@ -177,10 +158,11 @@ pre do |global,command,options,args|
   # puts command_line_hostnames.try(:size)
 
   # If an architecture was not specified, set it based on the mapped value
-  global[:arch] = @arch if global[:arch].nil?
 
-  swroot = File.join(global[:"software-root"], global[:arch])
-  raise "The software-root directory #{swroot} is not valid" unless Dir.exist?(swroot)
+  load_system_config
+  global[:arch] = get_arch(:command_line_arch => global[:arch])
+  @software_root = get_software_root(:root => global[:"software-root"], :arch => global[:arch])
+  puts global
 
   # Pre logic here
   # Return true to proceed; false to abourt and not call the
