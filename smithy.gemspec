@@ -23,4 +23,5 @@ bin/smith
   s.add_development_dependency('aruba')
   s.add_dependency('gli')
   s.add_dependency('open4')
+  s.add_dependency('rainbow')
 end

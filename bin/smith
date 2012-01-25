@@ -19,13 +19,13 @@ require 'rubygems'
 require 'gli'
 require 'English'
 require 'open4'
+require 'rainbow'
 require 'smithy'
 include GLI
 include Smithy
 
-@smithy_config_file = 'etc/smithyrc'
-
 version Smithy::VERSION
+@smithy_config_file = 'etc/smithyrc'
 
 # GLI Config file method - Unnecessary
 # config_file File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
@@ -157,12 +157,10 @@ pre do |global,command,options,args|
   # end
   # puts command_line_hostnames.try(:size)
 
-  # If an architecture was not specified, set it based on the mapped value
-
   load_system_config
-  global[:arch] = get_arch(:command_line_arch => global[:arch])
+  # If an architecture was not specified, set it based on the mapped value
+  global[:arch] = get_arch if global[:arch].nil?
   @software_root = get_software_root(:root => global[:"software-root"], :arch => global[:arch])
-  puts global
 
   # Pre logic here
   # Return true to proceed; false to abourt and not call the

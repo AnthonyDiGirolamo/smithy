@@ -44,12 +44,15 @@ module Smithy
         if args[:build_log_name]
           log_file_path = File.join(prefix, args[:build_log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
+
+          # TODO set permissions based on config file
+          log_file.chmod(log_file.stat.mode | 020)
+          log_file.chown(nil, 1099)
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"
         end
       end
-
 
       unless args[:dry_run]
         stdout, stderr = '',''
@@ -64,7 +67,11 @@ module Smithy
 
         log_file.close unless log_file.nil?
 
-        notice "#{prefix} #{build_exit_status==0 ? "SUCCESS" : "FAILED"}"
+        if build_exit_status == 0
+          notice_success "#{prefix} SUCCESS"
+        else
+          notice_fail "#{prefix} FAILED"
+        end
       end
     end
   end

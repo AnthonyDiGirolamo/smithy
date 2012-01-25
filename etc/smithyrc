@@ -21,3 +21,5 @@
   yona-login: yona
   yona: yona
 :"software-root": /sw
+:"file-group-name": ccsstaff
+:"file-bit-mask": 020
