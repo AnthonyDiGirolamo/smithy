@@ -46,9 +46,8 @@ module Smithy
           log_file_path = File.join(prefix, args[:build_log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
-          # TODO set permissions based on config file
-          log_file.chmod(log_file.stat.mode | 020)
-          log_file.chown(nil, 1099)
+          log_file.chmod(log_file.stat.mode | args[:file_mask])
+          log_file.chown(nil, args[:file_group])
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"

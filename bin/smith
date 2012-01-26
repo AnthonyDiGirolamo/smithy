@@ -127,7 +127,9 @@ command ['build','b'] do |c|
           :disable_logging => options[:"disable-build-log"],
           :build_log_name  => options[:"build-log-name"],
           :dry_run         => options[:"dry-run"],
-          :send_to_stdout  => options[:"send-to-stdout"])
+          :send_to_stdout  => options[:"send-to-stdout"],
+          :file_group      => global_options[:"file-group-id"],
+          :file_mask       => global_options[:"file-bit-mask"])
       end
     end
   end
