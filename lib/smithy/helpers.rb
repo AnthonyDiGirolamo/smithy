@@ -56,13 +56,25 @@ module Smithy
     end
   end
 
-  def load_system_config
+  def load_system_config(global = {})
     sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
+		options = {}
+
     if File.exists? sysconfig_path
       @smithy_config_hash = YAML.load_file(sysconfig_path)
+
+			options[:"file-group-name"] = @smithy_config_hash.try(:[], :"file-group-name")
+			options[:"file-bit-mask"]   = @smithy_config_hash.try(:[], :"file-bit-mask")
+
+			options[:arch] = get_arch
+			options[:full_software_root_path] = get_software_root(
+				:root => global[:"software-root"],
+				:arch => options[:arch])
     else
       STDERR.puts "warning: Cannot read config file: #{sysconfig_path}"
     end
+
+		return options
   end
 
   def get_arch
@@ -78,7 +90,7 @@ module Smithy
 
   def get_software_root(args = {})
     if args[:root].blank? || args[:arch].blank?
-      raise """Cannot determine which architecture to build for.
+      raise """Cannot determine which architecture we are using.
        Please specify using --arch or add a '#{@hostname}' hostname entry to:
        #{@smithy_bin_root}/#{@smithy_config_file}"""
     end

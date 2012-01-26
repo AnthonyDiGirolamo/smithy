@@ -8,6 +8,6 @@ _smith_completion() {
 compctl -K _smith_completion bundle exec smith
 
 _smith_search_completion() {
-  reply=(`bundle exec smith search --auto-complete $@`)
+  reply=(`bundle exec smith search --format=name $@`)
 }
 compctl -K _smith_search_completion bundle exec smith search

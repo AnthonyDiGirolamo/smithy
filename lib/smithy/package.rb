@@ -6,7 +6,7 @@ module Smithy
       @root   = args[:root]
       @arch   = args[:arch]
       # Remove root and arch from the path if necessary
-      path = args[:path].gsub(/#{root}\/?/,'').gsub(/\/?#{arch}\/?/,'').gsub(/\/rebuild$/,'')
+      path = args[:path].gsub(/\/?#{root}\/?/,'').gsub(/\/?#{arch}\/?/,'').gsub(/\/rebuild$/,'')
       path =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
       @version = $2
@@ -14,6 +14,7 @@ module Smithy
     end
 
     def valid?
+      # Name format validation
       if name.nil? || version.nil? || build_name.nil?
         raise "Package names must be of the form: NAME/VERSION/BUILD"
       end

@@ -1,5 +1,3 @@
-require 'terminal-table'
-
 module Smithy
   module Format
     class Table

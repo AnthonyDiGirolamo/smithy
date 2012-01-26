@@ -21,6 +21,8 @@ require 'English'
 require 'open4'
 require 'rainbow'
 require 'smithy'
+require 'terminal-table'
+
 include GLI
 include Smithy
 
@@ -61,23 +63,22 @@ command ['search','s'] do |c|
   c.action do |global_options,options,args|
     formatter = output_formats[options[:format]]
 
-    @software_root = File.join(global_options[:"software-root"], global_options[:arch])
-    notice "Searching in #{@software_root}"
+    notice "Searching in #{global_options[:full_software_root_path]}"
 
     # Array of full paths to rebuild scripts
-    software = Dir.glob(@software_root+"/*/*/*/rebuild").sort
+    software = Dir.glob(global_options[:full_software_root_path]+"/*/*/*/rebuild").sort
     software.collect!{|s| s.gsub(/\/rebuild$/, '')}
     software.sort!
 
     count = 0
     formatter.before
     if args.empty?
-      formatter.format(software, @software_root)
+      formatter.format(software, global_options[:full_software_root_path])
       count += software.count
     else
       args.each do |a|
         result = software.select { |s| s =~ /#{a}/ }
-        formatter.format(result, @software_root)
+        formatter.format(result, global_options[:full_software_root_path])
         count += result.count
       end
     end
@@ -132,23 +133,34 @@ command ['build','b'] do |c|
   end
 end
 
-#desc 'Describe create here'
-#arg_name 'Describe arguments to create here'
-#command :create do |c|
-  #c.desc 'Describe a switch to create'
-  #c.switch :s
+desc 'Generate a new package and all necessary files'
+# long_desc """The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+#
+# NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+#
+# VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
+#
+# BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
+#
+# EXAMPLES:
+#
+# silo/4.8/sles11.1_gnu4.5.3
+# fftw/3.2.2/cle4.0_pgi11.10.0"""
+arg_name 'NAME'
+command :new do |c|
+  c.action do |global_options,options,args|
+    raise "You must supply a name to create new packages" if args.empty?
 
-  #c.desc 'Describe a flag to create'
-  #c.default_value 'default'
-  #c.flag :f
-  #c.action do |global_options,options,args|
+    p = Package.new(
+      :root => global_options[:"software-root"],
+      :arch => global_options[:arch],
+      :path => args.first)
 
-    ## Your command logic here
-
-    ## If you have any errors, just raise them
-    ## raise "that command made no sense"
-  #end
-#end
+    if p.valid?
+      p.create
+    end
+  end
+end
 
 #desc 'Describe copy here'
 #arg_name 'Describe arguments to copy here'
@@ -168,10 +180,7 @@ pre do |global,command,options,args|
   # end
   # puts command_line_hostnames.try(:size)
 
-  load_system_config
-  # If an architecture was not specified, set it based on the mapped value
-  global[:arch] = get_arch if global[:arch].nil?
-  @software_root = get_software_root(:root => global[:"software-root"], :arch => global[:arch])
+  global.merge! load_system_config(global)
 
   if global[:'no-color']
     Sickill::Rainbow.enabled = false
