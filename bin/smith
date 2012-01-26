@@ -172,17 +172,15 @@ end
 #end
 
 pre do |global,command,options,args|
-  # Parse a hostname-architectures string on the command line - unnecessary
-  # if global[:"hostname-architectures"].class == String
-  #   command_line_hostnames = {}
-  #   global[:"hostname-architectures"].split(',').each do |entry|
-  #     machine_arch = entry.split(':')
-  #     command_line_hostnames.merge! Hash[*machine_arch] if machine_arch.count==2
-  #   end
-  # end
-  # puts command_line_hostnames.try(:size)
-
-  global.merge! load_system_config(global)
+  # Load and merge the system config values with command line values
+  # If an option is on the command line it is used instead
+  global.merge! load_system_config(global) do |key, values_command_line, values_config|
+    if values_command_line.nil?
+      values_config
+    else
+      values_command_line
+    end
+  end
 
   if global[:'no-color']
     Sickill::Rainbow.enabled = false
