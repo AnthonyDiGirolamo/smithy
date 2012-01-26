@@ -24,4 +24,5 @@ bin/smith
   s.add_dependency('gli')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
+  s.add_dependency('terminal-table')
 end

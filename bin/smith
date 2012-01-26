@@ -41,34 +41,47 @@ default_value '/sw'
 arg_name 'PATH'
 flag ['software-root']
 
+desc "Don't use colors"
+switch 'no-color'
+
 desc 'Search currently installed software'
 arg_name 'name'
 command ['search','s'] do |c|
-  c.desc 'Turn autocomplete output on'
-  c.switch ['auto-complete']
+  output_formats = {
+    'path'  => Smithy::Format::Path.new,
+    'name'  => Smithy::Format::Name.new,
+    'table' => Smithy::Format::Table.new,
+    'csv'   => Smithy::Format::CSV.new
+  }
+  c.desc 'Format of the output'
+  c.arg_name output_formats.keys.join('|')
+  c.default_value output_formats.keys.first
+  c.flag :format
 
   c.action do |global_options,options,args|
+    formatter = output_formats[options[:format]]
+
     @software_root = File.join(global_options[:"software-root"], global_options[:arch])
     notice "Searching in #{@software_root}"
 
     # Array of full paths to rebuild scripts
     software = Dir.glob(@software_root+"/*/*/*/rebuild").sort
     software.collect!{|s| s.gsub(/\/rebuild$/, '')}
-
-    # Format complete options correctly
-    software.collect!{|s| s.gsub(/#{@software_root}\//, '')} if options[:"auto-complete"]
+    software.sort!
 
     count = 0
+    formatter.before
     if args.empty?
-      puts software
+      formatter.format(software, @software_root)
       count += software.count
     else
       args.each do |a|
         result = software.select { |s| s =~ /#{a}/ }
-        puts result
+        formatter.format(result, @software_root)
         count += result.count
       end
     end
+    formatter.after
 
     notice "#{count} Found"
   end
@@ -159,6 +172,10 @@ pre do |global,command,options,args|
   # If an architecture was not specified, set it based on the mapped value
   global[:arch] = get_arch if global[:arch].nil?
   @software_root = get_software_root(:root => global[:"software-root"], :arch => global[:arch])
+
+  if global[:'no-color']
+    Sickill::Rainbow.enabled = false
+  end
 
   # Pre logic here
   # Return true to proceed; false to abourt and not call the
