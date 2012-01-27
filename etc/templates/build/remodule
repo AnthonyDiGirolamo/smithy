@@ -1,0 +1,5 @@
+module unload PrgEnv-gnu
+module unload PrgEnv-pgi
+module unload PrgEnv-cray
+module unload PrgEnv-intel
+module unload PrgEnv-pathscale

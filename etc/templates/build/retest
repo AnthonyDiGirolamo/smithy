@@ -1,0 +1,8 @@
+#!/bin/bash
+source ${MODULESHOME}/init/bash
+source $SW_BLDDIR/remodule
+
+if ./bin/git --version
+  then echo "==> TEST SUCCESS"
+  else echo "==> TEST FAILED" && exit 1
+fi

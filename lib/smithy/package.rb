@@ -28,6 +28,10 @@ module Smithy
       File.join(@root, @arch, @name, @version, @build_name)
     end
 
+    def software_root
+      File.join(@root, @arch)
+    end
+
     def prefix_exists?
       Dir.exist? prefix
     end
@@ -37,6 +41,7 @@ module Smithy
 
       rebuild_script = File.join(prefix,"rebuild")
       raise "Cannot locate rebuild script #{rebuild_script}" unless File.exist? rebuild_script
+      ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
 
       notice "Building #{prefix}"
@@ -72,6 +77,38 @@ module Smithy
         else
           notice_fail "#{prefix} FAILED"
         end
+      end
+    end
+
+    def create(args = {})
+      directories = [
+        File.join(software_root, name),
+        File.join(software_root, name, version),
+        File.join(software_root, name, version, build_name) ]
+
+      package_files = %w{.exceptions description support versions}
+      package_files.collect! do |f|
+        { :src  => File.join(args[:smithy_root], "etc/templates/package", f),
+          :dest => File.join(directories.first, f) }
+      end
+
+      build_files = %w{build-notes dependencies rebuild relink remodule retest}
+      build_files.collect! do |f|
+        { :src  => File.join(args[:smithy_root], "etc/templates/build", f),
+          :dest => File.join(directories.last, f) }
+      end
+
+      options = {:noop => false, :verbose => false}
+      options[:noop] = true if args[:dry_run]
+
+      directories.each do |d|
+        make_directory d, options
+        set_permissions d, args[:file_group], args[:file_mask], options
+      end
+
+      (package_files+build_files).each do |f|
+        install_file f[:src], f[:dest], options
+        set_permissions f[:dest], args[:file_group], args[:file_mask], options
       end
     end
   end

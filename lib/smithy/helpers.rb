@@ -101,4 +101,31 @@ module Smithy
     raise "The software-root directory '#{swroot}' is not valid" unless Dir.exist?(swroot)
     return swroot
   end
+
+	def set_permissions(f, group, mask, options = {})
+		FileUtils.chmod File.stat(f).mode | mask, f, options
+		FileUtils.chown nil, group, f, options
+	end
+
+	def make_directory(d, options = {})
+		if File.directory?(d)
+			puts "exist ".rjust(12).bright + d
+		else
+			FileUtils.mkdir d, options
+			puts "create ".rjust(12).bright + d
+		end
+	end
+
+	def install_file(source, dest, options = {})
+		if File.exists?(dest)
+			if FileUtils.identical?(source, dest)
+				puts "identical ".rjust(12).bright + dest
+			else
+				puts "conflict ".rjust(12).color(:red) + dest
+			end
+		else
+			FileUtils.install source, dest, options
+			puts "create ".rjust(12).bright + dest
+		end
+	end
 end

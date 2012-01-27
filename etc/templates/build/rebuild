@@ -1,0 +1,28 @@
+#!/bin/bash
+source ${MODULESHOME}/init/bash
+source $SW_BLDDIR/remodule
+
+# clean out old install
+rm -rf bin doc etc include info lib lib64 libexec man share
+
+export SRCDIR=path_to_source_folder
+cd $SRCDIR
+
+make clean
+
+if ./configure --prefix=$SW_BLDDIR
+  then echo "==> CONFIGURE SUCCESS"
+  else echo "==> CONFIGURE FAILED" && exit 1
+fi
+
+if make
+  then echo "==> MAKE SUCCESS"
+  else echo "==> MAKE FAILED" && exit 1
+fi
+
+if make install
+  then echo "==> INSTALL SUCCESS"
+  else echo "==> INSTALL FAILED" && exit 1
+fi
+
+exit 0

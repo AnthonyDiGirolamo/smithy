@@ -101,10 +101,10 @@ command ['build','b'] do |c|
   c.switch ["disable-build-log"]
 
   c.desc 'Send messages from underlying commands (configure, make, etc) to STDOUT.'
-  c.switch [:s, 'send-to-stdout']
+  c.switch [:s, "send-to-stdout"]
 
   c.desc 'See what packages will be built but without building them'
-  c.switch [:n, 'dry-run']
+  c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
     if args.empty?
@@ -150,6 +150,12 @@ desc 'Generate a new package and all necessary files'
 # fftw/3.2.2/cle4.0_pgi11.10.0"""
 arg_name 'NAME'
 command :new do |c|
+  c.desc "See what files will be created when running new without creating them."
+  c.switch [:n, "dry-run"]
+  c.desc "Provide a source tarball to unpack (optional)"
+  c.arg_name "FILE"
+  c.flag [:t, :tarball]
+
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
@@ -159,7 +165,11 @@ command :new do |c|
       :path => args.first)
 
     if p.valid?
-      p.create
+      p.create(
+        :dry_run     => options[:"dry-run"],
+        :smithy_root => @smithy_bin_root,
+        :file_group  => global_options[:"file-group-name"],
+        :file_mask   => global_options[:"file-bit-mask"])
     end
   end
 end
