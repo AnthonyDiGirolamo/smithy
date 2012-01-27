@@ -58,25 +58,25 @@ module Smithy
 
   def load_system_config(global = {})
     sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
-		options = {}
+    options = {}
 
     if File.exists? sysconfig_path
       @smithy_config_hash = YAML.load_file(sysconfig_path)
 
-			options[:"software-root"]   = @smithy_config_hash.try(:[], :"software-root")
-			options[:"file-bit-mask"]   = @smithy_config_hash.try(:[], :"file-bit-mask")
-			options[:"file-group-name"] = @smithy_config_hash.try(:[], :"file-group-name")
-			options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)
+      options[:"software-root"]   = @smithy_config_hash.try(:[], :"software-root")
+      options[:"file-bit-mask"]   = @smithy_config_hash.try(:[], :"file-bit-mask")
+      options[:"file-group-name"] = @smithy_config_hash.try(:[], :"file-group-name")
+      options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)
 
-			options[:arch] = get_arch
-			options[:full_software_root_path] = get_software_root(
-				:root => global[:"software-root"],
-				:arch => options[:arch])
+      options[:arch] = get_arch
+      options[:full_software_root_path] = get_software_root(
+        :root => global[:"software-root"],
+        :arch => options[:arch])
     else
       STDERR.puts "warning: Cannot read config file: #{sysconfig_path}"
     end
 
-		return options
+    return options
   end
 
   def get_arch
@@ -102,30 +102,59 @@ module Smithy
     return swroot
   end
 
-	def set_permissions(f, group, mask, options = {})
-		FileUtils.chmod File.stat(f).mode | mask, f, options
-		FileUtils.chown nil, group, f, options
-	end
+  def set_permissions(f, group, mask, options = {})
+    FileUtils.chmod File.stat(f).mode | mask, f, options
+    FileUtils.chown nil, group, f, options
+  end
 
-	def make_directory(d, options = {})
-		if File.directory?(d)
-			puts "exist ".rjust(12).bright + d
-		else
-			FileUtils.mkdir d, options
-			puts "create ".rjust(12).bright + d
-		end
-	end
+  def make_directory(d, options = {})
+    if File.directory?(d)
+      puts "exist ".rjust(12).bright + d
+    else
+      FileUtils.mkdir d, options
+      puts "create ".rjust(12).bright + d
+    end
+  end
 
-	def install_file(source, dest, options = {})
-		if File.exists?(dest)
-			if FileUtils.identical?(source, dest)
-				puts "identical ".rjust(12).bright + dest
-			else
-				puts "conflict ".rjust(12).color(:red) + dest
-			end
-		else
-			FileUtils.install source, dest, options
-			puts "create ".rjust(12).bright + dest
-		end
-	end
+  def install_file(source, dest, options = {})
+    if File.exists?(dest)
+      if FileUtils.identical?(source, dest)
+        puts "identical ".rjust(12).bright + dest
+      else
+        puts "conflict ".rjust(12).color(:red) + dest
+        overwrite = nil
+        while overwrite.nil? do
+          prompt = Readline.readline("Overwrite #{dest}? (enter \"h\" for help) [ynqdh] ")
+          case prompt.downcase
+          when "y"
+            overwrite = true
+          when "n"
+            overwrite = false
+          when "d"
+            puts `diff -w #{source} #{dest}`
+          when "h"
+            puts %{Y - yes, overwrite
+n - no, do not overwrite
+q - quit, abort
+d - diff, show the differences between the old and the new
+h - help, show this help}
+          when "q"
+            raise "Abort new package"
+          #else
+            #overwrite = true
+          end
+        end
+
+        if overwrite == true
+          puts "force ".rjust(12).bright + dest
+          FileUtils.install source, dest, options
+        else
+          puts "skip ".rjust(12).bright + dest
+        end
+      end
+    else
+      FileUtils.install source, dest, options
+      puts "create ".rjust(12).bright + dest
+    end
+  end
 end

@@ -20,8 +20,9 @@ require 'gli'
 require 'English'
 require 'open4'
 require 'rainbow'
-require 'smithy'
+require 'readline'
 require 'terminal-table'
+require 'smithy'
 
 include GLI
 include Smithy
@@ -135,7 +136,7 @@ command ['build','b'] do |c|
   end
 end
 
-desc 'Generate a new package and all necessary files'
+desc 'Generate a new software build and all necessary files'
 # long_desc """The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
 #
 # NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
@@ -150,7 +151,7 @@ desc 'Generate a new package and all necessary files'
 # fftw/3.2.2/cle4.0_pgi11.10.0"""
 arg_name 'NAME'
 command :new do |c|
-  c.desc "See what files will be created when running new without creating them."
+  c.desc "See what files will be created when running new without creating them"
   c.switch [:n, "dry-run"]
   c.desc "Provide a source tarball to unpack (optional)"
   c.arg_name "FILE"
@@ -173,13 +174,6 @@ command :new do |c|
     end
   end
 end
-
-#desc 'Describe copy here'
-#arg_name 'Describe arguments to copy here'
-#command :copy do |c|
-  #c.action do |global_options,options,args|
-  #end
-#end
 
 pre do |global,command,options,args|
   # Load and merge the system config values with command line values

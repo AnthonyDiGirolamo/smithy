@@ -81,6 +81,8 @@ module Smithy
     end
 
     def create(args = {})
+      notice "New #{prefix}"
+
       directories = [
         File.join(software_root, name),
         File.join(software_root, name, version),
