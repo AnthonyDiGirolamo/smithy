@@ -36,7 +36,6 @@ program_desc 'Smithy will help you build, test, and distribute software with eas
 
 desc "Machine architecure to operate on (default defined in: #{@smithy_bin_root}/#{@smithy_config_file})"
 arg_name 'NAME'
-default_value nil
 flag [:arch]
 
 desc 'The root level directory for software'
@@ -60,6 +59,12 @@ command ['search','s'] do |c|
   c.arg_name output_formats.keys.join('|')
   c.default_value output_formats.keys.first
   c.flag :format
+
+  #sorting = %w{name date user}
+  #c.desc 'Field to sort in ascending order'
+  #c.arg_name sorting.join('|')
+  #c.default_value sorting.first
+  #c.flag :sort
 
   c.action do |global_options,options,args|
     formatter = output_formats[options[:format]]
@@ -151,12 +156,13 @@ desc 'Generate a new software build and all necessary files'
 # fftw/3.2.2/cle4.0_pgi11.10.0"""
 arg_name 'NAME'
 command :new do |c|
+  c.desc "Create description file for website"
+  c.switch ["web-description"]
   c.desc "See what files will be created when running new without creating them"
   c.switch [:n, "dry-run"]
   c.desc "Provide a source tarball to unpack (optional)"
   c.arg_name "FILE"
   c.flag [:t, :tarball]
-
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
@@ -167,6 +173,7 @@ command :new do |c|
 
     if p.valid?
       p.create(
+        :web         => options[:"web-description"],
         :dry_run     => options[:"dry-run"],
         :smithy_root => @smithy_bin_root,
         :file_group  => global_options[:"file-group-name"],

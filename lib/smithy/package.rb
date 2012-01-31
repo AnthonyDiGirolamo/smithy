@@ -105,12 +105,20 @@ module Smithy
 
       directories.each do |d|
         make_directory d, options
-        set_permissions d, args[:file_group], args[:file_mask], options
+        make_group_writable d, args[:file_group], args[:file_mask], options
       end
 
-      (package_files+build_files).each do |f|
+      if args[:web]
+        all_files = package_files+build_files
+      else
+        all_files = build_files
+      end
+
+      all_files.each do |f|
         install_file f[:src], f[:dest], options
-        set_permissions f[:dest], args[:file_group], args[:file_mask], options
+        make_group_writable f[:dest], args[:file_group], args[:file_mask], options
+
+        make_executable f[:dest] if f[:dest] =~ /(rebuild|relink|retest)/
       end
     end
   end

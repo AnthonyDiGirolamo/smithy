@@ -102,7 +102,12 @@ module Smithy
     return swroot
   end
 
-  def set_permissions(f, group, mask, options = {})
+  def make_executable(f, options = {})
+    p = File.stat(f).mode | 0111
+    FileUtils.chmod p, f, options
+  end
+
+  def make_group_writable(f, group, mask, options = {})
     FileUtils.chmod File.stat(f).mode | mask, f, options
     FileUtils.chown nil, group, f, options
   end
