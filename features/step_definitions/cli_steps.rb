@@ -1,3 +1,7 @@
+Given /^my hostname is "([^"]*)"$/ do |hostname|
+    ENV['HOSTNAME'] = hostname
+end
+
 Given /^an empty software root in "([^"]*)"$/ do |swroot|
   FileUtils.mkdir(swroot) unless File.directory?(swroot)
   @swroot = swroot

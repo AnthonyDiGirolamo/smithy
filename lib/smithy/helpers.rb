@@ -85,7 +85,7 @@ module Smithy
   end
 
   def get_arch
-    @hostname = `hostname`.chomp
+    @hostname = ENV['HOSTNAME'] || `hostname`.chomp
     if @hostname =~ /(\D*)(\d*)/
       machine = $1
       arch = @smithy_config_hash.try(:[], :"hostname-architectures").try(:[], machine)
