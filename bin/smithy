@@ -34,7 +34,7 @@ version Smithy::VERSION
 
 program_desc 'Smithy will help you build, test, and distribute software with ease.'
 
-desc "Machine architecure to operate on (default defined in: #{@smithy_bin_root}/#{@smithy_config_file})"
+desc "Machine architecure to operate on, default can be defined in the config file"
 arg_name 'NAME'
 flag [:arch]
 
@@ -45,6 +45,10 @@ flag ['software-root']
 
 desc "Don't use colors"
 switch 'no-color'
+
+desc "Alternate config file (default: #{File.join(@smithy_bin_root,@smithy_config_file)})"
+arg_name 'FILE'
+flag [:"config-file"]
 
 desc 'Search currently installed software'
 arg_name 'name'

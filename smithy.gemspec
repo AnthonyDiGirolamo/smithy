@@ -9,14 +9,14 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.summary = %q{Smithy can help maintain a collection of software installed from source. Typically, many different versions built with different compilers.}
   s.files = %w(
-bin/smith
+bin/smithy
   )
   s.require_paths << 'lib'
   s.has_rdoc = true
   s.extra_rdoc_files = ['README.rdoc','smithy.rdoc']
   s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
   s.bindir = 'bin'
-  s.executables << 'smith'
+  s.executables << 'smithy'
   s.add_development_dependency('ruby-debug19')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')

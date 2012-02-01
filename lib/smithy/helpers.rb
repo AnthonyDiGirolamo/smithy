@@ -57,7 +57,12 @@ module Smithy
   end
 
   def load_system_config(global = {})
-    sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
+    if global[:"config-file"]
+      sysconfig_path = File.expand_path(global[:"config-file"])
+    else
+      sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
+    end
+
     options = {}
 
     if File.exists? sysconfig_path
@@ -68,7 +73,7 @@ module Smithy
       options[:"file-group-name"] = @smithy_config_hash.try(:[], :"file-group-name")
       options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)
 
-      options[:arch] = get_arch
+      options[:arch] = global[:arch] || get_arch
       options[:full_software_root_path] = get_software_root(
         :root => global[:"software-root"],
         :arch => options[:arch])

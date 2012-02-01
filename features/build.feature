@@ -1,6 +1,4 @@
-Feature: Build software using an existing rebuild script
-  As a busy software specialist
-  I want to easily rebuild software
+#Feature: Build software using an existing rebuild script
 
 #  Background:
 #    Given my terminal size is "80x24"
