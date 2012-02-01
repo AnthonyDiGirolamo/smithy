@@ -80,6 +80,66 @@ module Smithy
       end
     end
 
+    def extract(args = {})
+      archive = args[:archive]
+      unless File.exists? archive
+        raise "The archive #{archive} does not exist"
+      end
+
+      temp_dir = File.join(prefix,"tmp")
+      source_dir = File.join(prefix,"source")
+      FileUtils.rm_rf temp_dir
+      FileUtils.rm_rf source_dir
+      FileUtils.mkdir temp_dir
+      FileUtils.cd temp_dir
+
+      notice "Extracting #{archive} to #{source_dir}"
+
+      magic_bytes = ''
+      File.open(archive) { |f| magic_bytes = f.read(4) }
+      case magic_bytes
+      when /^PK\003\004/ # .zip archive
+        `unzip #{tarfile}`
+      when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
+        `tar xf #{archive}`
+      end
+
+      extracted_files = Dir.glob('*')
+      if extracted_files.count == 1
+        FileUtils.mv extracted_files.first, source_dir
+      else
+        FileUtils.cd prefix
+        FileUtils.mv temp_dir, source_dir
+      end
+
+      FileUtils.rm_rf temp_dir
+
+      #if @tarball_path.extname == '.jar'
+        #magic_bytes = nil
+      #elsif @tarball_path.extname == '.pkg'
+        ## Use more than 4 characters to not clash with magicbytes
+        #magic_bytes = "____pkg"
+      #else
+        ## get the first four bytes
+        #File.open(@tarball_path) { |f| magic_bytes = f.read(4) }
+      #end
+
+      ## magic numbers stolen from /usr/share/file/magic/
+      #case magic_bytes
+      #when /^PK\003\004/ # .zip archive
+        #quiet_safe_system SystemCommand.unzip, {:quiet_flag => '-qq'}, @tarball_path
+        #chdir
+      #when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
+        ## TODO check if it's really a tar archive
+        #safe_system SystemCommand.tar, 'xf', @tarball_path
+        #chdir
+      #when '____pkg'
+        #safe_system SystemCommand.pkgutil, '--expand', @tarball_path, File.basename(@url)
+        #chdir
+      #when 'Rar!'
+        #quiet_safe_system 'unrar', 'x', {:quiet_flag => '-inul'}, @tarball_path
+    end
+
     def create(args = {})
       notice "New #{prefix}"
 

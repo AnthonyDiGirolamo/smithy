@@ -189,6 +189,10 @@ command :new do |c|
         :file_group    => global_options[:"file-group-name"],
         :file_mask     => global_options[:"file-bit-mask"],
         :disable_group => global_options[:"disable-group-writable"])
+      if options[:tarball]
+        p.extract :archive => options[:tarball]
+      end
+
     end
   end
 end

@@ -2,11 +2,7 @@
 source ${MODULESHOME}/init/bash
 source $SW_BLDDIR/remodule
 
-# clean out old install
-rm -rf bin doc etc include info lib lib64 libexec man share
-
-export SRCDIR=path_to_source_folder
-cd $SRCDIR
+cd $SW_BLDDIR/source
 
 make clean
 
