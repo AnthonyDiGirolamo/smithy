@@ -72,6 +72,7 @@ module Smithy
 
         log_file.close unless log_file.nil?
 
+        #TODO set permissions
         if build_exit_status == 0
           notice_success "#{prefix} SUCCESS"
         else
@@ -114,30 +115,7 @@ module Smithy
 
       FileUtils.rm_rf temp_dir
 
-      #if @tarball_path.extname == '.jar'
-        #magic_bytes = nil
-      #elsif @tarball_path.extname == '.pkg'
-        ## Use more than 4 characters to not clash with magicbytes
-        #magic_bytes = "____pkg"
-      #else
-        ## get the first four bytes
-        #File.open(@tarball_path) { |f| magic_bytes = f.read(4) }
-      #end
-
-      ## magic numbers stolen from /usr/share/file/magic/
-      #case magic_bytes
-      #when /^PK\003\004/ # .zip archive
-        #quiet_safe_system SystemCommand.unzip, {:quiet_flag => '-qq'}, @tarball_path
-        #chdir
-      #when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
-        ## TODO check if it's really a tar archive
-        #safe_system SystemCommand.tar, 'xf', @tarball_path
-        #chdir
-      #when '____pkg'
-        #safe_system SystemCommand.pkgutil, '--expand', @tarball_path, File.basename(@url)
-        #chdir
-      #when 'Rar!'
-        #quiet_safe_system 'unrar', 'x', {:quiet_flag => '-inul'}, @tarball_path
+      #TODO set permissions on source dir
     end
 
     def create(args = {})
