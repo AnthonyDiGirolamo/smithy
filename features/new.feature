@@ -13,13 +13,19 @@ Feature: Add new software builds
         awesome_sauce: x86
       """
 
-  Scenario: Add a new software build
-    When I successfully run `smithy new --web-description git/1.6/sles11.1_gnu4.3.4`
-    Then a directory named "/tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4" should exist
-    And the stdout should contain "/tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4"
-    And a file named "/tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4/rebuild" should exist
-    And a file named "/tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4/remodule" should exist
-    And a file named "/tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4/retest" should exist
-    When I successfully run `diff -q /tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4/rebuild ../../etc/templates/build/rebuild`
-    Then the stdout should not contain "Files /tmp/swsmithy/x86/git/1.6/sles11.1_gnu4.3.4/rebuild and etc/templates/build/retest differ"
+  Scenario: Add a new software build without web metadata
+    When I successfully run `smithy new git/1.6/build2`
+    Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build2"
+    And a file named "/tmp/swsmithy/x86/git/description" should not exist
+
+  Scenario: Add a new software build with web metadata
+    When I successfully run `smithy new --web-description git/1.6/build1`
+    Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build1"
+    And a directory named "/tmp/swsmithy/x86/git/1.6/build1" should exist
+    And a file named "/tmp/swsmithy/x86/git/description" should exist
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should exist
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/remodule" should exist
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/retest" should exist
+    When I successfully run `diff -q /tmp/swsmithy/x86/git/1.6/build1/rebuild ../../etc/templates/build/rebuild`
+    Then the stdout should not contain "Files /tmp/swsmithy/x86/git/1.6/build1/rebuild and etc/templates/build/retest differ"
 
