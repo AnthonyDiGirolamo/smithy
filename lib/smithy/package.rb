@@ -51,8 +51,8 @@ module Smithy
           log_file_path = File.join(prefix, args[:build_log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
-          log_file.chmod(log_file.stat.mode | args[:file_mask])
-          log_file.chown(nil, args[:file_group])
+          set_group(log_file, args[:file_group])
+          make_group_writable(log_file, args[:file_mask]) unless args[:disable_group]
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"
@@ -105,7 +105,8 @@ module Smithy
 
       directories.each do |d|
         make_directory d, options
-        make_group_writable d, args[:file_group], args[:file_mask], options
+        set_group d, args[:file_group], options
+        make_group_writable d, args[:file_mask], options unless args[:disable_group]
       end
 
       if args[:web]
@@ -116,7 +117,8 @@ module Smithy
 
       all_files.each do |f|
         install_file f[:src], f[:dest], options
-        make_group_writable f[:dest], args[:file_group], args[:file_mask], options
+        set_group f[:dest], args[:file_group], options
+        make_group_writable f[:dest], args[:file_mask], options unless args[:disable_group]
 
         make_executable f[:dest] if f[:dest] =~ /(rebuild|relink|retest)/
       end

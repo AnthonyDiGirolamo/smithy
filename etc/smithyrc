@@ -1,5 +1,7 @@
 ---
-:"hostname-architectures":
+software-root: /sw
+file-group-name: ccsstaff
+hostname-architectures:
   arthur-login: xk6
   chester-login: xk6
   eugene: bgp
@@ -20,6 +22,3 @@
   smokylogin: smoky
   yona-login: yona
   yona: yona
-:"software-root": /sw
-:"file-group-name": ccsstaff
-:"file-bit-mask": 020

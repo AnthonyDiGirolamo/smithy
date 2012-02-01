@@ -28,25 +28,30 @@ include GLI
 include Smithy
 
 version Smithy::VERSION
-@smithy_config_file = 'etc/smithyrc'
-# GLI Config file method - Unnecessary
-# config_file File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
+@smithy_config_file = File.join(@smithy_bin_root,"etc/smithyrc")
 
 program_desc 'Smithy will help you build, test, and distribute software with ease.'
 
-desc "Machine architecure to operate on, default can be defined in the config file"
+desc "Machine architecure to operate on"
 arg_name 'NAME'
 flag [:arch]
 
+desc "Group name for files created by smithy"
+default_value "ccsstaff"
+arg_name "GROUP"
+flag ["file-group-name"]
+
+desc "Disable group writable file creation"
+switch ["disable-group-writable"]
+
 desc 'The root level directory for software'
-default_value '/sw'
 arg_name 'PATH'
 flag ['software-root']
 
 desc "Don't use colors"
 switch 'no-color'
 
-desc "Alternate config file (default: #{File.join(@smithy_bin_root,@smithy_config_file)})"
+desc "Alternate config file (default: #{@smithy_config_file})"
 arg_name 'FILE'
 flag [:"config-file"]
 
@@ -139,7 +144,8 @@ command ['build','b'] do |c|
           :dry_run         => options[:"dry-run"],
           :send_to_stdout  => options[:"send-to-stdout"],
           :file_group      => global_options[:"file-group-id"],
-          :file_mask       => global_options[:"file-bit-mask"])
+          :file_mask       => global_options[:"file-bit-mask"],
+          :disable_group => global_options[:"disable-group-writable"])
       end
     end
   end
@@ -177,11 +183,12 @@ command :new do |c|
 
     if p.valid?
       p.create(
-        :web         => options[:"web-description"],
-        :dry_run     => options[:"dry-run"],
-        :smithy_root => @smithy_bin_root,
-        :file_group  => global_options[:"file-group-name"],
-        :file_mask   => global_options[:"file-bit-mask"])
+        :web           => options[:"web-description"],
+        :dry_run       => options[:"dry-run"],
+        :smithy_root   => @smithy_bin_root,
+        :file_group    => global_options[:"file-group-name"],
+        :file_mask     => global_options[:"file-bit-mask"],
+        :disable_group => global_options[:"disable-group-writable"])
     end
   end
 end
@@ -197,9 +204,9 @@ pre do |global,command,options,args|
     end
   end
 
-  if global[:'no-color']
-    Sickill::Rainbow.enabled = false
-  end
+  global[:"file-bit-mask"] = 020 unless global[:"disable-group-writable"]
+
+  Sickill::Rainbow.enabled = false if global[:"no-color"]
 
   # Pre logic here
   # Return true to proceed; false to abourt and not call the

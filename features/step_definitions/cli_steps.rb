@@ -2,12 +2,12 @@ Given /^my hostname is "([^"]*)"$/ do |hostname|
     ENV['HOSTNAME'] = hostname
 end
 
-Given /^an empty software root in "([^"]*)"$/ do |swroot|
+Given /^an empty software root in "([^"]*)" exists$/ do |swroot|
   FileUtils.mkdir(swroot) unless File.directory?(swroot)
   @swroot = swroot
 end
 
-Given /^my architecture is set to "([^"]*)"$/ do |arch|
+Given /^an architecture folder named "([^"]*)" exists$/ do |arch|
   @arch = arch
   @full_swroot = File.join(@swroot, arch)
   FileUtils.mkdir(@full_swroot) unless File.directory?(@full_swroot)

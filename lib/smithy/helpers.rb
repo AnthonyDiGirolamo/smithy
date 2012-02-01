@@ -60,7 +60,7 @@ module Smithy
     if global[:"config-file"]
       sysconfig_path = File.expand_path(global[:"config-file"])
     else
-      sysconfig_path = File.expand_path(File.join(@smithy_bin_root,@smithy_config_file))
+      sysconfig_path = File.expand_path(@smithy_config_file)
     end
 
     options = {}
@@ -68,14 +68,15 @@ module Smithy
     if File.exists? sysconfig_path
       @smithy_config_hash = YAML.load_file(sysconfig_path)
 
-      options[:"software-root"]   = @smithy_config_hash.try(:[], :"software-root")
-      options[:"file-bit-mask"]   = @smithy_config_hash.try(:[], :"file-bit-mask")
-      options[:"file-group-name"] = @smithy_config_hash.try(:[], :"file-group-name")
-      options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)
+      options[:"software-root"]   = @smithy_config_hash.try(:[], "software-root")
+      options[:"file-group-name"] = @smithy_config_hash.try(:[], "file-group-name")
+      if options[:"file-group-name"]
+        options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)
+      end
 
       options[:arch] = global[:arch] || get_arch
       options[:full_software_root_path] = get_software_root(
-        :root => global[:"software-root"],
+        :root => options[:"software-root"],
         :arch => options[:arch])
     else
       STDERR.puts "warning: Cannot read config file: #{sysconfig_path}"
@@ -88,7 +89,7 @@ module Smithy
     @hostname = ENV['HOSTNAME'] || `hostname`.chomp
     if @hostname =~ /(\D*)(\d*)/
       machine = $1
-      arch = @smithy_config_hash.try(:[], :"hostname-architectures").try(:[], machine)
+      arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
       return arch
     else
       return nil
@@ -99,7 +100,7 @@ module Smithy
     if args[:root].blank? || args[:arch].blank?
       raise """Cannot determine which architecture we are using.
        Please specify using --arch or add a '#{@hostname}' hostname entry to:
-       #{@smithy_bin_root}/#{@smithy_config_file}"""
+       #{@smithy_config_file}"""
     end
 
     swroot = File.join(args[:root], args[:arch])
@@ -112,9 +113,12 @@ module Smithy
     FileUtils.chmod p, f, options
   end
 
-  def make_group_writable(f, group, mask, options = {})
-    FileUtils.chmod File.stat(f).mode | mask, f, options
+  def set_group(f, group, options = {})
     FileUtils.chown nil, group, f, options
+  end
+
+  def make_group_writable(f, mask, options = {})
+    FileUtils.chmod File.stat(f).mode | mask, f, options
   end
 
   def make_directory(d, options = {})
