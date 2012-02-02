@@ -114,11 +114,22 @@ module Smithy
   end
 
   def set_group(f, group, options = {})
-    FileUtils.chown nil, group, f, options
+    method = :chown
+    if options.has_key? :recursive
+      options.reject!{|k,v| k.eql?(:recursive)}
+      method = :chown_R
+    end
+    FileUtils.send method, nil, group, f, options
   end
 
-  def make_group_writable(f, mask, options = {})
-    FileUtils.chmod File.stat(f).mode | mask, f, options
+  def make_group_writable(f, options = {})
+    # FileUtils.chmod_R doesn't work well for combinations of files
+    # with different bitmasks, it sets everything the same
+    if options.has_key? :recursive
+      `chmod -R g+w #{f}`
+    else
+      `chmod g+w #{f}`
+    end
   end
 
   def make_directory(d, options = {})

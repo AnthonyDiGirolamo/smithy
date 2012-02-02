@@ -132,20 +132,17 @@ command ['build','b'] do |c|
     raise "You must supply at least one package to build" if packages.empty?
 
     packages.each do |package|
-      p = Package.new(
-        :root => global_options[:"software-root"],
-        :arch => global_options[:arch],
-        :path => package)
+      p = Package.new :root => global_options[:"software-root"],
+                      :arch => global_options[:arch],
+                      :path => package,
+                :file_group => global_options[:"file-group-name"],
+             :disable_group => global_options[:"disable-group-writable"]
 
       if p.valid?
-        p.run_rebuild_script(
-          :disable_logging => options[:"disable-build-log"],
-          :build_log_name  => options[:"build-log-name"],
-          :dry_run         => options[:"dry-run"],
-          :send_to_stdout  => options[:"send-to-stdout"],
-          :file_group      => global_options[:"file-group-id"],
-          :file_mask       => global_options[:"file-bit-mask"],
-          :disable_group => global_options[:"disable-group-writable"])
+        p.run_rebuild_script :dry_run => options[:"dry-run"],
+                     :disable_logging => options[:"disable-build-log"],
+                      :build_log_name => options[:"build-log-name"],
+                      :send_to_stdout => options[:"send-to-stdout"]
       end
     end
   end
@@ -176,19 +173,16 @@ command :new do |c|
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
-    p = Package.new(
-      :root => global_options[:"software-root"],
-      :arch => global_options[:arch],
-      :path => args.first)
+    p = Package.new :root => global_options[:"software-root"],
+                    :arch => global_options[:arch],
+                    :path => args.first,
+              :file_group => global_options[:"file-group-name"],
+           :disable_group => global_options[:"disable-group-writable"]
 
     if p.valid?
-      p.create(
-        :web           => options[:"web-description"],
-        :dry_run       => options[:"dry-run"],
-        :smithy_root   => @smithy_bin_root,
-        :file_group    => global_options[:"file-group-name"],
-        :file_mask     => global_options[:"file-bit-mask"],
-        :disable_group => global_options[:"disable-group-writable"])
+       p.create :dry_run => options[:"dry-run"],
+            :smithy_root => @smithy_bin_root,
+                    :web => options[:"web-description"]
       if options[:tarball]
         p.extract :archive => options[:tarball]
       end
@@ -208,7 +202,7 @@ pre do |global,command,options,args|
     end
   end
 
-  global[:"file-bit-mask"] = 020 unless global[:"disable-group-writable"]
+  #global[:"file-bit-mask"] = 0o020 unless global[:"disable-group-writable"]
 
   Sickill::Rainbow.enabled = false if global[:"no-color"]
 

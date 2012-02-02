@@ -1,27 +1,39 @@
 module Smithy
   class Package
     attr_accessor :arch, :root, :name, :version, :build_name
+    attr_accessor :group
 
     def initialize(args = {})
       @root   = args[:root]
       @arch   = args[:arch]
       # Remove root and arch from the path if necessary
+      @path = args[:path]
       path = args[:path].gsub(/\/?#{root}\/?/,'').gsub(/\/?#{arch}\/?/,'').gsub(/\/rebuild$/,'')
       path =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
       @version = $2
       @build_name = $3
+      @group = args[:file_group]
+
+      if args[:disable_group]
+        @group_writeable = false
+      else
+        @group_writeable = true
+      end
+    end
+
+    def group_writeable?
+      @group_writeable
     end
 
     def valid?
       # Name format validation
-      if name.nil? || version.nil? || build_name.nil?
-        raise "Package names must be of the form: NAME/VERSION/BUILD"
+      if @name.nil? || @version.nil? || @build_name.nil? || @name.include?('/') || @version.include?('/') || @build_name.include?('/')
+        raise "The package name \"#{@path}\" must be of the form: NAME/VERSION/BUILD"
+        return false
+      else
+        return true
       end
-      if name.include?('/') || version.include?('/') || build_name.include?('/')
-        raise "Package names must be of the form: NAME/VERSION/BUILD"
-      end
-      return true
     end
 
     def prefix
@@ -51,8 +63,8 @@ module Smithy
           log_file_path = File.join(prefix, args[:build_log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
-          set_group(log_file, args[:file_group])
-          make_group_writable(log_file, args[:file_mask]) unless args[:disable_group]
+          set_group(log_file, group)
+          make_group_writable(log_file, mask) if group_writeable?
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"
@@ -82,7 +94,7 @@ module Smithy
     end
 
     def extract(args = {})
-      archive = args[:archive]
+      archive = File.join(Dir.pwd, args[:archive])
       unless File.exists? archive
         raise "The archive #{archive} does not exist"
       end
@@ -96,8 +108,10 @@ module Smithy
 
       notice "Extracting #{archive} to #{source_dir}"
 
-      magic_bytes = ''
-      File.open(archive) { |f| magic_bytes = f.read(4) }
+      magic_bytes = nil
+      File.open(archive) do |f|
+        magic_bytes = f.read(4)
+      end
       case magic_bytes
       when /^PK\003\004/ # .zip archive
         `unzip #{tarfile}`
@@ -116,6 +130,8 @@ module Smithy
       FileUtils.rm_rf temp_dir
 
       #TODO set permissions on source dir
+      set_group source_dir, @group, :recursive => true
+      make_group_writable source_dir, :recursive => true if group_writeable?
     end
 
     def create(args = {})
@@ -143,8 +159,8 @@ module Smithy
 
       directories.each do |d|
         make_directory d, options
-        set_group d, args[:file_group], options
-        make_group_writable d, args[:file_mask], options unless args[:disable_group]
+        set_group d, group, options
+        make_group_writable d, options if group_writeable?
       end
 
       if args[:web]
@@ -155,8 +171,8 @@ module Smithy
 
       all_files.each do |f|
         install_file f[:src], f[:dest], options
-        set_group f[:dest], args[:file_group], options
-        make_group_writable f[:dest], args[:file_mask], options unless args[:disable_group]
+        set_group f[:dest], group, options
+        make_group_writable f[:dest], options if group_writeable?
 
         make_executable f[:dest] if f[:dest] =~ /(rebuild|relink|retest)/
       end
