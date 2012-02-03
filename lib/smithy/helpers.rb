@@ -123,6 +123,7 @@ module Smithy
   end
 
   def make_group_writable(f, options = {})
+    f = f.path if f.class == File
     # FileUtils.chmod_R doesn't work well for combinations of files
     # with different bitmasks, it sets everything the same
     if options.has_key? :recursive
