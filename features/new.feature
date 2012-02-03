@@ -1,4 +1,7 @@
 Feature: Add new software builds
+  As a tired staff member
+  I should be able to create new software builds in /sw
+  In a couple commands or less
 
   Background:
     Given my hostname is "awesome_sauce"
