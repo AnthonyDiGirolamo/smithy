@@ -73,13 +73,20 @@ module Smithy
 
       unless args[:dry_run]
         stdout, stderr = '',''
-        t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
-        while t.status do
-          process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
-          sleep 0.25
-        end
+        build_exit_status = 0
 
-        build_exit_status = t.exitstatus
+        begin
+          t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
+          while t.status do
+            process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
+            sleep 0.25
+          end
+
+          build_exit_status = t.exitstatus # this will throw an exception if != 0
+        rescue => exception
+          build_exit_status = exception.exitstatus
+        end
+        # There is usually some leftover output
         process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
 
         log_file.close unless log_file.nil?
