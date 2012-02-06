@@ -87,13 +87,10 @@ module Smithy
 
   def get_arch
     @hostname = ENV['HOSTNAME'] || `hostname`.chomp
-    if @hostname =~ /(\D*)(\d*)/
-      machine = $1
-      arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
-      return arch
-    else
-      return nil
-    end
+		machine = @hostname.gsub(/(\d*)$/,'')
+		arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
+		#TODO Check for nil arch and print coherent error message
+		return arch
   end
 
   def get_software_root(args = {})
