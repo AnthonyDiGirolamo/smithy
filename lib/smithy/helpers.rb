@@ -1,5 +1,5 @@
-# Borrowed from Rails
-# https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/object/try.rb
+# try and blank? methods borrowed from rails
+# See: https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/object/try.rb
 class Object
   def try(method, *args, &block)
     send(method, *args, &block)

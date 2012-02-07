@@ -189,6 +189,36 @@ command ['deploy'] do |c|
   end
 end
 
+desc "Edit a software build script"
+arg_name "NAME"
+command ['edit'] do |c|
+  c.desc "Editor for opening script files"
+  c.flag [:e, :editor]
+  c.action do |global_options,options,args|
+    editor = options[:editor] || ENV['EDITOR']
+    raise """Please specify which editor to launch using the
+       $EDITOR environment variable or the --editor option.""" if editor.blank?
+
+    raise "You must supply a package name to edit" if args.empty?
+
+    p = Package.new :root => global_options[:"software-root"],
+                    :arch => global_options[:arch],
+                    :path => args.first,
+              :file_group => global_options[:"file-group-name"]
+
+    if p.valid?
+      file_before = File.stat(p.rebuild_script)
+      status = Kernel::system(editor, p.rebuild_script)
+      #puts status
+      #puts $CHILD_STATUS
+      # Compare modification times
+      if status && File.stat(p.rebuild_script) > file_before
+        notice "Modified #{p.rebuild_script}"
+      end
+    end
+  end
+end
+# Interesting: smithy search name | xargs sh -c 'vim "$@" < /dev/tty' vim
 
 pre do |global,command,options,args|
   # Load and merge the system config values with command line values

@@ -40,6 +40,10 @@ module Smithy
       File.join(@root, @arch, @name, @version, @build_name)
     end
 
+    def rebuild_script
+      File.join(prefix,"rebuild")
+    end
+
     def software_root
       File.join(@root, @arch)
     end
@@ -51,7 +55,6 @@ module Smithy
     def run_rebuild_script(args ={})
       #TODO check for .lock file, create and delete after complete
 
-      rebuild_script = File.join(prefix,"rebuild")
       raise "Cannot locate rebuild script #{rebuild_script}" unless File.exist? rebuild_script
       ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
