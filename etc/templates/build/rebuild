@@ -2,6 +2,8 @@
 source ${MODULESHOME}/init/bash
 source $SW_BLDDIR/remodule
 
+# clean out old install
+cd $SW_BLDDIR && rm -rf bin doc etc include info lib lib64 libexec man share
 cd $SW_BLDDIR/source
 
 make clean
