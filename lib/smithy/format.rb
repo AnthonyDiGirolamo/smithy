@@ -9,7 +9,12 @@ module Smithy
         software.each do |s|
           row = []
           row << s
-          f = File.stat(s+'/rebuild')
+          source = s+'/rebuild'
+          if File.exist?(source)
+            f = File.stat(source)
+          else
+            f = File.stat(s)
+          end
           row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
           user = Etc.getpwuid(f.uid)
           row << user.try(:name)
@@ -31,7 +36,12 @@ module Smithy
         software.each do |s|
           output = []
           output << s
-          f = File.stat(s+'/rebuild')
+          source = s+'/rebuild'
+          if File.exist?(source)
+            f = File.stat(source)
+          else
+            f = File.stat(s)
+          end
           output << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
           user = Etc.getpwuid(f.uid)
           unless user.blank?

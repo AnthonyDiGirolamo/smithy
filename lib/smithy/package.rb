@@ -64,8 +64,8 @@ module Smithy
 
     def run_rebuild_script(args ={})
       #TODO check for .lock file, create and delete after complete
+      rebuild_script_exists!
 
-      raise "Cannot locate rebuild script #{rebuild_script}" unless rebuild_script_exists?
       ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
 

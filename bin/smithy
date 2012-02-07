@@ -77,12 +77,15 @@ command ['search','s'] do |c|
 
   c.action do |global_options,options,args|
     formatter = output_formats[options[:format]]
+    raise "Unknow format \"#{options[:format]}\" valid formats include: #{output_formats.keys.join(',')}" if formatter.nil?
 
     notice "Searching in #{global_options[:full_software_root_path]}"
 
     # Array of full paths to rebuild scripts
-    software = Dir.glob(global_options[:full_software_root_path]+"/*/*/*/rebuild").sort
-    software.collect!{|s| s.gsub(/\/rebuild$/, '')}
+    #software = Dir.glob(global_options[:full_software_root_path]+"/*/*/*/rebuild").sort
+    software = Dir.glob(global_options[:full_software_root_path]+"/*/*/*/")
+    #software.collect!{|s| s.gsub(/\/rebuild$/, '')}
+    software.collect!{|s| s.gsub(/\/$/, '')}
     software.sort!
 
     count = 0
@@ -122,11 +125,10 @@ command ['build','b'] do |c|
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
+    packages = args
     if args.empty?
       notice "Reading package names from STDIN..."
       packages = STDIN.readlines.map{|p| p.chomp}
-    else
-      packages = args
     end
 
     raise "You must supply at least one package to build" if packages.empty?
@@ -220,7 +222,38 @@ command ['edit'] do |c|
     end
   end
 end
-# Interesting: smithy search name | xargs sh -c 'vim "$@" < /dev/tty' vim
+
+desc "Validate a software build"
+long_desc "Repair permissions and check that files exist"
+arg_name "NAME"
+command ['deploy'] do |c|
+  c.action do |global_options,options,args|
+    packages = args
+    if args.empty?
+      notice "Reading package names from STDIN..."
+      packages = STDIN.readlines.map{|p| p.chomp}
+    end
+
+    raise "You must supply at least one package to build" if packages.empty?
+
+    packages.each do |package|
+      p = Package.new :root => global_options[:"software-root"],
+                      :arch => global_options[:arch],
+                      :path => package,
+                :file_group => global_options[:"file-group-name"],
+             :disable_group => global_options[:"disable-group-writable"]
+
+      if p.valid?
+        p.run_rebuild_script :dry_run => options[:"dry-run"],
+                     :disable_logging => options[:"disable-build-log"],
+                      :build_log_name => options[:"build-log-name"],
+                      :send_to_stdout => options[:"send-to-stdout"]
+      end
+    end
+  end
+end
+
+
 
 pre do |global,command,options,args|
   # Load and merge the system config values with command line values
