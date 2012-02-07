@@ -106,8 +106,10 @@ module Smithy
   end
 
   def make_executable(f, options = {})
-    p = File.stat(f).mode | 0111
-    FileUtils.chmod p, f, options
+    unless options[:noop]
+      p = File.stat(f).mode | 0111
+      FileUtils.chmod p, f, options
+    end
   end
 
   def set_group(f, group, options = {})
@@ -124,9 +126,9 @@ module Smithy
     # FileUtils.chmod_R doesn't work well for combinations of files
     # with different bitmasks, it sets everything the same
     if options.has_key? :recursive
-      `chmod -R g+w #{f}`
+      `chmod -R g+w #{f}` unless options[:noop]
     else
-      `chmod g+w #{f}`
+      `chmod g+w #{f}` unless options[:noop]
     end
   end
 

@@ -36,6 +36,13 @@ module Smithy
       end
     end
 
+    def rebuild_script_exists?
+      File.exist?(rebuild_script)
+    end
+    def rebuild_script_exists!
+      raise "The script #{rebuild_script} does not exist!" unless rebuild_script_exists?
+    end
+
     def prefix
       File.join(@root, @arch, @name, @version, @build_name)
     end
@@ -51,11 +58,14 @@ module Smithy
     def prefix_exists?
       Dir.exist? prefix
     end
+    def prefix_exists!
+      raise "The package #{prefix} does not exist!" unless prefix_exists?
+    end
 
     def run_rebuild_script(args ={})
       #TODO check for .lock file, create and delete after complete
 
-      raise "Cannot locate rebuild script #{rebuild_script}" unless File.exist? rebuild_script
+      raise "Cannot locate rebuild script #{rebuild_script}" unless rebuild_script_exists?
       ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
 
@@ -186,7 +196,7 @@ module Smithy
         set_group f[:dest], group, options
         make_group_writable f[:dest], options if group_writeable?
 
-        make_executable f[:dest] if f[:dest] =~ /(rebuild|relink|retest)/
+        make_executable f[:dest], options if f[:dest] =~ /(rebuild|relink|retest)/
       end
     end
   end

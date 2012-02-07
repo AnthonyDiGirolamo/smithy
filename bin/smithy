@@ -205,8 +205,10 @@ command ['edit'] do |c|
                     :arch => global_options[:arch],
                     :path => args.first,
               :file_group => global_options[:"file-group-name"]
-
     if p.valid?
+      p.prefix_exists!
+      p.rebuild_script_exists!
+
       file_before = File.stat(p.rebuild_script)
       status = Kernel::system(editor, p.rebuild_script)
       #puts status
