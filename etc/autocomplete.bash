@@ -79,6 +79,7 @@ _smithy ()
         __smithycomp "
         build
         deploy
+        edit
         help
         new
         search"
@@ -92,6 +93,7 @@ _smithy ()
 	case "$cmd" in
 	b|build)  _smithy_build  ;;
 	s|search) _smithy_search ;;
+	edit)     _smithy_edit   ;;
 	new)      _smithy_new    ;;
 	help)     _smithy_help   ;;
 	*)        ;;
@@ -121,6 +123,25 @@ _smithy_build () {
       --disable-build-log
       --dry-run
       --send-to-stdout"
+		return
+		;;
+	esac
+  __smithy_complete_packages
+}
+
+_smithy_edit () {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$prv" in
+  -e|--editor=*)
+    COMPREPLY=($(compgen -c "$cur"))
+    return
+    ;;
+  esac
+	case "$cur" in
+	-*)
+		__smithycomp "
+      --editor="
 		return
 		;;
 	esac
