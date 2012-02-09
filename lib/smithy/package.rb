@@ -191,20 +191,20 @@ module Smithy
       options[:noop] = true if args[:dry_run]
 
       directories.each do |d|
-        make_directory d, options
-        set_group d, group, options
-        make_group_writable d, options if group_writeable?
+        FileOperations.make_directory d, options
+        FileOperations.set_group d, group, options
+        FileOperations.make_group_writable d, options if group_writeable?
       end
 
       all_files = build_support_files
       all_files = package_support_files + all_files if args[:web]
 
       all_files.each do |f|
-        install_file f[:src], f[:dest], options
-        set_group f[:dest], group, options
-        make_group_writable f[:dest], options if group_writeable?
+        FileOperations.install_file f[:src], f[:dest], options
+        FileOperations.set_group f[:dest], group, options
+        FileOperations.make_group_writable f[:dest], options if group_writeable?
 
-        make_executable f[:dest], options if f[:dest] =~ /(rebuild|relink|retest)/
+        FileOperations.make_executable f[:dest], options if f[:dest] =~ /(rebuild|relink|retest)/
       end
     end
   end
