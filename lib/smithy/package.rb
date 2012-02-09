@@ -186,25 +186,23 @@ module Smithy
 
     def create(args = {})
       notice "New #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
-
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
 
-      directories.each do |d|
-        FileOperations.make_directory d, options
-        FileOperations.set_group d, group, options
-        FileOperations.make_group_writable d, options if group_writeable?
+      directories.each do |dir|
+        FileOperations.make_directory dir, options
+        FileOperations.set_group dir, group, options
+        FileOperations.make_group_writable dir, options if group_writeable?
       end
 
       all_files = build_support_files
       all_files = package_support_files + all_files if args[:web]
 
-      all_files.each do |f|
-        FileOperations.install_file f[:src], f[:dest], options
-        FileOperations.set_group f[:dest], group, options
-        FileOperations.make_group_writable f[:dest], options if group_writeable?
-
-        FileOperations.make_executable f[:dest], options if f[:dest] =~ /(rebuild|relink|retest)/
+      all_files.each do |file|
+        FileOperations.install_file file[:src], file[:dest], options
+        FileOperations.set_group file[:dest], group, options
+        FileOperations.make_group_writable file[:dest], options if group_writeable?
+        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(rebuild|relink|retest)/
       end
     end
   end
