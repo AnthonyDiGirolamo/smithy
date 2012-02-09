@@ -22,6 +22,24 @@ module Smithy
       end
     end
 
+    def package_support_files
+      file_list = %w{.exceptions description support versions}
+      file_list.collect! do |f|
+        { :src  => File.join(@@smithy_bin_root, "etc/templates/package", f),
+          :dest => File.join(application_directory, f) }
+      end
+      return file_list
+    end
+
+    def build_support_files
+      file_list = %w{build-notes dependencies rebuild relink remodule retest}
+      file_list.collect! do |f|
+        { :src  => File.join(@@smithy_bin_root, "etc/templates/build", f),
+          :dest => File.join(prefix, f) }
+      end
+      return file_list
+    end
+
     def group_writeable?
       @group_writeable
     end
@@ -47,19 +65,32 @@ module Smithy
       File.join(@root, @arch, @name, @version, @build_name)
     end
 
+    def prefix_exists?
+      Dir.exist? prefix
+    end
+
+    def prefix_exists!
+      raise "The package #{prefix} does not exist!" unless prefix_exists?
+    end
+
+    def application_directory
+      File.join(@root, @arch, @name)
+    end
+
+    def version_directory
+      File.join(@root, @arch, @name, @version)
+    end
+
+    def directories
+      [ application_directory, version_directory, prefix ]
+    end
+
     def rebuild_script
       File.join(prefix,"rebuild")
     end
 
     def software_root
       File.join(@root, @arch)
-    end
-
-    def prefix_exists?
-      Dir.exist? prefix
-    end
-    def prefix_exists!
-      raise "The package #{prefix} does not exist!" unless prefix_exists?
     end
 
     def run_rebuild_script(args ={})
@@ -117,9 +148,7 @@ module Smithy
 
     def extract(args = {})
       archive = File.join(Dir.pwd, args[:archive])
-      unless File.exists? archive
-        raise "The archive #{archive} does not exist"
-      end
+      raise "The archive #{archive} does not exist" unless File.exists? archive
 
       temp_dir = File.join(prefix,"tmp")
       source_dir = File.join(prefix,"source")
@@ -151,30 +180,12 @@ module Smithy
 
       FileUtils.rm_rf temp_dir
 
-      #TODO set permissions on source dir
       set_group source_dir, @group, :recursive => true
       make_group_writable source_dir, :recursive => true if group_writeable?
     end
 
     def create(args = {})
-      notice "New #{prefix}"
-
-      directories = [
-        File.join(software_root, name),
-        File.join(software_root, name, version),
-        File.join(software_root, name, version, build_name) ]
-
-      package_files = %w{.exceptions description support versions}
-      package_files.collect! do |f|
-        { :src  => File.join(args[:smithy_root], "etc/templates/package", f),
-          :dest => File.join(directories.first, f) }
-      end
-
-      build_files = %w{build-notes dependencies rebuild relink remodule retest}
-      build_files.collect! do |f|
-        { :src  => File.join(args[:smithy_root], "etc/templates/build", f),
-          :dest => File.join(directories.last, f) }
-      end
+      notice "New #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
 
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
@@ -185,11 +196,8 @@ module Smithy
         make_group_writable d, options if group_writeable?
       end
 
-      if args[:web]
-        all_files = package_files+build_files
-      else
-        all_files = build_files
-      end
+      all_files = build_support_files
+      all_files = package_support_files + all_files if args[:web]
 
       all_files.each do |f|
         install_file f[:src], f[:dest], options

@@ -12,8 +12,8 @@ unless File.respond_to? :realpath
 end
 
 # Add the lib dir to the ruby library search path
-@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
-$: << File.expand_path(@smithy_bin_root + '/lib')
+@@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+$: << File.expand_path(@@smithy_bin_root + '/lib')
 
 require 'rubygems'
 require 'gli'
@@ -28,7 +28,7 @@ include GLI
 include Smithy
 
 version Smithy::VERSION
-@smithy_config_file = File.join(@smithy_bin_root,"etc/smithyrc")
+@smithy_config_file = File.join(@@smithy_bin_root,"etc/smithyrc")
 
 program_desc "Smithy will help you build, test, and distribute software with ease."
 
@@ -173,7 +173,6 @@ command :new do |c|
 
     if p.valid?
        p.create :dry_run => options[:"dry-run"],
-            :smithy_root => @smithy_bin_root,
                     :web => options[:"web-description"]
       if options[:tarball]
         p.extract :archive => options[:tarball]
@@ -226,7 +225,7 @@ end
 desc "Validate a software build"
 long_desc "Repair permissions and check that files exist"
 arg_name "NAME"
-command ['deploy'] do |c|
+command ['validate'] do |c|
   c.action do |global_options,options,args|
     packages = args
     if args.empty?
@@ -253,11 +252,9 @@ command ['deploy'] do |c|
   end
 end
 
-
-
 pre do |global,command,options,args|
-  # Load and merge the system config values with command line values
-  # If an option is on the command line it is used instead
+  # Load and merge the system config values with command line values, options on
+  # the command line take precedence.
   global.merge! load_system_config(global) do |key, values_command_line, values_config|
     if values_command_line.nil?
       values_config
@@ -265,8 +262,6 @@ pre do |global,command,options,args|
       values_command_line
     end
   end
-
-  #global[:"file-bit-mask"] = 0o020 unless global[:"disable-group-writable"]
 
   Sickill::Rainbow.enabled = false if global[:"no-color"]
 
