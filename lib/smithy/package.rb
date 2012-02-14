@@ -107,8 +107,8 @@ module Smithy
           log_file_path = File.join(prefix, args[:build_log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
-          set_group(log_file, group)
-          make_group_writable(log_file) if group_writeable?
+          FileOperations.set_group(log_file, group)
+          FileOperations.make_group_writable(log_file) if group_writeable?
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"
@@ -135,8 +135,8 @@ module Smithy
 
         log_file.close unless log_file.nil?
 
-        set_group prefix, @group, :recursive => true
-        make_group_writable prefix, :recursive => true if group_writeable?
+        FileOperations.set_group prefix, @group, :recursive => true
+        FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
 
         if build_exit_status == 0
           notice_success "#{prefix} SUCCESS"
@@ -180,8 +180,8 @@ module Smithy
 
       FileUtils.rm_rf temp_dir
 
-      set_group source_dir, @group, :recursive => true
-      make_group_writable source_dir, :recursive => true if group_writeable?
+      FileOperations.set_group source_dir, @group, :recursive => true
+      FileOperations.make_group_writable source_dir, :recursive => true if group_writeable?
     end
 
     def create(args = {})
