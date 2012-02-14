@@ -31,6 +31,7 @@ lib/smithy.rb
 lib/smithy/format.rb
 lib/smithy/helpers.rb
 lib/smithy/package.rb
+lib/smithy/file_operations.rb
 lib/smithy_version.rb
   )
   s.require_paths << 'lib'
