@@ -164,6 +164,7 @@ _smithy_search () {
 		return
 		;;
 	esac
+  __smithy_complete_packages
 }
 
 _smithy_new () {
