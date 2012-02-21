@@ -8,8 +8,10 @@ module Smithy
       @arch   = args[:arch]
       # Remove root and arch from the path if necessary
       @path = args[:path]
-      path = args[:path].gsub(/\/?#{root}\/?/,'').gsub(/\/?#{arch}\/?/,'').gsub(/\/rebuild$/,'')
-      path =~ /(.*)\/(.*)\/(.*)$/
+      p = args[:path].dup
+      p.gsub! /\/?#{root}\/?/, ''
+      p.gsub! /\/?#{arch}\/?/, ''
+      p =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
       @version = $2
       @build_name = $3
@@ -54,6 +56,19 @@ module Smithy
       end
     end
 
+    def prefix
+      File.join(@root, @arch, @name, @version, @build_name)
+    end
+    def prefix_exists?
+      Dir.exist? prefix
+    end
+    def prefix_exists!
+      raise "The package #{prefix} does not exist!" unless prefix_exists?
+    end
+
+    def rebuild_script
+      File.join(prefix,"rebuild")
+    end
     def rebuild_script_exists?
       File.exist?(rebuild_script)
     end
@@ -61,16 +76,24 @@ module Smithy
       raise "The script #{rebuild_script} does not exist!" unless rebuild_script_exists?
     end
 
-    def prefix
-      File.join(@root, @arch, @name, @version, @build_name)
+    def retest_script
+      File.join(prefix,"retest")
+    end
+    def retest_script_exists?
+      File.exist?(retest_script)
+    end
+    def retest_script_exists!
+      raise "The script #{retest_script} does not exist!" unless retest_script_exists?
     end
 
-    def prefix_exists?
-      Dir.exist? prefix
+    def remodule_script
+      File.join(prefix,"remodule")
     end
-
-    def prefix_exists!
-      raise "The package #{prefix} does not exist!" unless prefix_exists?
+    def remodule_script_exists?
+      File.exist?(remodule_script)
+    end
+    def remodule_script_exists!
+      raise "The script #{remodule_script} does not exist!" unless remodule_script_exists?
     end
 
     def application_directory
@@ -83,10 +106,6 @@ module Smithy
 
     def directories
       [ application_directory, version_directory, prefix ]
-    end
-
-    def rebuild_script
-      File.join(prefix,"rebuild")
     end
 
     def software_root

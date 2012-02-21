@@ -56,8 +56,8 @@ arg_name "FILE"
 flag [:"config-file"]
 
 desc "Search currently installed software"
-arg_name "name"
-command ['search','s'] do |c|
+arg_name "PATTERN"
+command ['search'] do |c|
   output_formats = {
     'path'  => Smithy::Format::Path.new,
     'name'  => Smithy::Format::Name.new,
@@ -109,7 +109,7 @@ end
 desc "Build software"
 long_desc "The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD."
 arg_name "PATH"
-command ['build','b'] do |c|
+command ['build'] do |c|
   c.desc 'Build log file name located within the software prefix.'
   c.arg_name 'FILE'
   c.default_value 'build.log'
@@ -150,7 +150,7 @@ command ['build','b'] do |c|
   end
 end
 
-desc "Generate a new software build and all necessary files"
+desc "Generate a new build and all necessary files"
 arg_name "NAME"
 command :new do |c|
   c.desc "Create description file for website"
@@ -182,19 +182,21 @@ command :new do |c|
   end
 end
 
-desc "Deploy a software build"
-long_desc "Place module files in the correct locations"
-arg_name "NAME"
-command ['deploy'] do |c|
-  c.action do |global_options,options,args|
-  end
-end
-
-desc "Edit a software build script"
+desc "Edit package support files"
 arg_name "NAME"
 command ['edit'] do |c|
   c.desc "Editor for opening script files"
   c.flag [:e, :editor]
+
+  c.desc "Edit a build script (this is the default behavior)"
+  c.switch [:b, :build]
+  c.desc "Edit modules loaded for the build script"
+  c.switch [:c, :"compile-time-modules"]
+  c.desc "Edit a test script"
+  c.switch [:t, :test]
+  c.desc "Edit the package's module-file"
+  c.switch [:m, :module]
+
   c.action do |global_options,options,args|
     editor = options[:editor] || ENV['EDITOR']
     raise """Please specify which editor to launch using the
@@ -210,22 +212,25 @@ command ['edit'] do |c|
       p.prefix_exists!
       p.rebuild_script_exists!
 
-      file_before = File.stat(p.rebuild_script)
-      status = Kernel::system(editor, p.rebuild_script)
+      file_name = p.rebuild_script
+      file_name = p.prefix + "/remodule" if options[:c]
+
+      file_before = File.stat(file_name)
+      status = Kernel::system(editor, file_name)
       #puts status
       #puts $CHILD_STATUS
       # Compare modification times
-      if status && File.stat(p.rebuild_script) > file_before
-        notice "Modified #{p.rebuild_script}"
+      if status && File.stat(file_name) > file_before
+        notice "Modified #{file_name}"
       end
     end
   end
 end
 
-desc "Validate a software build"
+desc "Repair a package"
 long_desc "Repair permissions and check that files exist"
 arg_name "NAME"
-command ['validate'] do |c|
+command ['repair'] do |c|
   c.action do |global_options,options,args|
     packages = args
     if args.empty?
@@ -233,7 +238,7 @@ command ['validate'] do |c|
       packages = STDIN.readlines.map{|p| p.chomp}
     end
 
-    raise "You must supply at least one package to build" if packages.empty?
+    raise "You must supply at least one package to repair" if packages.empty?
 
     packages.each do |package|
       p = Package.new :root => global_options[:"software-root"],
@@ -243,12 +248,17 @@ command ['validate'] do |c|
              :disable_group => global_options[:"disable-group-writable"]
 
       if p.valid?
-        p.run_rebuild_script :dry_run => options[:"dry-run"],
-                     :disable_logging => options[:"disable-build-log"],
-                      :build_log_name => options[:"build-log-name"],
-                      :send_to_stdout => options[:"send-to-stdout"]
+        p.repair :dry_run => options[:"dry-run"]
       end
     end
+  end
+end
+
+desc "Deploy a package"
+long_desc "Place module files in the correct locations and update web descriptions."
+arg_name "NAME"
+command ['deploy'] do |c|
+  c.action do |global_options,options,args|
   end
 end
 
