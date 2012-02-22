@@ -166,7 +166,8 @@ module Smithy
     end
 
     def extract(args = {})
-      archive = File.join(Dir.pwd, args[:archive])
+      archive = args[:archive]
+      archive = File.join(Dir.pwd, args[:archive]) unless File.exists? archive
       raise "The archive #{archive} does not exist" unless File.exists? archive
 
       temp_dir = File.join(prefix,"tmp")
@@ -222,6 +223,39 @@ module Smithy
         FileOperations.set_group file[:dest], group, options
         FileOperations.make_group_writable file[:dest], options if group_writeable?
         FileOperations.make_executable file[:dest], options if file[:dest] =~ /(rebuild|relink|retest)/
+      end
+    end
+
+    def repair(args = {})
+      notice "Repair #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
+      options = {:noop => false, :verbose => false}
+      options[:noop] = true if args[:dry_run]
+
+      notice "Setting permissions"
+
+      FileOperations.set_group prefix, group, options.merge(:recursive => true)
+      FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writeable?
+
+      [version_directory, application_directory].each do |dir|
+        FileOperations.set_group dir, group, options
+        FileOperations.make_group_writable dir, options if group_writeable?
+      end
+
+      notice "Checking support files"
+      build_support_files.each do |file|
+        f = file[:dest]
+
+        if File.exists?(f)
+          if File.size(f) == 0
+            puts "empty ".rjust(12).bright + f
+          else
+            puts "exists ".rjust(12).bright + f
+          end
+          FileOperations.make_executable file[:dest], options if f =~ /(rebuild|relink|retest)/
+        else
+          puts "missing ".rjust(12).bright + f
+          # copy template?
+        end
       end
     end
   end

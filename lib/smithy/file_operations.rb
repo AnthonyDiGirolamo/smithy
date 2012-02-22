@@ -24,10 +24,12 @@ module Smithy
         # FileUtils.chmod_R doesn't work well for combinations of files
         # with different bitmasks, it sets everything the same
         if options.has_key? :recursive
-          `chmod -R g+w #{f}` unless options[:noop]
+          command = "chmod -R g+w #{f}"
         else
-          `chmod g+w #{f}` unless options[:noop]
+          command = "chmod g+w #{f}"
         end
+        puts command if options[:verbose]
+        `#{command}` unless options[:noop]
       end
 
       def make_directory(d, options = {})

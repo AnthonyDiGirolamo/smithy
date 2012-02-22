@@ -194,8 +194,8 @@ command ['edit'] do |c|
   c.switch [:c, :"compile-time-modules"]
   c.desc "Edit a test script"
   c.switch [:t, :test]
-  c.desc "Edit the package's module-file"
-  c.switch [:m, :module]
+  #c.desc "Edit the package's module-file"
+  #c.switch [:m, :module]
 
   c.action do |global_options,options,args|
     editor = options[:editor] || ENV['EDITOR']
@@ -213,12 +213,14 @@ command ['edit'] do |c|
       p.rebuild_script_exists!
 
       file_name = p.rebuild_script
-      file_name = p.prefix + "/remodule" if options[:c]
+      file_name = p.remodule_script if options[:c]
+      file_name = p.retest_script   if options[:t]
 
       file_before = File.stat(file_name)
       status = Kernel::system(editor, file_name)
       #puts status
       #puts $CHILD_STATUS
+
       # Compare modification times
       if status && File.stat(file_name) > file_before
         notice "Modified #{file_name}"
@@ -231,6 +233,9 @@ desc "Repair a package"
 long_desc "Repair permissions and check that files exist"
 arg_name "NAME"
 command ['repair'] do |c|
+  c.desc "Verify permissions only"
+  c.switch [:n, "dry-run"]
+
   c.action do |global_options,options,args|
     packages = args
     if args.empty?

@@ -12,7 +12,6 @@ hostname-architectures:
   jaguar-ext: xt5
   jaguar: xk6
   jaguarpf-login: xk6
-  jaguarpf-ext: xk6
   lens-login: analysis-x64
   lens: analysis-x64
   rizzo: xt5
