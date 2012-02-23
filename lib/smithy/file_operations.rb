@@ -10,13 +10,21 @@ module Smithy
         end
       end
 
-      def set_group(f, group, options = {})
+      def set_group(f, new_group, options = {})
         method = :chown
         if options.has_key? :recursive
           options.reject!{|k,v| k.eql?(:recursive)}
           method = :chown_R
         end
-        FileUtils.send method, nil, group, f, options
+
+        current_group = Etc.getgrgid(File.stat(f).gid).name rescue nil
+        return if current_group.eql?(new_group)
+
+        begin
+          FileUtils.send method, nil, new_group, f, options
+        rescue
+          raise "Could not set group \"#{new_group}\" on file \"#{f}\""
+        end
       end
 
       def make_group_writable(f, options = {})
@@ -27,7 +35,14 @@ module Smithy
           command = "chmod -R g+w #{f}"
         else
           command = "chmod g+w #{f}"
+          # Check to see if it's already group writeable
+          # convert the integer to a string in base 8
+          mode = File.stat(f).mode.to_s(8)
+          # check the group bit, convert back to integer
+          group_bit = mode[mode.size-2].to_i
+          return if group_bit == 6 || group_bit == 7
         end
+
         puts command if options[:verbose]
         `#{command}` unless options[:noop]
       end
