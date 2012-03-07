@@ -172,12 +172,13 @@ command :new do |c|
            :disable_group => global_options[:"disable-group-writable"]
 
     if p.valid?
-       p.create :dry_run => options[:"dry-run"],
-                    :web => options[:"web-description"]
       if options[:tarball]
-        p.extract :archive => options[:tarball]
+        archive = File.absolute_path options[:tarball]
+        raise "The archive #{archive} does not exist" unless File.exists? archive
       end
-
+      p.create :dry_run => options[:"dry-run"],
+                   :web => options[:"web-description"]
+      p.extract :archive => archive if options[:tarball]
     end
   end
 end

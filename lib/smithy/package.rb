@@ -167,9 +167,6 @@ module Smithy
 
     def extract(args = {})
       archive = args[:archive]
-      archive = File.join(Dir.pwd, args[:archive]) unless File.exists? archive
-      raise "The archive #{archive} does not exist" unless File.exists? archive
-
       temp_dir = File.join(prefix,"tmp")
       source_dir = File.join(prefix,"source")
       FileUtils.rm_rf temp_dir
