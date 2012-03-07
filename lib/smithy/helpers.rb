@@ -86,9 +86,12 @@ module Smithy
   end
 
   def get_arch
-    @hostname = ENV['HOSTNAME'] || `hostname`.chomp
+    @hostname = `hostname -s`.chomp || ENV['HOSTNAME'].chomp
+    # Remove trailing numbers (if they exist)
 		machine = @hostname.gsub(/(\d*)$/,'')
 		arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
+    # Match against hostname if previous attempt fails
+		arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], @hostname) if arch.nil?
 		#TODO Check for nil arch and print coherent error message
 		return arch
   end
