@@ -37,7 +37,6 @@ arg_name "NAME"
 flag [:arch]
 
 desc "Group name for files created by smithy"
-default_value "ccsstaff"
 arg_name "GROUP"
 flag ["file-group-name"]
 
