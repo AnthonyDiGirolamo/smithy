@@ -78,6 +78,7 @@ _smithy ()
       *)
         __smithycomp "
         build
+        repair
         deploy
         edit
         help
@@ -95,6 +96,7 @@ _smithy ()
 	s|search) _smithy_search ;;
 	edit)     _smithy_edit   ;;
 	new)      _smithy_new    ;;
+	repair)   _smithy_repair ;;
 	help)     _smithy_help   ;;
 	*)        ;;
 	esac
@@ -189,7 +191,20 @@ _smithy_new () {
 }
 
 _smithy_help () {
-  __smithycomp "build search new"
+  __smithycomp "build search new edit repair deploy"
+}
+
+_smithy_repair () {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+
+	case "$cur" in
+	-*)
+		__smithycomp "
+      --dry-run"
+		return
+		;;
+	esac
+  __smithy_complete_packages
 }
 
 complete -F _smithy smithy
