@@ -1,14 +1,13 @@
 #!/bin/bash
-source ${MODULESHOME}/init/bash
-source $SW_BLDDIR/remodule
+source $SMITHY_PREFIX/remodule
 
 # clean out old install
-cd $SW_BLDDIR && rm -rf bin doc etc include info lib lib64 libexec man share
-cd $SW_BLDDIR/source
+cd $SMITHY_PREFIX && rm -rf bin doc etc include info lib lib64 libexec man share
+cd $SMITHY_SOURCE
 
 make clean
 
-if ./configure --prefix=$SW_BLDDIR
+if ./configure --prefix=$SMITHY_PREFIX
   then echo "==> CONFIGURE SUCCESS"
   else echo "==> CONFIGURE FAILED" && exit 1
 fi

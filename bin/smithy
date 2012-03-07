@@ -190,8 +190,6 @@ command ['edit'] do |c|
 
   c.desc "Edit a build script (this is the default behavior)"
   c.switch [:b, :build]
-  c.desc "Edit modules loaded for the build script"
-  c.switch [:c, :"compile-time-modules"]
   c.desc "Edit a test script"
   c.switch [:t, :test]
   #c.desc "Edit the package's module-file"
@@ -213,11 +211,16 @@ command ['edit'] do |c|
       p.rebuild_script_exists!
 
       file_name = p.rebuild_script
-      file_name = p.remodule_script if options[:c]
       file_name = p.retest_script   if options[:t]
 
       file_before = File.stat(file_name)
-      status = Kernel::system(editor, file_name)
+      if editor =~ /vim/
+        status = Kernel::system(editor, "-O", file_name, p.remodule_script)
+      elsif editor =~ /emacs/
+        status = Kernel::system(editor, p.remodule_script, file_name)
+      else
+        status = Kernel::system(editor, file_name)
+      end
       #puts status
       #puts $CHILD_STATUS
 
