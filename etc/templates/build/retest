@@ -1,8 +1,6 @@
 #!/bin/bash
-source ${MODULESHOME}/init/bash
-source $SW_BLDDIR/remodule
+# Load environment and modules
+source $SMITHY_PREFIX/remodule
 
-if ./bin/git --version
-  then echo "==> TEST SUCCESS"
-  else echo "==> TEST FAILED" && exit 1
-fi
+run ./bin/executable --version
+

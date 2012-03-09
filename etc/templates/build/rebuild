@@ -1,25 +1,13 @@
 #!/bin/bash
+# Load environment and modules
 source $SMITHY_PREFIX/remodule
 
-# clean out old install
+# Clean out old install
 cd $SMITHY_PREFIX && rm -rf bin doc etc include info lib lib64 libexec man share
+
 cd $SMITHY_SOURCE
-
 make clean
+run ./configure --prefix=$SMITHY_PREFIX
+run make
+run make install
 
-if ./configure --prefix=$SMITHY_PREFIX
-  then echo "==> CONFIGURE SUCCESS"
-  else echo "==> CONFIGURE FAILED" && exit 1
-fi
-
-if make
-  then echo "==> MAKE SUCCESS"
-  else echo "==> MAKE FAILED" && exit 1
-fi
-
-if make install
-  then echo "==> INSTALL SUCCESS"
-  else echo "==> INSTALL FAILED" && exit 1
-fi
-
-exit 0
