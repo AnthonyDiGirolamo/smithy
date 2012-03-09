@@ -183,17 +183,11 @@ command :new do |c|
 end
 
 desc "Edit package support files"
-arg_name "NAME"
+arg_name "build|test|modules NAME"
 command ['edit'] do |c|
   c.desc "Editor for opening script files"
+  c.arg_name "BINARY"
   c.flag [:e, :editor]
-
-  c.desc "Edit a build script (this is the default behavior)"
-  c.switch [:b, :build]
-  c.desc "Edit a test script"
-  c.switch [:t, :test]
-  #c.desc "Edit the package's module-file"
-  #c.switch [:m, :module]
 
   c.action do |global_options,options,args|
     editor = options[:editor] || ENV['EDITOR']
@@ -202,32 +196,55 @@ command ['edit'] do |c|
 
     raise "You must supply a package name to edit" if args.empty?
 
-    p = Package.new :root => global_options[:"software-root"],
-                    :arch => global_options[:arch],
-                    :path => args.first,
-              :file_group => global_options[:"file-group-name"]
-    if p.valid?
-      p.prefix_exists!
-      p.rebuild_script_exists!
+    arguments = args.dup
 
-      file_name = p.rebuild_script
-      file_name = p.retest_script   if options[:t]
+    if arguments.include? "config"
+      file_name = @smithy_config_file
+      status = Kernel::system(editor, file_name)
+    else
 
-      file_before = File.stat(file_name)
-      if editor =~ /vim/
-        status = Kernel::system(editor, "-O", file_name, p.remodule_script)
-      elsif editor =~ /emacs/
-        status = Kernel::system(editor, p.remodule_script, file_name)
+      if arguments.include? "build"
+        file_name = "build"
+        arguments.delete "build"
+      elsif arguments.include? "test"
+        file_name = "test"
+        arguments.delete "test"
+      elsif arguments.include?("env") || arguments.include?("modules")
+        file_name = "env"
+        arguments.delete "env"
       else
-        status = Kernel::system(editor, file_name)
+        file_name = "build"
       end
-      #puts status
-      #puts $CHILD_STATUS
 
-      # Compare modification times
-      if status && File.stat(file_name) > file_before
-        notice "Modified #{file_name}"
+      p = Package.new :root => global_options[:"software-root"],
+                      :arch => global_options[:arch],
+                      :path => arguments.first,
+                :file_group => global_options[:"file-group-name"]
+      if p.valid?
+        p.prefix_exists!
+        p.rebuild_script_exists!
+
+        file_name = p.rebuild_script  if file_name == "build"
+        file_name = p.retest_script   if file_name == "test"
+        file_name = p.remodule_script if file_name == "env"
+
+        file_before = File.stat(file_name)
+        if editor =~ /vim/
+          status = Kernel::system(editor, "-O", file_name, p.remodule_script)
+        elsif editor =~ /emacs/
+          status = Kernel::system(editor, p.remodule_script, file_name)
+        else
+          status = Kernel::system(editor, file_name)
+        end
+        #puts status
+        #puts $CHILD_STATUS
+
+        # Compare modification times
+        if status && File.stat(file_name) > file_before
+          notice "Modified #{file_name}"
+        end
       end
+
     end
   end
 end
