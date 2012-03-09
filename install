@@ -1,0 +1,8 @@
+#!/bin/sh
+bundle exec rake repackage
+source /sw/tools/smithy/environment.sh
+export GEM_HOME=/sw/tools/smithy
+gem uninstall software_smithy --all --executables
+gem install pkg/software_smithy-*.gem
+export GEM_HOME=$HOME/.gem/ruby/1.9.1
+sed -i 's/#!\/.*/#!\/usr\/bin\/env ruby/g' /sw/tools/smithy/bin/*
