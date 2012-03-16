@@ -1,6 +1,15 @@
 = smithy
 
-Describe your project here
+Smithy is a tool that aims to replicate and improve upon functionality of
+swtools. See http://www.olcf.ornl.gov/center-projects/swtools/ for more
+information on swtools.
+
+Smithy's goals are:
+
+- Provide a simplified and intuitive command line interface
+- Reduce the number of steps necessary for each function
+
+The following is command line usage help:
 
 :include:smithy.rdoc
 

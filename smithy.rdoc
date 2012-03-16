@@ -1,5 +1,94 @@
-= smith
+= <tt>smithy</tt>
 
-Generate this with
-    smith rdoc
-After you have described your command line interface
+Smithy will help you build, test, and distribute software with ease.
+
+    smithy [global options] command_name [command-specific options] [--] arguments...
+
+* Use the command +help+ to get a summary of commands
+* Use the command <tt>help command_name</tt> to get a help for +command_name+
+* Use <tt>--</tt> to stop command line argument processing; useful if your arguments have dashes in them
+
+== Global Options
+These options are available for any command and are specified before the name of the command
+
+[<tt>--arch=NAME</tt>] Machine architecure to operate on
+[<tt>--config-file=FILE</tt>] Alternate config file (default: /autofs/na1_home/lmd/smithy/etc/smithyrc)
+[<tt>--disable-group-writable</tt>] Disable group writable file creation
+[<tt>--file-group-name=GROUP</tt>] Group name for files created by smithy
+[<tt>--help</tt>] Show this message
+[<tt>--no-color</tt>] Don't use colors
+[<tt>--software-root=PATH</tt>] The root level directory for software
+== Commands
+[<tt>build</tt>] Build software
+[<tt>deploy</tt>] Deploy a package
+[<tt>edit</tt>] Edit package support files
+[<tt>help</tt>] Shows list of commands or help for one command
+[<tt>new</tt>] Generate a new build and all necessary files
+[<tt>repair</tt>] Repair a package
+[<tt>search</tt>] Search currently installed software
+
+=== <tt>build PATH</tt>
+
+Build software
+
+The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD.
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>--build-log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
+[<tt>--disable-build-log</tt>] Disable build logging
+[<tt>-n, --dry-run</tt>] See what packages will be built but without building them
+[<tt>-s, --send-to-stdout</tt>] Send messages from underlying commands (configure, make, etc) to STDOUT.
+=== <tt>deploy NAME</tt>
+
+Deploy a package
+
+Place module files in the correct locations and update web descriptions.
+
+=== <tt>edit build|test|modules NAME</tt>
+
+Edit package support files
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-e, --editor=BINARY</tt>] Editor for opening script files
+=== <tt>help [command]</tt>
+
+Shows list of commands or help for one command
+
+Gets help for the application or its commands.  Can also list the commands in a way helpful to creating a bash-style completion function
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
+=== <tt>new NAME</tt>
+
+Generate a new build and all necessary files
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-n, --dry-run</tt>] See what files will be created when running new without creating them
+[<tt>-t, --tarball=FILE</tt>] Provide a source tarball to unpack (optional)
+[<tt>--web-description</tt>] Create description file for website
+=== <tt>repair NAME</tt>
+
+Repair a package
+
+Repair permissions and check that files exist
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-n, --dry-run</tt>] Verify permissions only
+=== <tt>search PATTERN</tt>
+
+Search currently installed software
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>--format=path|name|table|csv</tt>] Format of the output <i>( default: <tt>path</tt>)</i>
