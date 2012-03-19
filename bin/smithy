@@ -187,12 +187,14 @@ command :new do |c|
       # Template modulefile
       @package = p
       module_erb = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
-      new_module = File.join(p.prefix,"modulefile.new")
+      new_module = File.join(p.prefix,"modulefile_#{Time.now.to_i}")
       old_module = File.join(p.prefix,"modulefile")
       erb = ERB.new(File.read(module_erb), nil, "<>")
       File.open(new_module, "w+") do |f|
         f.write erb.result
       end
+      FileOperations.make_group_writable(new_module, :verbose => options["dry-run"])
+      FileOperations.set_group(new_module, p.group, :verbose => options["dry-run"])
       if FileOperations.install_file(new_module, old_module, :verbose => options["dry-run"])
         FileUtils.rm_f(new_module, :verbose => options["dry-run"])
         FileOperations.make_group_writable(old_module, :verbose => options["dry-run"])

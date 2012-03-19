@@ -169,36 +169,57 @@ module Smithy
       archive = args[:archive]
       temp_dir = File.join(prefix,"tmp")
       source_dir = File.join(prefix,"source")
-      FileUtils.rm_rf temp_dir
-      FileUtils.rm_rf source_dir
-      FileUtils.mkdir temp_dir
-      FileUtils.cd temp_dir
 
-      notice "Extracting #{archive} to #{source_dir}"
-
-      magic_bytes = nil
-      File.open(archive) do |f|
-        magic_bytes = f.read(4)
-      end
-      case magic_bytes
-      when /^PK\003\004/ # .zip archive
-        `unzip #{tarfile}`
-      when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
-        `tar xf #{archive}`
-      end
-
-      extracted_files = Dir.glob('*')
-      if extracted_files.count == 1
-        FileUtils.mv extracted_files.first, source_dir
-      else
-        FileUtils.cd prefix
-        FileUtils.mv temp_dir, source_dir
+      overwrite = nil
+      while overwrite.nil? do
+        prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynqh] ")
+        case prompt.downcase
+        when "y"
+          overwrite = true
+        when "n"
+          overwrite = false
+        when "h"
+          puts %{y - yes, overwrite
+n - no, do not overwrite
+q - quit, abort
+h - help, show this help}
+        when "q"
+          raise "Abort new package"
+        end
       end
 
-      FileUtils.rm_rf temp_dir
+      if overwrite == true
+        FileUtils.rm_rf temp_dir
+        FileUtils.rm_rf source_dir
+        FileUtils.mkdir temp_dir
+        FileUtils.cd temp_dir
 
-      FileOperations.set_group source_dir, @group, :recursive => true
-      FileOperations.make_group_writable source_dir, :recursive => true if group_writeable?
+        notice "Extracting #{archive} to #{source_dir}"
+
+        magic_bytes = nil
+        File.open(archive) do |f|
+          magic_bytes = f.read(4)
+        end
+        case magic_bytes
+        when /^PK\003\004/ # .zip archive
+          `unzip #{tarfile}`
+        when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
+          `tar xf #{archive}`
+        end
+
+        extracted_files = Dir.glob('*')
+        if extracted_files.count == 1
+          FileUtils.mv extracted_files.first, source_dir
+        else
+          FileUtils.cd prefix
+          FileUtils.mv temp_dir, source_dir
+        end
+
+        FileUtils.rm_rf temp_dir
+
+        FileOperations.set_group source_dir, @group, :recursive => true
+        FileOperations.make_group_writable source_dir, :recursive => true if group_writeable?
+      end
     end
 
     def create(args = {})
@@ -219,14 +240,17 @@ module Smithy
         FileOperations.install_file file[:src], file[:dest], options
         FileOperations.set_group file[:dest], group, options
         FileOperations.make_group_writable file[:dest], options if group_writeable?
-        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(rebuild|relink|retest)/
+        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(rebuild|relink|retest|remodule)/
       end
     end
 
     def repair(args = {})
       notice "Repair #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
       options = {:noop => false, :verbose => false}
-      options[:noop] = true if args[:dry_run]
+      if args[:dry_run]
+        options[:noop] = true
+        options[:verbose] = true
+      end
 
       notice "Setting permissions"
 
@@ -244,11 +268,11 @@ module Smithy
 
         if File.exists?(f)
           if File.size(f) == 0
-            puts "empty ".rjust(12).bright + f
+            puts "empty ".rjust(12).color(:red) + f
           else
             puts "exists ".rjust(12).bright + f
           end
-          FileOperations.make_executable file[:dest], options if f =~ /(rebuild|relink|retest)/
+          FileOperations.make_executable file[:dest], options if f =~ /(rebuild|remodule|relink|retest)/
         else
           puts "missing ".rjust(12).bright + f
           # copy template?

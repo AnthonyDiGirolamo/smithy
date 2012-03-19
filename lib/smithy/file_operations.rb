@@ -18,12 +18,12 @@ module Smithy
         end
 
         current_group = Etc.getgrgid(File.stat(f).gid).name rescue nil
-        return if current_group.eql?(new_group)
+        return if current_group.eql?(new_group) && method == :chown
 
         begin
           FileUtils.send method, nil, new_group, f, options
         rescue
-          raise "Could not set group \"#{new_group}\" on file \"#{f}\""
+          raise "Could not set group \"#{new_group}\" on \"#{f}\""
         end
       end
 
