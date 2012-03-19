@@ -14,6 +14,7 @@ bin/smithy
 etc/autocomplete.bash
 etc/autocomplete.zsh
 etc/smithyrc
+etc/templates/modulefile.erb
 etc/templates/build/.owners
 etc/templates/build/build-notes
 etc/templates/build/dependencies
@@ -45,7 +46,8 @@ lib/smithy_version.rb
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
   s.add_dependency('gli')
+  s.add_dependency('maruku')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
-  s.add_dependency('terminal-table')
+  s.add_dependency('terminal-table', '< 1.4.5')
 end
