@@ -1,4 +1,5 @@
 #!/bin/sh
+bundle exec rake rerdoc
 bundle exec rake repackage
 
 source ${MODULESHOME}/init/bash
