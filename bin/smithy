@@ -11,8 +11,9 @@ unless File.respond_to? :realpath
   end
 end
 
-# Add the lib dir to the ruby library search path
+# Absolute path to the smithy gem prefix
 @@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+# Add the smithy lib dir to the ruby library search path
 $: << File.expand_path(@@smithy_bin_root + '/lib')
 
 require 'rubygems'
@@ -22,12 +23,15 @@ require 'open4'
 require 'rainbow'
 require 'readline'
 require 'terminal-table'
+require 'erb'
 require 'smithy'
 
 include GLI
 include Smithy
 
 version Smithy::VERSION
+
+# Absolute path to the smithy config file
 @smithy_config_file = File.join(@@smithy_bin_root,"etc/smithyrc")
 
 program_desc "Smithy will help you build, test, and distribute software with ease."
@@ -177,7 +181,23 @@ command :new do |c|
       end
       p.create :dry_run => options[:"dry-run"],
                    :web => options[:"web-description"]
+
       p.extract :archive => archive if options[:tarball]
+
+      # Template modulefile
+      @package = p
+      module_erb = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
+      new_module = File.join(p.prefix,"modulefile.new")
+      old_module = File.join(p.prefix,"modulefile")
+      erb = ERB.new(File.read(module_erb), nil, "<>")
+      File.open(new_module, "w+") do |f|
+        f.write erb.result
+      end
+      if FileOperations.install_file(new_module, old_module, :verbose => options["dry-run"])
+        FileUtils.rm_f(new_module, :verbose => options["dry-run"])
+        FileOperations.make_group_writable(old_module, :verbose => options["dry-run"])
+        FileOperations.set_group(old_module, p.group, :verbose => options["dry-run"])
+      end
     end
   end
 end

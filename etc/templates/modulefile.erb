@@ -1,0 +1,38 @@
+#%Module
+# Include any important help information here.
+# This will be displayed when users run <%= @package.name %>/<%= @package.version %>
+proc ModulesHelp { } {
+   puts stderr "<%= @package.name %> <%= @package.version %>"
+   puts stderr ""
+}
+# One line description
+module-whatis "<%= @package.name %> <%= @package.version %>"
+<% if nil %>
+if [ is-loaded pathscale ] {
+  puts stderr "Not implemented for the pathscale compiler"
+  break
+} elseif [ is-loaded pgi ] {
+  if [ is-loaded pgi/11.10 ] {
+    set BUILD centos5.7_pgi11.10
+  } else {
+    set BUILD centos5.7_pgi10.6
+  }
+} elseif [ is-loaded gcc/4.3.2 ] {
+  set BUILD centos5.7_gnu4.3.2
+} elseif [ is-loaded intel/11.1.072 ] {
+  set BUILD centos5.7_intel11.1.072
+} else {
+  puts stderr "Atlas $VERSION is available for the following compilers:"
+  puts stderr "  gnu/4.3.2"
+  puts stderr "  pgi/10.6"
+  puts stderr "  pgi/11.10"
+  puts stderr "  intel/11.1.072"
+  break
+}
+<% end %>
+
+set PREFIX <%= @package.prefix %>
+setenv <%= @package.name.upcase %>_DIR $PREFIX
+prepend-path PATH $PREFIX/bin
+prepend-path LD_LIBRARY_PATH $PREFIX/lib
+prepend-path MANPATH $PREFIX/share/man

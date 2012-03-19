@@ -57,9 +57,11 @@ module Smithy
       end
 
       def install_file(source, dest, options = {})
+				installed = false
         if File.exists?(dest)
           if FileUtils.identical?(source, dest)
             puts "identical ".rjust(12).bright + dest
+						installed = true
           else
             puts "conflict ".rjust(12).color(:red) + dest
             overwrite = nil
@@ -88,6 +90,7 @@ module Smithy
             if overwrite == true
               puts "force ".rjust(12).bright + dest
               FileUtils.install source, dest, options
+							installed = true
             else
               puts "skip ".rjust(12).bright + dest
             end
@@ -95,7 +98,10 @@ module Smithy
         else
           FileUtils.install source, dest, options
           puts "create ".rjust(12).bright + dest
+					installed = true
         end
+
+				return installed
       end
 
     end

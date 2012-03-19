@@ -255,5 +255,6 @@ module Smithy
         end
       end
     end
+
   end
 end
