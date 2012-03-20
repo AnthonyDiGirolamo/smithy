@@ -35,12 +35,14 @@ module Smithy
           command = "chmod -R g+w #{f}"
         else
           command = "chmod g+w #{f}"
-          # Check to see if it's already group writeable
-          # convert the integer to a string in base 8
-          mode = File.stat(f).mode.to_s(8)
-          # check the group bit, convert back to integer
-          group_bit = mode[mode.size-2].to_i
-          return if group_bit == 6 || group_bit == 7
+          unless options[:noop]
+            # Check to see if it's already group writeable
+            # convert the integer to a string in base 8
+            mode = File.stat(f).mode.to_s(8)
+            # check the group bit, convert back to integer
+            group_bit = mode[mode.size-2].to_i
+            return if group_bit == 6 || group_bit == 7
+          end
         end
 
         puts command if options[:verbose]
