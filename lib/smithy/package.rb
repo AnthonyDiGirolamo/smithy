@@ -289,7 +289,7 @@ module Smithy
       builds.collect! do |s|
         s.split("/").last
       end
-      return builds
+      return builds.sort
     end
 
     def create_modulefile(args = {})

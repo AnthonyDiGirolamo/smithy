@@ -1,6 +1,6 @@
 #%Module
 proc ModulesHelp { } {
-   puts stderr "[module-info name]"
+   puts stderr "<%= @package.name %> <%= @package.version %>"
    puts stderr ""
 }
 # One line description
@@ -9,43 +9,7 @@ module-whatis "<%= @package.name %> <%= @package.version %>"
 <% if @builds.empty? %>
 set PREFIX <%= @package.prefix %>
 <% else %>
-if [ is-loaded gcc ] {
-<% if i=@builds.index{|b|b=~/(gnu|gcc)/} %>
-  set BUILD <%= @builds[i] %>
-<% else %>
-  puts stderr "Not implemented for the gnu compiler"
-<% end %>
-} elseif [ is-loaded pgi ] {
-<% if i=@builds.index{|b|b=~/pgi/} %>
-  set BUILD <%= @builds[i] %>
-<% else %>
-  puts stderr "Not implemented for the pgi compiler"
-<%# if [ is-loaded pgi/11.10 ] { set BUILD <%= @builds[i] } else { set BUILD <%= @builds[i] } %>
-<% end %>
-} elseif [ is-loaded intel ] {
-<% if i=@builds.index{|b|b=~/intel/} %>
-  set BUILD <%= @builds[i] %>
-<% else %>
-  puts stderr "Not implemented for the intel compiler"
-<% end %>
-} elseif [ is-loaded cce ] {
-<% if i=@builds.index{|b|b=~/cray/} %>
-  set BUILD <%= @builds[i] %>
-<% else %>
-  puts stderr "Not implemented for the cray compiler"
-<% end %>
-} elseif [ is-loaded pathscale ] {
-<% if i=@builds.index{|b|b=~/pathscale/} %>
-  set BUILD <%= @builds[i] %>
-<% else %>
-  puts stderr "Not implemented for the pathscale compiler"
-<% end %>
-}
-if {![info exists BUILD]} {
-  puts stderr "[module-info name] is only available for the following environments:"
-  <% @builds.each do |build| %>puts stderr "  <%= build %>"
-  <% end %>break
-}
+<%= module_build_list @package, @builds %>
 
 set PREFIX <%= @package.version_directory %>/$BUILD
 <% end %>
