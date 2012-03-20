@@ -170,6 +170,10 @@ module Smithy
       temp_dir = File.join(prefix,"tmp")
       source_dir = File.join(prefix,"source")
 
+      notice "Extracting #{archive} to #{source_dir}"
+
+      return if args[:dry_run]
+
       overwrite = nil
       while overwrite.nil? do
         prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynqh] ")
@@ -193,8 +197,6 @@ h - help, show this help}
         FileUtils.rm_rf source_dir
         FileUtils.mkdir temp_dir
         FileUtils.cd temp_dir
-
-        notice "Extracting #{archive} to #{source_dir}"
 
         magic_bytes = nil
         File.open(archive) do |f|
@@ -247,10 +249,8 @@ h - help, show this help}
     def repair(args = {})
       notice "Repair #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
       options = {:noop => false, :verbose => false}
-      if args[:dry_run]
-        options[:noop] = true
-        options[:verbose] = true
-      end
+      options[:noop] = true if args[:dry_run]
+      options[:verbose] = true if args[:dry_run] || args[:verbose]
 
       notice "Setting permissions"
 
@@ -278,6 +278,38 @@ h - help, show this help}
           # copy template?
         end
       end
+    end
+
+    def all_builds
+      builds = Dir.glob(version_directory+"/*")
+      builds.collect! do |s|
+        s.split("/").last
+      end
+      return builds
+    end
+
+    def create_modulefile(args = {})
+      options = {:noop => false, :verbose => false}
+      options[:noop] = true if args[:dry_run]
+      module_erb  = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
+      module_path = File.join(self.prefix, "modulefile")
+      module_dir  = File.join(module_path, self.name)
+      new_module  = File.join(module_dir, self.version+"_#{Time.now.to_i}")
+      old_module  = File.join(module_dir, self.version)
+      FileUtils.mkdir_p(module_dir, options)
+      unless args[:dry_run]
+        erb = ERB.new(File.read(module_erb), nil, "<>")
+        File.open(new_module, "w+") do |f|
+          f.write erb.result
+        end
+      end
+
+      if FileOperations.install_file(new_module, old_module, options)
+        FileUtils.rm_f(new_module, options)
+      end
+
+      FileOperations.make_group_writable(module_path, options.merge(:recursive => true))
+      FileOperations.set_group(module_path, self.group, options.merge(:recursive => true))
     end
 
   end

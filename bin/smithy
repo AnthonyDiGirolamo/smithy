@@ -154,6 +154,20 @@ command ['build'] do |c|
 end
 
 desc "Generate a new build and all necessary files"
+#long_desc <<-EOS
+#The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+
+#NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+
+#VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
+
+#BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
+
+#EXAMPLES:
+
+#silo/4.8/sles11.1_gnu4.5.3
+#fftw/3.2.2/cle4.0_pgi11.10.0
+#EOS
 arg_name "NAME"
 command :new do |c|
   c.desc "Create description file for website"
@@ -182,24 +196,11 @@ command :new do |c|
       p.create :dry_run => options[:"dry-run"],
                    :web => options[:"web-description"]
 
-      p.extract :archive => archive if options[:tarball]
+      p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
 
-      # Template modulefile
       @package = p
-      module_erb = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
-      new_module = File.join(p.prefix,"modulefile_#{Time.now.to_i}")
-      old_module = File.join(p.prefix,"modulefile")
-      erb = ERB.new(File.read(module_erb), nil, "<>")
-      File.open(new_module, "w+") do |f|
-        f.write erb.result
-      end
-      FileOperations.make_group_writable(new_module, :verbose => options["dry-run"])
-      FileOperations.set_group(new_module, p.group, :verbose => options["dry-run"])
-      if FileOperations.install_file(new_module, old_module, :verbose => options["dry-run"])
-        FileUtils.rm_f(new_module, :verbose => options["dry-run"])
-        FileOperations.make_group_writable(old_module, :verbose => options["dry-run"])
-        FileOperations.set_group(old_module, p.group, :verbose => options["dry-run"])
-      end
+      @builds = p.all_builds
+      p.create_modulefile :dry_run => options[:"dry-run"]
     end
   end
 end
@@ -306,6 +307,22 @@ long_desc "Place module files in the correct locations and update web descriptio
 arg_name "NAME"
 command ['deploy'] do |c|
   c.action do |global_options,options,args|
+    packages = args
+    if args.empty?
+      notice "Reading package names from STDIN..."
+      packages = STDIN.readlines.map{|p| p.chomp}
+    end
+
+    raise "You must supply at least one package to deploy" if packages.empty?
+
+    packages.each do |package|
+      p = Package.new :root => global_options[:"software-root"],
+                      :arch => global_options[:arch],
+                      :path => package
+      if p.valid?
+        notice "Deploying #{p.prefix}"
+      end
+    end
   end
 end
 

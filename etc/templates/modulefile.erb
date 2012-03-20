@@ -1,38 +1,56 @@
 #%Module
-# Include any important help information here.
-# This will be displayed when users run <%= @package.name %>/<%= @package.version %>
 proc ModulesHelp { } {
-   puts stderr "<%= @package.name %> <%= @package.version %>"
+   puts stderr "[module-info name]"
    puts stderr ""
 }
 # One line description
 module-whatis "<%= @package.name %> <%= @package.version %>"
-<% if nil %>
-if [ is-loaded pathscale ] {
-  puts stderr "Not implemented for the pathscale compiler"
-  break
-} elseif [ is-loaded pgi ] {
-  if [ is-loaded pgi/11.10 ] {
-    set BUILD centos5.7_pgi11.10
-  } else {
-    set BUILD centos5.7_pgi10.6
-  }
-} elseif [ is-loaded gcc/4.3.2 ] {
-  set BUILD centos5.7_gnu4.3.2
-} elseif [ is-loaded intel/11.1.072 ] {
-  set BUILD centos5.7_intel11.1.072
-} else {
-  puts stderr "Atlas $VERSION is available for the following compilers:"
-  puts stderr "  gnu/4.3.2"
-  puts stderr "  pgi/10.6"
-  puts stderr "  pgi/11.10"
-  puts stderr "  intel/11.1.072"
-  break
-}
-<% end %>
 
+<% if @builds.empty? %>
 set PREFIX <%= @package.prefix %>
+<% else %>
+if [ is-loaded gcc ] {
+<% if i=@builds.index{|b|b=~/(gnu|gcc)/} %>
+  set BUILD <%= @builds[i] %>
+<% else %>
+  puts stderr "Not implemented for the gnu compiler"
+<% end %>
+} elseif [ is-loaded pgi ] {
+<% if i=@builds.index{|b|b=~/pgi/} %>
+  set BUILD <%= @builds[i] %>
+<% else %>
+  puts stderr "Not implemented for the pgi compiler"
+<%# if [ is-loaded pgi/11.10 ] { set BUILD <%= @builds[i] } else { set BUILD <%= @builds[i] } %>
+<% end %>
+} elseif [ is-loaded intel ] {
+<% if i=@builds.index{|b|b=~/intel/} %>
+  set BUILD <%= @builds[i] %>
+<% else %>
+  puts stderr "Not implemented for the intel compiler"
+<% end %>
+} elseif [ is-loaded cce ] {
+<% if i=@builds.index{|b|b=~/cray/} %>
+  set BUILD <%= @builds[i] %>
+<% else %>
+  puts stderr "Not implemented for the cray compiler"
+<% end %>
+} elseif [ is-loaded pathscale ] {
+<% if i=@builds.index{|b|b=~/pathscale/} %>
+  set BUILD <%= @builds[i] %>
+<% else %>
+  puts stderr "Not implemented for the pathscale compiler"
+<% end %>
+}
+if {![info exists BUILD]} {
+  puts stderr "[module-info name] is only available for the following environments:"
+  <% @builds.each do |build| %>puts stderr "  <%= build %>"
+  <% end %>break
+}
+
+set PREFIX <%= @package.version_directory %>/$BUILD
+<% end %>
 setenv <%= @package.name.upcase %>_DIR $PREFIX
 prepend-path PATH $PREFIX/bin
 prepend-path LD_LIBRARY_PATH $PREFIX/lib
 prepend-path MANPATH $PREFIX/share/man
+
