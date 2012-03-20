@@ -175,24 +175,28 @@ module Smithy
       return if args[:dry_run]
 
       overwrite = nil
-      while overwrite.nil? do
-        prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynqh] ")
-        case prompt.downcase
-        when "y"
-          overwrite = true
-        when "n"
-          overwrite = false
-        when "h"
-          puts %{y - yes, overwrite
-n - no, do not overwrite
-q - quit, abort
-h - help, show this help}
-        when "q"
-          raise "Abort new package"
+      if File.exists?(source_dir)
+        while overwrite.nil? do
+          prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynqh] ")
+          case prompt.downcase
+          when "y"
+            overwrite = true
+          when "n"
+            overwrite = false
+          when "h"
+            puts %{y - yes, overwrite
+  n - no, do not overwrite
+  q - quit, abort
+  h - help, show this help}
+          when "q"
+            raise "Abort new package"
+          end
         end
+      else
+        overwrite = true
       end
 
-      if overwrite == true
+      if overwrite
         FileUtils.rm_rf temp_dir
         FileUtils.rm_rf source_dir
         FileUtils.mkdir temp_dir
