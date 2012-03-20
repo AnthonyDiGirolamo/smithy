@@ -45,6 +45,7 @@ lib/smithy_version.rb
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
+  s.add_development_dependency('ronn')
   s.add_dependency('gli')
   s.add_dependency('maruku')
   s.add_dependency('open4')
