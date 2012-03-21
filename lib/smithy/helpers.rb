@@ -108,15 +108,14 @@ module Smithy
     return swroot
   end
 
-
   def module_build_list(package, builds, args = {})
     output = ""
     environments = [
-      {:name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
-      {:name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
-      {:name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
-      {:name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
-      {:name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
+      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
+      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
+      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
+      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
+      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
     ]
 
     environments.each_with_index do |e,i|
@@ -125,13 +124,13 @@ module Smithy
       else
         output << "} elseif "
       end
-      output << "[ is-loaded #{e[:name]} ] {\n"
+      output << "[ is-loaded #{e[:prg_env]} ] {\n"
       if j=builds.index{|b|b=~e[:regex]}
         sub_builds = builds.select{|b|b=~e[:regex]}
         if sub_builds.size > 1
           sub_builds.each_with_index do |b,k|
             b =~ e[:regex]
-            name = e[:name]
+            name = e[:compiler_name]
             version = $2
             if k == 0
               output << "  if "

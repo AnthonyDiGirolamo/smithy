@@ -154,20 +154,20 @@ command ['build'] do |c|
 end
 
 desc "Generate a new build and all necessary files"
-#long_desc <<-EOS
-#The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+long_desc <<-EOS
+The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
 
-#NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
 
-#VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
+VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
 
-#BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
+BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
 
-#EXAMPLES:
+EXAMPLES:
 
-#silo/4.8/sles11.1_gnu4.5.3
-#fftw/3.2.2/cle4.0_pgi11.10.0
-#EOS
+silo/4.8/sles11.1_gnu4.5.3
+fftw/3.2.2/cle4.0_pgi11.10.0
+EOS
 arg_name "NAME"
 command :new do |c|
   c.desc "Create description file for website"
@@ -175,6 +175,9 @@ command :new do |c|
 
   c.desc "See what files will be created when running new without creating them"
   c.switch [:n, "dry-run"]
+
+  c.desc "Skip modulefile generation"
+  c.switch ["skip-modulefile"]
 
   c.desc "Provide a source tarball to unpack (optional)"
   c.arg_name "FILE"
@@ -198,9 +201,12 @@ command :new do |c|
 
       p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
 
-      @package = p
-      @builds = p.all_builds
-      p.create_modulefile :dry_run => options[:"dry-run"]
+      unless options[:"skip-modulefile"]
+        # Instance Variables for erb template
+        @package = p
+        @builds = p.all_builds
+        p.create_modulefile :dry_run => options[:"dry-run"]
+      end
     end
   end
 end
