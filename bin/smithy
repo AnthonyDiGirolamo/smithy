@@ -327,6 +327,25 @@ command ['deploy'] do |c|
                       :path => package
       if p.valid?
         notice "Deploying #{p.prefix}"
+
+        description = File.join(p.application_directory, "description.markdown")
+        text = ""
+
+        begin
+          if File.exist? description
+            f = File.open description
+            d = Maruku.new(f.read)
+            text = d.to_html
+          else
+            description = File.join(p.application_directory, "description")
+            f = File.open description
+            text = f.read
+          end
+        rescue => exception
+          raise "Cannot read #{description}"
+        end
+
+        puts text
       end
     end
   end
