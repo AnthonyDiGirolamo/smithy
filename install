@@ -1,4 +1,5 @@
 #!/bin/sh
+bundle exec smithy rdoc
 bundle exec rake rerdoc
 bundle exec rake repackage
 

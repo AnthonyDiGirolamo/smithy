@@ -23,6 +23,7 @@ These options are available for any command and are specified before the name of
 [<tt>deploy</tt>] Deploy a package
 [<tt>edit</tt>] Edit package support files
 [<tt>help</tt>] Shows list of commands or help for one command
+[<tt>module</tt>] Manage modulefiles for a package
 [<tt>new</tt>] Generate a new build and all necessary files
 [<tt>repair</tt>] Repair a package
 [<tt>search</tt>] Search currently installed software
@@ -64,14 +65,42 @@ Gets help for the application or its commands.  Can also list the commands in a 
 These options are specified *after* the command.
 
 [<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
+=== <tt>module NAME</tt>
+
+Manage modulefiles for a package
+
+smithy module create NAME/VERSION/BUILD
+
+Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
+
+smithy module use NAME/VERSION/BUILD
+
+Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
+
+
 === <tt>new NAME</tt>
 
 Generate a new build and all necessary files
+
+The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+
+NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+
+VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
+
+BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
+
+EXAMPLES:
+
+silo/4.8/sles11.1_gnu4.5.3
+fftw/3.2.2/cle4.0_pgi11.10.0
+
 
 ==== Options
 These options are specified *after* the command.
 
 [<tt>-n, --dry-run</tt>] See what files will be created when running new without creating them
+[<tt>--skip-modulefile</tt>] Skip modulefile generation
 [<tt>-t, --tarball=FILE</tt>] Provide a source tarball to unpack (optional)
 [<tt>--web-description</tt>] Create description file for website
 === <tt>repair NAME</tt>

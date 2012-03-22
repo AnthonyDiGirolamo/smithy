@@ -286,9 +286,10 @@ module Smithy
 
     def all_builds
       builds = Dir.glob(version_directory+"/*")
-      builds.collect! do |s|
-        s.split("/").last
-      end
+      # Delete anything that isn't a directory
+      builds.reject! { |b| ! File.directory?(b) }
+      # Get the directory name from the full path
+      builds.collect! { |b| File.basename(b) }
       return builds.sort
     end
 
