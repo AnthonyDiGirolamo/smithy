@@ -24,12 +24,16 @@ end
 
 module Smithy
   def notice(message)
-    STDOUT.puts "==> "+message.bright if STDOUT.tty?
+    STDOUT.puts ("==> "+message).bright if STDOUT.tty?
+  end
+
+  def notice_warn(message)
+    STDOUT.puts ("==> "+message).color(:yellow) if STDOUT.tty?
   end
 
   def notice_success(message)
     if STDOUT.tty?
-      STDOUT.puts "==> "+message.color(:green)
+      STDOUT.puts ("==> "+message).color(:green)
     else
       STDOUT.puts message
     end
@@ -37,7 +41,7 @@ module Smithy
 
   def notice_fail(message)
     if STDOUT.tty?
-      STDOUT.puts "==> "+message.color(:red)
+      STDOUT.puts ("==> "+message).color(:red)
     else
       STDOUT.puts message
     end
@@ -88,12 +92,12 @@ module Smithy
   def get_arch
     @hostname = `hostname -s`.chomp || ENV['HOSTNAME'].chomp
     # Remove trailing numbers (if they exist)
-		machine = @hostname.gsub(/(\d*)$/,'')
-		arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
+    machine = @hostname.gsub(/(\d*)$/,'')
+    arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
     # Match against hostname if previous attempt fails
-		arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], @hostname) if arch.nil?
-		#TODO Check for nil arch and print coherent error message
-		return arch
+    arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], @hostname) if arch.nil?
+    #TODO Check for nil arch and print coherent error message
+    return arch
   end
 
   def get_software_root(args = {})

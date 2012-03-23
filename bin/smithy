@@ -363,6 +363,8 @@ Run the proper module command to add a package's modulefile to the MODULEPATH. T
 EOS
 arg_name "NAME"
 command ['module'] do |c|
+  c.desc "See what files will be created without creating them"
+  c.switch [:n, "dry-run"]
   c.action do |global_options,options,args|
     raise "You must supply a package name" if args.empty?
 
@@ -374,25 +376,28 @@ command ['module'] do |c|
     elsif arguments.include? "create"
       operation = :create
       arguments.delete "create"
+    elsif arguments.include? "deploy"
+      operation = :deploy
+      arguments.delete "deploy"
     end
 
     p = Package.new :root => global_options[:"software-root"],
                     :arch => global_options[:arch],
                     :path => arguments.first
     if p.valid?
+      m = ModuleFile.new :package => p
       case operation
       when :use
-        module_path = File.join(p.prefix, "modulefile")
-        if Dir.exist?(module_path)
-          puts "module use #{module_path}"
+        mp = m.module_path
+        if Dir.exist?(mp)
+          return "module use #{mp}"
         else
-          raise "No modulefiles found in #{module_path}"
+          raise "No modulefiles found in #{mp}"
         end
       when :create
-        # Instance Variables for erb template
-        @package = p
-        @builds = p.all_builds
-        p.create_modulefile :dry_run => options[:"dry-run"]
+        m.create :dry_run => options[:"dry-run"]
+      when :deploy
+        m.deploy :dry_run => options[:"dry-run"]
       end
     end
   end

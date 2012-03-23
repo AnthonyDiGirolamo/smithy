@@ -293,29 +293,5 @@ module Smithy
       return builds.sort
     end
 
-    def create_modulefile(args = {})
-      options = {:noop => false, :verbose => false}
-      options[:noop] = true if args[:dry_run]
-      module_erb  = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
-      module_path = File.join(self.prefix, "modulefile")
-      module_dir  = File.join(module_path, self.name)
-      new_module  = File.join(module_dir, self.version+"_#{Time.now.to_i}")
-      old_module  = File.join(module_dir, self.version)
-      FileUtils.mkdir_p(module_dir, options)
-      unless args[:dry_run]
-        erb = ERB.new(File.read(module_erb), nil, "<>")
-        File.open(new_module, "w+") do |f|
-          f.write erb.result
-        end
-      end
-
-      if FileOperations.install_file(new_module, old_module, options)
-        FileUtils.rm_f(new_module, options)
-      end
-
-      FileOperations.make_group_writable(module_path, options.merge(:recursive => true))
-      FileOperations.set_group(module_path, self.group, options.merge(:recursive => true))
-    end
-
   end
 end
