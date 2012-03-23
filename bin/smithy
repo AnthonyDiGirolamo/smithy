@@ -360,6 +360,11 @@ Generate a modulefile for a given package. This operation normally happens after
 smithy module use NAME/VERSION/BUILD
 
 Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
+
+smithy module deploy NAME/VERSION/BUILD
+
+Copy a package's module_file to the system module path. This is typically done after you have tested a new module in isolation.
+
 EOS
 arg_name "NAME"
 command ['module'] do |c|
