@@ -137,11 +137,10 @@ command ['build'] do |c|
     raise "You must supply at least one package to build" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :root => global_options[:"software-root"],
-                      :arch => global_options[:arch],
-                      :path => package,
+      p = Package.new :path => package,
                 :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"]
+             :disable_group => global_options[:"disable-group-writable"],
+             :software_root => global_options[:full_software_root_path]
 
       if p.valid?
         p.run_rebuild_script :dry_run => options[:"dry-run"],
@@ -185,11 +184,10 @@ command :new do |c|
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
-    p = Package.new :root => global_options[:"software-root"],
-                    :arch => global_options[:arch],
-                    :path => args.first,
+    p = Package.new :path => args.first,
               :file_group => global_options[:"file-group-name"],
-           :disable_group => global_options[:"disable-group-writable"]
+           :disable_group => global_options[:"disable-group-writable"],
+           :software_root => global_options[:full_software_root_path]
 
     if p.valid?
       if options[:tarball]
@@ -202,10 +200,8 @@ command :new do |c|
       p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
 
       unless options[:"skip-modulefile"]
-        # Instance Variables for erb template
-        @package = p
-        @builds = p.all_builds
-        p.create_modulefile :dry_run => options[:"dry-run"]
+        m = ModuleFile.new :package => p
+        m.create :dry_run => options[:"dry-run"]
       end
     end
   end
@@ -245,10 +241,9 @@ command ['edit'] do |c|
         file_name = "build"
       end
 
-      p = Package.new :root => global_options[:"software-root"],
-                      :arch => global_options[:arch],
-                      :path => arguments.first,
-                :file_group => global_options[:"file-group-name"]
+      p = Package.new :path => arguments.first,
+                :file_group => global_options[:"file-group-name"],
+             :software_root => global_options[:full_software_root_path]
       if p.valid?
         p.prefix_exists!
         p.rebuild_script_exists!
@@ -295,11 +290,10 @@ command ['repair'] do |c|
     raise "You must supply at least one package to repair" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :root => global_options[:"software-root"],
-                      :arch => global_options[:arch],
-                      :path => package,
+      p = Package.new :path => package,
                 :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"]
+             :disable_group => global_options[:"disable-group-writable"],
+             :software_root => global_options[:full_software_root_path]
 
       if p.valid?
         p.repair :dry_run => options[:"dry-run"]
@@ -322,9 +316,8 @@ command ['deploy'] do |c|
     raise "You must supply at least one package to deploy" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :root => global_options[:"software-root"],
-                      :arch => global_options[:arch],
-                      :path => package
+      p = Package.new :path => package,
+             :software_root => global_options[:full_software_root_path]
       if p.valid?
         notice "Deploying #{p.prefix}"
 
@@ -386,9 +379,8 @@ command ['module'] do |c|
       arguments.delete "deploy"
     end
 
-    p = Package.new :root => global_options[:"software-root"],
-                    :arch => global_options[:arch],
-                    :path => arguments.first
+    p = Package.new :path => arguments.first,
+             :software_root => global_options[:full_software_root_path]
     if p.valid?
       m = ModuleFile.new :package => p
       case operation

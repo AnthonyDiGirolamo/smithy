@@ -4,8 +4,13 @@ module Smithy
     attr_accessor :group
 
     def initialize(args = {})
-      @root   = args[:root]
-      @arch   = args[:arch]
+      if args[:software_root]
+        @root = File.dirname args[:software_root]
+        @arch = File.basename args[:software_root]
+      else
+        @root = args[:root]
+        @arch = args[:arch]
+      end
       # Remove root and arch from the path if necessary
       @path = args[:path]
       p = args[:path].dup
