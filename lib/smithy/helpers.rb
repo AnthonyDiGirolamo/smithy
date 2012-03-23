@@ -90,10 +90,9 @@ module Smithy
   end
 
   def get_arch
-    #@hostname = `hostname -s`.chomp || ENV['HOSTNAME'].chomp
     @hostname = ENV['HOSTNAME'].chomp || `hostname -s`.chomp
-    # Remove trailing numbers (if they exist)
-    machine = @hostname.gsub(/(\d*)$/,'')
+    # Remove trailing numbers (if they exist) and a possible single trailing period
+    machine = @hostname.gsub(/(\d*)\.?$/,'')
     arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
     # Match against hostname if previous attempt fails
     arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], @hostname) if arch.nil?
