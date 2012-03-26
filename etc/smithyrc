@@ -1,5 +1,6 @@
 ---
 software-root: /sw
+web-root: /sw/tools/www
 file-group-name: ccsstaff
 hostname-architectures:
   arthur-login: xk6

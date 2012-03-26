@@ -73,6 +73,7 @@ module Smithy
       @smithy_config_hash = YAML.load_file(sysconfig_path)
 
       options[:"software-root"]   = @smithy_config_hash.try(:[], "software-root")
+      options[:"web-root"]        = @smithy_config_hash.try(:[], "web-root")
       options[:"file-group-name"] = @smithy_config_hash.try(:[], "file-group-name")
       if options[:"file-group-name"]
         options[:"file-group-id"]   = Etc.getgrnam(options[:"file-group-name"]).try(:gid)

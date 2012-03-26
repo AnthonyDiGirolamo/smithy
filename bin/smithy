@@ -51,6 +51,10 @@ desc "The root level directory for software"
 arg_name "PATH"
 flag ["software-root"]
 
+desc "The root level directory for web files"
+arg_name "PATH"
+flag ["web-root"]
+
 desc "Don't use colors"
 switch "no-color"
 
@@ -319,26 +323,49 @@ command ['deploy'] do |c|
       p = Package.new :path => package,
              :software_root => global_options[:full_software_root_path]
       if p.valid?
-        notice "Deploying #{p.prefix}"
+        if p.publishable?
+          notice "Deploying #{p.prefix}"
 
-        description = File.join(p.application_directory, "description.markdown")
-        text = ""
+          www_root = global_options.try(:[], :"web-root")
+          FileUtils.mkdir_p www_root                           unless Dir.exists? www_root
+          raise "Cannot access web-root directory #{www_root}" unless Dir.exists? www_root
+          www_root += "/#{p.arch.downcase}"
+          FileUtils.mkdir_p www_root                           unless Dir.exists? www_root
+          raise "Cannot create web-root directory #{www_root}" unless Dir.exists? www_root
 
-        begin
-          if File.exist? description
-            f = File.open description
-            d = Maruku.new(f.read)
-            text = d.to_html
-          else
-            description = File.join(p.application_directory, "description")
-            f = File.open description
-            text = f.read
+          description_file = File.join(p.application_directory, "description.markdown")
+          description_text = ""
+
+          begin
+            if File.exist? description_file
+              f = File.open description_file
+              d = Maruku.new(f.read)
+              description_text = d.to_html
+            else
+              description_file = File.join(p.application_directory, "description")
+              f = File.open description_file
+              description_text = f.read
+            end
+          rescue => exception
+            raise "#{exception}\nCannot read #{description_file}"
           end
-        rescue => exception
-          raise "Cannot read #{description}"
-        end
 
-        puts text
+          alphabetical_output = www_root+"/alphabetical.html"
+          category_output     = www_root+"/category.html"
+          description_output  = www_root+"/#{p.name.downcase}.html"
+
+          d = File.open(description_output, "w+")
+          d.write(description_text)
+          d.close
+          puts "updated ".rjust(12).bright + description_output
+
+          #TODO update alpha list
+          #TODO update category list
+
+          notice_success "SUCCESS #{p.qualified_name} published to web"
+        else
+          notice_fail "Flagged for no publishing, remove 'noweb' from #{p.exceptions_file} and re-deploy."
+        end
       end
     end
   end

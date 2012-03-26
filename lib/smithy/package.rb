@@ -38,6 +38,10 @@ module Smithy
       return file_list
     end
 
+    def exceptions_file
+      package_support_files.first[:dest]
+    end
+
     def build_support_files
       file_list = %w{build-notes dependencies rebuild relink remodule retest}
       file_list.collect! do |f|
@@ -59,6 +63,10 @@ module Smithy
       else
         return true
       end
+    end
+
+    def qualified_name
+      [@name, @version, @build_name].join('/')
     end
 
     def prefix
@@ -296,6 +304,18 @@ module Smithy
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
       return builds.sort
+    end
+
+    def publishable?
+      metadata = File.join(application_directory, ".exceptions")
+      # Assume publishable
+      options = {:web => true}
+      if File.exists? metadata
+        File.open(metadata).readlines.each do |line|
+          options[:web] = false if line =~ /^\s*noweb\s*$/
+        end
+      end
+      return options[:web]
     end
 
   end

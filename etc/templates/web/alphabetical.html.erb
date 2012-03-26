@@ -1,0 +1,7 @@
+<a href="?&view=category">Category View</a>
+
+<ul class="sw">
+<% @packages.each do |package| %>
+  <li><a href="?&software=<%=h package.name.downcase %>"><%=h package.name.downcase %></a></li>
+<% end %>
+</ul>
