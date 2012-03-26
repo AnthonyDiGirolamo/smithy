@@ -3,6 +3,30 @@ module Smithy
     attr_accessor :arch, :root, :name, :version, :build_name
     attr_accessor :group
 
+    def self.all(args = {})
+      # Array of full paths to rebuild scripts
+      software = Dir.glob(args[:root]+"/*/*/*/rebuild")
+      # Array of full paths
+      #software = Dir.glob(args[:root]+"/*/*/*/")
+      software.collect!{|s| s.gsub(/\/rebuild$/, '')}
+      #software.collect!{|s| s.gsub(/\/$/, '')}
+      software.sort!
+    end
+
+    def self.all_web(args = {})
+      software = Dir.glob(args[:root]+"/*/description")
+      software.reject! do |s|
+        reject = false
+        exceptions_file = s.gsub(/description$/, '.exceptions')
+        if File.exists? exceptions_file
+          File.open(exceptions_file).readlines.each do |l|
+            reject = true if l =~ /^\s*noweb\s*$/
+          end
+        end
+        reject
+      end
+    end
+
     def initialize(args = {})
       if args[:software_root]
         @root = File.dirname args[:software_root]
