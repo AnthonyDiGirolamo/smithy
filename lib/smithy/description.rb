@@ -22,6 +22,11 @@ module Smithy
       binding
     end
 
+    def valid?
+      raise "Cannot find the package #{@path}" unless Dir.exists? @path
+      return true
+    end
+
     def exceptions_file
       File.join(@path, Package::PackageFileNames[:exception])
     end
@@ -68,7 +73,7 @@ module Smithy
           description_text = f.read
         end
       rescue => exception
-        raise "#{exception}\nCannot read #{description_file}"
+        raise "#{exception}\nCannot read #{description_file} or #{description_file}.markdown"
       end
 
       alphabetical_output = File.join(www_arch, "/alphabetical.html")

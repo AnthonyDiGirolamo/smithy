@@ -343,10 +343,10 @@ command ['deploy'] do |c|
 
     packages.each do |package|
       d = Description.new :root => swroot, :package => package, :www_root => www_root
-      if d.publishable?
-        notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-deploy."
-      else
+      if d.valid? && d.publishable?
         d.deploy :dry_run => options[:"dry-run"]
+      else
+        notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-deploy."
       end
     end
   end
