@@ -18,6 +18,7 @@ These options are available for any command and are specified before the name of
 [<tt>--help</tt>] Show this message
 [<tt>--no-color</tt>] Don't use colors
 [<tt>--software-root=PATH</tt>] The root level directory for software
+[<tt>--web-root=PATH</tt>] The root level directory for web files
 == Commands
 [<tt>build</tt>] Build software
 [<tt>deploy</tt>] Deploy a package
@@ -45,8 +46,12 @@ These options are specified *after* the command.
 
 Deploy a package
 
-Place module files in the correct locations and update web descriptions.
+Publish packages to web
 
+==== Options
+These options are specified *after* the command.
+
+[<tt>-n, --dry-run</tt>] See what files will be created without creating them
 === <tt>edit build|test|modules NAME</tt>
 
 Edit package support files
@@ -77,7 +82,15 @@ smithy module use NAME/VERSION/BUILD
 
 Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
 
+smithy module deploy NAME/VERSION/BUILD
 
+Copy a package's module_file to the system module path. This is typically done after you have tested a new module in isolation.
+
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>-n, --dry-run</tt>] See what files will be created without creating them
 === <tt>new NAME</tt>
 
 Generate a new build and all necessary files
