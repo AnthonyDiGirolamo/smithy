@@ -4,7 +4,7 @@ module Smithy
 
     def initialize(args = {})
       @package = args[:package]
-      @builds = @package.all_builds
+      @builds = @package.alternate_builds
     end
 
     def get_binding
@@ -12,7 +12,7 @@ module Smithy
     end
 
     def module_path
-      File.join(package.prefix, "modulefile")
+      File.join(package.version_directory, "modulefile")
     end
 
     def module_file

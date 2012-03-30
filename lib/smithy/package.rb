@@ -3,58 +3,36 @@ module Smithy
     attr_accessor :arch, :root, :name, :version, :build_name
     attr_accessor :group
 
-    def self.all(args = {})
-      # Array of full paths to rebuild scripts
-      software = Dir.glob(args[:root]+"/*/*/*/rebuild")
-      # Array of full paths
-      #software = Dir.glob(args[:root]+"/*/*/*/")
-      software.collect!{|s| s.gsub(/\/rebuild$/, '')}
-      #software.collect!{|s| s.gsub(/\/$/, '')}
-      software.sort!
-    end
-
-    def self.all_web(args = {})
-      software = Dir.glob(args[:root]+"/*/description")
-      software.reject! do |s|
-        reject = false
-        exceptions_file = s.gsub(/description$/, '.exceptions')
-        if File.exists? exceptions_file
-          File.open(exceptions_file).readlines.each do |l|
-            reject = true if l =~ /^\s*noweb\s*$/
-          end
-        end
-        reject
-      end
+    def self.normalize_name(args = {})
+      # Remove root and arch from the path if necessary
+      p = args[:name].dup
+      p.gsub! /\/?#{args[:root]}\/?/, ''
+      p.gsub! /\/?#{args[:arch]}\/?/, ''
+      return p
     end
 
     def initialize(args = {})
-      if args[:software_root]
-        @root = File.dirname args[:software_root]
-        @arch = File.basename args[:software_root]
-      else
-        @root = args[:root]
-        @arch = args[:arch]
-      end
-      # Remove root and arch from the path if necessary
-      @path = args[:path]
-      p = args[:path].dup
-      p.gsub! /\/?#{root}\/?/, ''
-      p.gsub! /\/?#{arch}\/?/, ''
-      p =~ /(.*)\/(.*)\/(.*)$/
+      @root = File.dirname args[:root]
+      @arch = File.basename args[:root]
+      @path = Package.normalize_name(:name => args[:path], :root => @root, :arch => @arch)
+      @path =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
       @version = $2
       @build_name = $3
       @group = args[:file_group]
 
-      if args[:disable_group]
-        @group_writeable = false
-      else
-        @group_writeable = true
-      end
+      @group_writeable = true
+      @group_writeable = false if args[:disable_group]
     end
 
+    PackageFileNames = {
+      :exception   => ".exceptions",
+      :description => "description",
+      :support     => "support",
+      :versions    => "versions" }
+
     def package_support_files
-      file_list = %w{.exceptions description support versions}
+      file_list = PackageFileNames.values
       file_list.collect! do |f|
         { :src  => File.join(@@smithy_bin_root, "etc/templates/package", f),
           :dest => File.join(application_directory, f) }
@@ -62,12 +40,16 @@ module Smithy
       return file_list
     end
 
-    def exceptions_file
-      package_support_files.first[:dest]
-    end
+    BuildFileNames = {
+      :notes        => "build-notes",
+      :dependencies => "dependencies",
+      :build        => "rebuild",
+      :link         => "relink",
+      :test         => "retest",
+      :env          => "remodule" }
 
     def build_support_files
-      file_list = %w{build-notes dependencies rebuild relink remodule retest}
+      file_list = BuildFileNames.values
       file_list.collect! do |f|
         { :src  => File.join(@@smithy_bin_root, "etc/templates/build", f),
           :dest => File.join(prefix, f) }
@@ -321,25 +303,46 @@ module Smithy
       end
     end
 
-    def all_builds
+    def alternate_builds
       builds = Dir.glob(version_directory+"/*")
       # Delete anything that isn't a directory
       builds.reject! { |b| ! File.directory?(b) }
+      builds.delete("modulefile")
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
       return builds.sort
     end
 
     def publishable?
-      metadata = File.join(application_directory, ".exceptions")
-      # Assume publishable
-      options = {:web => true}
-      if File.exists? metadata
-        File.open(metadata).readlines.each do |line|
-          options[:web] = false if line =~ /^\s*noweb\s*$/
-        end
+      Description.publishable?(application_directory)
+    end
+
+    def self.all(args = {})
+      # Array of full paths to rebuild scripts
+      software = Dir.glob(args[:root]+"/*/*/*/rebuild")
+      # Remove rebuild from each path
+      software.collect!{|s| s.gsub(/\/rebuild$/, '')}
+      #TODO allow sorting?
+      software.sort!
+    end
+
+    def self.all_web(args = {})
+      # Find all software with descriptions
+      software = Dir.glob(args[:root]+"/*/description")
+      software.collect!{|s| s.gsub(/\/description$/, '')}
+      # Remove any with noweb in their exceptions file
+      software.reject! do |s|
+        ! Description.publishable?(application_directory)
       end
-      return options[:web]
+
+      #software.collect! do |s|
+        #builds = Dir.glob(s+"/*/*/rebuild")
+        #builds.collect!{|s| s.gsub(/\/rebuild$/, '')}
+        #builds.first
+      #end
+      #software.compact!
+
+      return software
     end
 
   end

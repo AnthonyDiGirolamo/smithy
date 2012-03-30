@@ -76,6 +76,9 @@ command ['search'] do |c|
   c.default_value output_formats.keys.first
   c.flag :format
 
+  #c.desc 'Only search packages ready for web publishing'
+  #c.switch [:w, "web-enabled"]
+
   #sorting = %w{name date user}
   #c.desc 'Field to sort in ascending order'
   #c.arg_name sorting.join('|')
@@ -129,7 +132,7 @@ command ['build'] do |c|
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
-    packages = args
+    packages = args.dup
     if args.empty?
       notice "Reading package names from STDIN..."
       packages = STDIN.readlines.map{|p| p.chomp}
@@ -141,7 +144,7 @@ command ['build'] do |c|
       p = Package.new :path => package,
                 :file_group => global_options[:"file-group-name"],
              :disable_group => global_options[:"disable-group-writable"],
-             :software_root => global_options[:full_software_root_path]
+                      :root => global_options[:full_software_root_path]
 
       if p.valid?
         p.run_rebuild_script :dry_run => options[:"dry-run"],
@@ -188,7 +191,7 @@ command :new do |c|
     p = Package.new :path => args.first,
               :file_group => global_options[:"file-group-name"],
            :disable_group => global_options[:"disable-group-writable"],
-           :software_root => global_options[:full_software_root_path]
+                    :root => global_options[:full_software_root_path]
 
     if p.valid?
       if options[:tarball]
@@ -222,42 +225,53 @@ command ['edit'] do |c|
 
     raise "You must supply a package name to edit" if args.empty?
 
-    arguments = args.dup
+    operations = [:build, :test, :config, :env]
 
-    if arguments.include? "config"
+    arguments = args.dup
+    operation = nil
+    operations.each do |o|
+      if arguments.include? o.to_s
+        operation = o
+        arguments.delete o.to_s
+        break
+      end
+    end
+
+    if operation == :config
       file_name = @smithy_config_file
       status = Kernel::system(editor, file_name)
     else
-
-      if arguments.include? "build"
-        file_name = "build"
-        arguments.delete "build"
-      elsif arguments.include? "test"
-        file_name = "test"
-        arguments.delete "test"
-      elsif arguments.include?("env") || arguments.include?("modules")
-        file_name = "env"
-        arguments.delete "env"
-      else
-        file_name = "build"
-      end
-
       p = Package.new :path => arguments.first,
                 :file_group => global_options[:"file-group-name"],
-             :software_root => global_options[:full_software_root_path]
+                      :root => global_options[:full_software_root_path]
       if p.valid?
         p.prefix_exists!
         p.rebuild_script_exists!
 
-        file_name = p.rebuild_script  if file_name == "build"
-        file_name = p.retest_script   if file_name == "test"
-        file_name = p.remodule_script if file_name == "env"
+        file_name = case operation
+        when :build
+          p.rebuild_script
+        when :test
+          p.retest_script
+        when :env
+          p.remodule_script
+        else
+          p.rebuild_script
+        end
 
         file_before = File.stat(file_name)
         if editor =~ /vim/
-          status = Kernel::system(editor, "-O", file_name, p.remodule_script)
+          if operation==:env
+            status = Kernel::system(editor, file_name)
+          else
+            status = Kernel::system(editor, "-O", file_name, p.remodule_script)
+          end
         elsif editor =~ /emacs/
-          status = Kernel::system(editor, p.remodule_script, file_name)
+          if operation==:env
+            status = Kernel::system(editor, file_name)
+          else
+            status = Kernel::system(editor, p.remodule_script, file_name)
+          end
         else
           status = Kernel::system(editor, file_name)
         end
@@ -282,7 +296,7 @@ command ['repair'] do |c|
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
-    packages = args
+    packages = args.dup
     if args.empty?
       notice "Reading package names from STDIN..."
       packages = STDIN.readlines.map{|p| p.chomp}
@@ -294,7 +308,7 @@ command ['repair'] do |c|
       p = Package.new :path => package,
                 :file_group => global_options[:"file-group-name"],
              :disable_group => global_options[:"disable-group-writable"],
-             :software_root => global_options[:full_software_root_path]
+                      :root => global_options[:full_software_root_path]
 
       if p.valid?
         p.repair :dry_run => options[:"dry-run"]
@@ -304,11 +318,18 @@ command ['repair'] do |c|
 end
 
 desc "Deploy a package"
-long_desc "Place module files in the correct locations and update web descriptions."
+long_desc "Publish packages to web"
 arg_name "NAME"
 command ['deploy'] do |c|
+  c.desc "See what files will be created without creating them"
+  c.switch [:n, "dry-run"]
+
   c.action do |global_options,options,args|
-    packages = args
+    swroot = global_options[:full_software_root_path]
+    www_root = global_options.try(:[], :"web-root")
+    raise """Cannot determine where to deploy web descriptions.\n       Please add a 'web-root: PATH' entry to the smithy config file.""" if www_root.nil?
+
+    packages = args.dup
     if args.empty?
       notice "Reading package names from STDIN..."
       packages = STDIN.readlines.map{|p| p.chomp}
@@ -316,53 +337,16 @@ command ['deploy'] do |c|
 
     raise "You must supply at least one package to deploy" if packages.empty?
 
+    if packages.include?("all")
+      packages = Package.all_web :root => swroot
+    end
+
     packages.each do |package|
-      p = Package.new :path => package,
-             :software_root => global_options[:full_software_root_path]
-      if p.valid?
-        if p.publishable?
-          notice "Deploying #{p.prefix}"
-
-          www_root = global_options.try(:[], :"web-root")
-          FileUtils.mkdir_p www_root                           unless Dir.exists? www_root
-          raise "Cannot access web-root directory #{www_root}" unless Dir.exists? www_root
-          www_root += "/#{p.arch.downcase}"
-          FileUtils.mkdir_p www_root                           unless Dir.exists? www_root
-          raise "Cannot create web-root directory #{www_root}" unless Dir.exists? www_root
-
-          description_file = File.join(p.application_directory, "description.markdown")
-          description_text = ""
-
-          begin
-            if File.exist? description_file
-              f = File.open description_file
-              d = Maruku.new(f.read)
-              description_text = d.to_html
-            else
-              description_file = File.join(p.application_directory, "description")
-              f = File.open description_file
-              description_text = f.read
-            end
-          rescue => exception
-            raise "#{exception}\nCannot read #{description_file}"
-          end
-
-          alphabetical_output = www_root+"/alphabetical.html"
-          category_output     = www_root+"/category.html"
-          description_output  = www_root+"/#{p.name.downcase}.html"
-
-          d = File.open(description_output, "w+")
-          d.write(description_text)
-          d.close
-          puts "updated ".rjust(12).bright + description_output
-
-          #TODO update alpha list
-          #TODO update category list
-
-          notice_success "SUCCESS #{p.qualified_name} published to web"
-        else
-          notice_fail "Flagged for no publishing, remove 'noweb' from #{p.exceptions_file} and re-deploy."
-        end
+      d = Description.new :root => swroot, :package => package, :www_root => www_root
+      if d.publishable?
+        notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-deploy."
+      else
+        d.deploy :dry_run => options[:"dry-run"]
       end
     end
   end
@@ -381,7 +365,6 @@ Run the proper module command to add a package's modulefile to the MODULEPATH. T
 smithy module deploy NAME/VERSION/BUILD
 
 Copy a package's module_file to the system module path. This is typically done after you have tested a new module in isolation.
-
 EOS
 arg_name "NAME"
 command ['module'] do |c|
@@ -390,28 +373,29 @@ command ['module'] do |c|
   c.action do |global_options,options,args|
     raise "You must supply a package name" if args.empty?
 
+    operations = [:use, :create, :deploy]
+
     arguments = args.dup
     operation = nil
-    if arguments.include? "use"
-      operation = :use
-      arguments.delete "use"
-    elsif arguments.include? "create"
-      operation = :create
-      arguments.delete "create"
-    elsif arguments.include? "deploy"
-      operation = :deploy
-      arguments.delete "deploy"
+    operations.each do |o|
+      if arguments.include? o.to_s
+        operation = o
+        arguments.delete o.to_s
+        break
+      end
     end
 
+    raise "Missing module command, run 'smithy module #{operations.join("|")} NAME/VERSION/BUILD'" if operation.nil?
+
     p = Package.new :path => arguments.first,
-             :software_root => global_options[:full_software_root_path]
+                    :root => global_options[:full_software_root_path]
     if p.valid?
       m = ModuleFile.new :package => p
       case operation
       when :use
         mp = m.module_path
         if Dir.exist?(mp)
-          return "module use #{mp}"
+          puts "module use #{mp}"
         else
           raise "No modulefiles found in #{mp}"
         end
