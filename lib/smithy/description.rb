@@ -18,10 +18,6 @@ module Smithy
       end
     end
 
-    def get_binding
-      binding
-    end
-
     def valid?
       raise "Cannot find the package #{@path}" unless Dir.exists? @path
       return true
@@ -50,8 +46,6 @@ module Smithy
     def deploy(args = {})
       options = {:verbose => false, :noop => false}
       options = {:verbose => true, :noop => true} if args[:dry_run]
-
-      notice "Deploying #{path}"
 
       www_arch = File.join(www_root, "/#{arch.downcase}")
 
@@ -85,6 +79,16 @@ module Smithy
       end
       puts "updated ".rjust(12).bright + description_output
 
+      #TODO update category list
+
+      #notice_success "SUCCESS #{path} published to web"
+    end
+
+    def self.alpha_update(args = {})
+      root = args[:root]
+      arch = args[:arch]
+      www_arch = File.join(args[:www_root], arch)
+
       erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/alphabetical.html.erb")
       alphabetical_output = File.join(www_arch, "/alphabetical.html")
 
@@ -99,12 +103,7 @@ module Smithy
         end
       end
       puts "updated ".rjust(12).bright + alphabetical_output
-
-      #TODO update category list
-
-      notice_success "SUCCESS #{path} published to web"
     end
-
 
   end
 end
