@@ -276,6 +276,7 @@ command ['edit'] do |c|
 
     operations = [:build, :test, :config, :env, :modulefile]
     arguments = args.dup
+    operation = nil
     operations.each do |o|
       if arguments.include? o.to_s
         operation = o
@@ -304,8 +305,7 @@ command ['edit'] do |c|
       when :env
         p.remodule_script
       when :modulefile
-        m = ModuleFile.new :package => p
-        m.module_file
+        ModuleFile.new(:package => p).module_file
       else
         p.rebuild_script
       end
