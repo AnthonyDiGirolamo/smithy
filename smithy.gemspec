@@ -28,7 +28,11 @@ etc/templates/package/.exceptions
 etc/templates/package/description
 etc/templates/package/support
 etc/templates/package/versions
+etc/templates/web/alphabetical.html.erb
+etc/templates/web/category.html.erb
+etc/templates/web/package.html.erb
 lib/smithy.rb
+lib/smithy/description.rb
 lib/smithy/format.rb
 lib/smithy/helpers.rb
 lib/smithy/package.rb

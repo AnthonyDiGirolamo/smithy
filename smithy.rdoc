@@ -28,6 +28,7 @@ These options are available for any command and are specified before the name of
 [<tt>new</tt>] Generate a new build and all necessary files
 [<tt>repair</tt>] Repair a package
 [<tt>search</tt>] Search currently installed software
+[<tt>test</tt>] Test software
 
 === <tt>build PATH</tt>
 
@@ -38,10 +39,11 @@ The software to build may be either the absolute path or the full name of the so
 ==== Options
 These options are specified *after* the command.
 
-[<tt>--build-log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
-[<tt>--disable-build-log</tt>] Disable build logging
-[<tt>-n, --dry-run</tt>] See what packages will be built but without building them
-[<tt>-s, --send-to-stdout</tt>] Send messages from underlying commands (configure, make, etc) to STDOUT.
+[<tt>--disable-log</tt>] Disable logging
+[<tt>-f, --force</tt>] Ignore .lock file and run anyway
+[<tt>--log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
+[<tt>-n, --dry-run</tt>] See what scripts will be run without running them
+[<tt>-s, --send-to-stdout</tt>] Send messages from test scripts to STDOUT.
 === <tt>deploy NAME</tt>
 
 Deploy a package
@@ -52,7 +54,7 @@ Publish packages to web
 These options are specified *after* the command.
 
 [<tt>-n, --dry-run</tt>] See what files will be created without creating them
-=== <tt>edit build|test|modules NAME</tt>
+=== <tt>edit build|test|modules|modulefile NAME</tt>
 
 Edit package support files
 
@@ -134,3 +136,15 @@ Search currently installed software
 These options are specified *after* the command.
 
 [<tt>--format=path|name|table|csv</tt>] Format of the output <i>( default: <tt>path</tt>)</i>
+=== <tt>test </tt>
+
+Test software
+
+==== Options
+These options are specified *after* the command.
+
+[<tt>--disable-log</tt>] Disable logging
+[<tt>-f, --force</tt>] Ignore .lock file and run anyway
+[<tt>--log-name=FILE</tt>] Test log file name located within the software prefix. <i>( default: <tt>test.log</tt>)</i>
+[<tt>-n, --dry-run</tt>] See what scripts will be run without running them
+[<tt>-s, --send-to-stdout</tt>] Send messages from test scripts to STDOUT.
