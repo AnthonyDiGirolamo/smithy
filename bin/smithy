@@ -113,6 +113,51 @@ command ['search'] do |c|
   end
 end
 
+desc "Test software"
+command ['test'] do |c|
+  c.desc 'Test log file name located within the software prefix.'
+  c.arg_name 'FILE'
+  c.default_value 'test.log'
+  c.flag ["log-name"]
+
+  c.desc "Disable logging"
+  c.switch ["disable-log"]
+
+  c.desc 'Send messages from test scripts to STDOUT.'
+  c.switch [:s, "send-to-stdout"]
+
+  c.desc 'Ignore .lock file and run anyway'
+  c.switch [:f, "force"]
+
+  c.desc 'See what scripts will be run without running them'
+  c.switch [:n, "dry-run"]
+
+  c.action do |global_options,options,args|
+    packages = args.dup
+    if args.empty?
+      notice "Reading package names from STDIN..."
+      packages = STDIN.readlines.map{|p| p.chomp}
+    end
+
+    raise "You must supply at least one package to test" if packages.empty?
+
+    packages.each do |package|
+      p = Package.new :path => package,
+                :file_group => global_options[:"file-group-name"],
+             :disable_group => global_options[:"disable-group-writable"],
+                      :root => global_options[:full_software_root_path]
+      p.valid?
+      p.run_script :script => :test,
+                  :dry_run => options[:"dry-run"],
+          :disable_logging => options[:"disable-log"],
+                 :log_name => options[:"log-name"],
+           :send_to_stdout => options[:"send-to-stdout"],
+                    :force => options[:"force"]
+    end
+  end
+end
+
+
 desc "Build software"
 long_desc "The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD."
 arg_name "PATH"
@@ -120,15 +165,18 @@ command ['build'] do |c|
   c.desc 'Build log file name located within the software prefix.'
   c.arg_name 'FILE'
   c.default_value 'build.log'
-  c.flag ["build-log-name"]
+  c.flag ["log-name"]
 
-  c.desc "Disable build logging"
-  c.switch ["disable-build-log"]
+  c.desc "Disable logging"
+  c.switch ["disable-log"]
 
-  c.desc 'Send messages from underlying commands (configure, make, etc) to STDOUT.'
+  c.desc 'Send messages from test scripts to STDOUT.'
   c.switch [:s, "send-to-stdout"]
 
-  c.desc 'See what packages will be built but without building them'
+  c.desc 'Ignore .lock file and run anyway'
+  c.switch [:f, "force"]
+
+  c.desc 'See what scripts will be run without running them'
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
@@ -146,12 +194,13 @@ command ['build'] do |c|
              :disable_group => global_options[:"disable-group-writable"],
                       :root => global_options[:full_software_root_path]
 
-      if p.valid?
-        p.run_rebuild_script :dry_run => options[:"dry-run"],
-                     :disable_logging => options[:"disable-build-log"],
-                      :build_log_name => options[:"build-log-name"],
-                      :send_to_stdout => options[:"send-to-stdout"]
-      end
+      p.valid?
+      p.run_script :script => :build,
+                  :dry_run => options[:"dry-run"],
+          :disable_logging => options[:"disable-log"],
+                 :log_name => options[:"log-name"],
+           :send_to_stdout => options[:"send-to-stdout"],
+                    :force => options[:"force"]
     end
   end
 end
@@ -212,7 +261,7 @@ command :new do |c|
 end
 
 desc "Edit package support files"
-arg_name "build|test|modules NAME"
+arg_name "build|test|modules|modulefile NAME"
 command ['edit'] do |c|
   c.desc "Editor for opening script files"
   c.arg_name "BINARY"
@@ -225,10 +274,8 @@ command ['edit'] do |c|
 
     raise "You must supply a package name to edit" if args.empty?
 
-    operations = [:build, :test, :config, :env]
-
+    operations = [:build, :test, :config, :env, :modulefile]
     arguments = args.dup
-    operation = nil
     operations.each do |o|
       if arguments.include? o.to_s
         operation = o
@@ -236,6 +283,7 @@ command ['edit'] do |c|
         break
       end
     end
+    operation = operations.first if operation.nil?
 
     if operation == :config
       file_name = @smithy_config_file
@@ -244,44 +292,42 @@ command ['edit'] do |c|
       p = Package.new :path => arguments.first,
                 :file_group => global_options[:"file-group-name"],
                       :root => global_options[:full_software_root_path]
-      if p.valid?
-        p.prefix_exists!
-        p.rebuild_script_exists!
+      p.valid?
+      p.prefix_exists!
+      p.rebuild_script_exists!
 
-        file_name = case operation
-        when :build
-          p.rebuild_script
-        when :test
-          p.retest_script
-        when :env
-          p.remodule_script
-        else
-          p.rebuild_script
-        end
+      file_name = case operation
+      when :build
+        p.rebuild_script
+      when :test
+        p.retest_script
+      when :env
+        p.remodule_script
+      when :modulefile
+        m = ModuleFile.new :package => p
+        m.module_file
+      else
+        p.rebuild_script
+      end
 
-        file_before = File.stat(file_name)
-        if editor =~ /vim/
-          if operation==:env
-            status = Kernel::system(editor, file_name)
-          else
-            status = Kernel::system(editor, "-O", file_name, p.remodule_script)
-          end
-        elsif editor =~ /emacs/
-          if operation==:env
-            status = Kernel::system(editor, file_name)
-          else
-            status = Kernel::system(editor, p.remodule_script, file_name)
-          end
-        else
-          status = Kernel::system(editor, file_name)
-        end
-        #puts status
-        #puts $CHILD_STATUS
+      file_before = File.stat(file_name)
+      arg_list = []
+      arg_list << editor
+      arg_list << "-O" if editor =~ /vim/
 
-        # Compare modification times
-        if status && File.stat(file_name) > file_before
-          notice "Modified #{file_name}"
-        end
+      case operation
+      when :build || :test
+        arg_list << file_name
+        arg_list << p.remodule_script
+      else
+        arg_list << file_name
+      end
+
+      status = Kernel::system(*arg_list)
+
+      # Compare modification times
+      if status && File.stat(file_name) > file_before
+        notice "Modified #{file_name}"
       end
 
     end

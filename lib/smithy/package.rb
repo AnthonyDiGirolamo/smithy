@@ -93,7 +93,7 @@ module Smithy
     end
 
     def rebuild_script
-      File.join(prefix,"rebuild")
+      File.join(prefix, BuildFileNames[:build])
     end
     def rebuild_script_exists?
       File.exist?(rebuild_script)
@@ -103,7 +103,7 @@ module Smithy
     end
 
     def retest_script
-      File.join(prefix,"retest")
+      File.join(prefix, BuildFileNames[:test])
     end
     def retest_script_exists?
       File.exist?(retest_script)
@@ -138,18 +138,44 @@ module Smithy
       File.join(@root, @arch)
     end
 
-    def run_rebuild_script(args ={})
-      #TODO check for .lock file, create and delete after complete
-      rebuild_script_exists!
+    def lock_file
+      File.join(prefix, ".lock")
+    end
+
+    def create_lock_file
+      if File.exists? lock_file
+        notice_fail "#{lock_file} exists, is someone else building this package? If not delete and rerun."
+        return false
+      else
+        FileUtils.touch(lock_file)
+        return true
+      end
+    end
+
+    def delete_lock_file
+      FileUtils.rm_f(lock_file)
+    end
+
+    def run_script(args ={})
+      case args[:script]
+      when :build
+        rebuild_script_exists!
+        script = rebuild_script
+        notice "Building #{prefix}"
+      when :test
+        retest_script_exists!
+        script = retest_script
+        notice "Testing #{prefix}"
+      else
+        return nil
+      end
 
       ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
 
-      notice "Building #{prefix}"
-
       unless args[:disable_logging]
-        if args[:build_log_name]
-          log_file_path = File.join(prefix, args[:build_log_name])
+        if args[:log_name]
+          log_file_path = File.join(prefix, args[:log_name])
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
           FileOperations.set_group(log_file, group)
@@ -161,19 +187,26 @@ module Smithy
       end
 
       unless args[:dry_run]
+        if args[:force]
+          delete_lock_file
+          create_lock_file
+        else
+          return unless create_lock_file
+        end
+
         stdout, stderr = '',''
-        build_exit_status = 0
+        exit_status = 0
 
         begin
-          t = Open4.background(rebuild_script, 0=>'', 1=>stdout, 2=>stderr)
+          t = Open4.background(script, 0=>'', 1=>stdout, 2=>stderr)
           while t.status do
             process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
             sleep 0.25
           end
 
-          build_exit_status = t.exitstatus # this will throw an exception if != 0
+          exit_status = t.exitstatus # this will throw an exception if != 0
         rescue => exception
-          build_exit_status = exception.exitstatus
+          exit_status = exception.exitstatus
         end
         # There is usually some leftover output
         process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
@@ -183,11 +216,13 @@ module Smithy
         FileOperations.set_group prefix, @group, :recursive => true
         FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
 
-        if build_exit_status == 0
+        if exit_status == 0
           notice_success "#{prefix} SUCCESS"
         else
           notice_fail "#{prefix} FAILED"
         end
+
+        delete_lock_file
       end
     end
 
