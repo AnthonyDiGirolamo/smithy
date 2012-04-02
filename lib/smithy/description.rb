@@ -3,6 +3,7 @@ module Smithy
     attr_accessor :path, :package, :root, :arch, :www_root, :name
 
     def initialize(args = {})
+      @www_root = args[:www_root]
       @package = args[:package]
       if @package.class == Package
         @path = args[:package].application_directory
@@ -15,7 +16,6 @@ module Smithy
         @name    = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
         @path    = File.join @root, @arch, @name
       end
-      @www_root = args[:www_root]
     end
 
     def get_binding
@@ -33,8 +33,9 @@ module Smithy
 
     def self.publishable?(path)
       exceptions_file = File.join(path, Package::PackageFileNames[:exception])
+      description_file = File.join(path, Package::PackageFileNames[:description])
       publishable = true
-      if File.exists? exceptions_file
+      if File.exists?(exceptions_file) && ( File.exists?(description_file) || File.exists?(description_file+".markdown") )
         File.open(exceptions_file).readlines.each do |line|
           publishable = false if line =~ /^\s*noweb\s*$/
         end
@@ -76,10 +77,7 @@ module Smithy
         raise "#{exception}\nCannot read #{description_file} or #{description_file}.markdown"
       end
 
-      alphabetical_output = File.join(www_arch, "/alphabetical.html")
-      category_output     = File.join(www_arch, "/category.html")
       description_output  = File.join(www_arch, "/#{name.downcase}.html")
-
       unless args[:dry_run]
         d = File.open(description_output, "w+")
         d.write(description_text)
@@ -87,11 +85,26 @@ module Smithy
       end
       puts "updated ".rjust(12).bright + description_output
 
-      #TODO update alpha list
+      erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/alphabetical.html.erb")
+      alphabetical_output = File.join(www_arch, "/alphabetical.html")
+
+      @packages = Package.all_web :root => File.join(root,arch)
+      @packages.collect!{|p| Package.normalize_name(:name => p, :root => root, :arch => arch)}
+      @packages.sort!
+
+      erb = ERB.new(File.read(erb_file), nil, "<>")
+      unless args[:dry_run]
+        File.open(alphabetical_output, "w+") do |f|
+          f.write erb.result(binding)
+        end
+      end
+      puts "updated ".rjust(12).bright + alphabetical_output
+
       #TODO update category list
 
       notice_success "SUCCESS #{path} published to web"
     end
+
 
   end
 end

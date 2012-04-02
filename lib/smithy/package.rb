@@ -6,8 +6,15 @@ module Smithy
     def self.normalize_name(args = {})
       # Remove root and arch from the path if necessary
       p = args[:name].dup
-      p.gsub! /\/?#{args[:root]}\/?/, ''
-      p.gsub! /\/?#{args[:arch]}\/?/, ''
+      if args[:swroot]
+        root = File.dirname args[:swroot]
+        arch = File.basename args[:swroot]
+      else
+        root = args[:root]
+        arch = args[:arch]
+      end
+      p.gsub! /\/?#{root}\/?/, ''
+      p.gsub! /\/?#{arch}\/?/, ''
       return p
     end
 
@@ -332,7 +339,7 @@ module Smithy
       software.collect!{|s| s.gsub(/\/description$/, '')}
       # Remove any with noweb in their exceptions file
       software.reject! do |s|
-        ! Description.publishable?(application_directory)
+        ! Description.publishable?(s)
       end
 
       #software.collect! do |s|
