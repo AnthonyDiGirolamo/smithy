@@ -213,13 +213,18 @@ module Smithy
 
         log_file.close unless log_file.nil?
 
-        FileOperations.set_group prefix, @group, :recursive => true
-        FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
-
         if exit_status == 0
-          notice_success "#{prefix} SUCCESS"
+          notice_success "SUCCESS #{prefix}"
         else
-          notice_fail "#{prefix} FAILED"
+          notice_fail "FAILED #{prefix}"
+        end
+
+        case args[:script]
+        when :build
+          notice "Setting permissions"
+          FileOperations.set_group prefix, @group, :recursive => true
+          FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
+        when :test
         end
 
         delete_lock_file
