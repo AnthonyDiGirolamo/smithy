@@ -72,18 +72,21 @@ _smithy ()
         --file-group-name=
         --help
         --no-color
-        --software-root="
+        --software-root=
+        --web-root="
         return
         ;;
       *)
         __smithycomp "
         build
-        repair
         deploy
         edit
         help
+        module
         new
-        search"
+        repair
+        search
+        test"
         return
         ;;
     esac
@@ -92,12 +95,13 @@ _smithy ()
 
 	# subcommands have their own completion functions
 	case "$cmd" in
-	b|build)  _smithy_build  ;;
-	s|search) _smithy_search ;;
-	edit)     _smithy_edit   ;;
-	new)      _smithy_new    ;;
-	repair)   _smithy_repair ;;
-	help)     _smithy_help   ;;
+	build|test)    _smithy_build  ;;
+	edit)          _smithy_edit   ;;
+	help)          _smithy_help   ;;
+	module)        _smithy_module ;;
+	new)           _smithy_new    ;;
+	repair|deploy) _smithy_repair ;;
+	search)        _smithy_search ;;
 	*)        ;;
 	esac
 }
@@ -113,7 +117,7 @@ _smithy_build () {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
-  --build-log-name=*)
+  --log-name=*)
     COMPREPLY=($(compgen -f "$cur"))
     return
     ;;
@@ -121,10 +125,30 @@ _smithy_build () {
 	case "$cur" in
 	-*)
 		__smithycomp "
-      --build-log-name=
-      --disable-build-log
+      --disable-log
+      --force
+      --log-name=
       --dry-run
       --send-to-stdout"
+		return
+		;;
+	esac
+  __smithy_complete_packages
+}
+
+_smithy_module () {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$prv" in
+  module)
+    __smithycomp "create use deploy"
+    return
+    ;;
+  esac
+	case "$cur" in
+	-*)
+		__smithycomp "
+      --dry-run"
 		return
 		;;
 	esac
@@ -135,6 +159,10 @@ _smithy_edit () {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
+  edit)
+    __smithycomp "build test modules modulefile"
+    return
+    ;;
   -e|--editor=*)
     COMPREPLY=($(compgen -c "$cur"))
     return
@@ -184,7 +212,8 @@ _smithy_new () {
 		__smithycomp "
       --dry-run
       --tarball=
-      --web-description"
+      --web-description
+      --skip-modulefile"
 		return
 		;;
 	esac
