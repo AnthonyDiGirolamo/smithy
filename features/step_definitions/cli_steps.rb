@@ -22,19 +22,19 @@ Given /^my config file contains:$/ do |string|
 end
 
 Then /^a file named "([^"]*)" should be group writable$/ do |file|
-	mode = File.stat(file).mode.to_s(8)
-	group_bit = mode[mode.size-2].to_i
-	unless group_bit >= 6 && group_bit <= 7
-		raise "#{file} is not group writeable"
-	end
+  mode = File.stat(file).mode.to_s(8)
+  group_bit = mode[mode.size-2].to_i
+  unless group_bit >= 6 && group_bit <= 7
+    raise "#{file} is not group writeable"
+  end
 end
 
 Then /^a file named "([^"]*)" should not be group writable$/ do |file|
-	mode = File.stat(file).mode.to_s(8)
-	group_bit = mode[mode.size-2].to_i
-	unless group_bit == 4 || group_bit == 5
-		raise "#{file} is group writeable"
-	end
+  mode = File.stat(file).mode.to_s(8)
+  group_bit = mode[mode.size-2].to_i
+  unless group_bit == 4 || group_bit == 5
+    raise "#{file} is group writeable"
+  end
 end
 
 Then /^a file named "([^"]*)" should be executable$/ do |file|
@@ -42,7 +42,7 @@ Then /^a file named "([^"]*)" should be executable$/ do |file|
 end
 
 Then /^a file named "([^"]*)" should have a group name of "([^"]*)"$/ do |file, group|
-	Etc.getgrgid(File.stat(file).gid).name.should == group
+  Etc.getgrgid(File.stat(file).gid).name.should == group
 end
 
 Given /^a tarfile named "([^"]*)"$/ do |tarfile|

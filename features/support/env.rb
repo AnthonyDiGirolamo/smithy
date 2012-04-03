@@ -8,7 +8,7 @@ ENV['GLI_DEBUG'] = 'true'
 Before do
   #@dirs = [".", "tmp/aruba"]
   @real_hostname = ENV['HOSTNAME']
-	@aruba_timeout_seconds = 360
+  @aruba_timeout_seconds = 360
   #@real_home = ENV['HOME']
   #fake_home = File.join('/tmp','fake_home')
   #FileUtils.rm_rf fake_home, :secure => true
@@ -24,9 +24,9 @@ After do
     ENV['HOSTNAME'] = @real_hostname
   end
 
-	if @temp_swroot
-		FileUtils.rm_rf @temp_swroot if File.exists? @temp_swroot
-	end
+  if @temp_swroot
+    FileUtils.rm_rf @temp_swroot if File.exists? @temp_swroot
+  end
 
   if @config_backup
     FileUtils.cp "etc/smithyrc.original", "etc/smithyrc"

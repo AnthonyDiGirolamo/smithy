@@ -20,9 +20,9 @@ Feature: Add new software builds
     When I successfully run `smithy new git/1.6/build1`
     Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build1"
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should exist
-		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be group writable
-		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should have a group name of "ccsstaff"
-		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be executable
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be group writable
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should have a group name of "ccsstaff"
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be executable
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/remodule" should exist
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/retest" should exist
     And a file named "/tmp/swsmithy/x86/git/1.6/modulefile/git/1.6" should exist
@@ -45,17 +45,17 @@ Feature: Add new software builds
     And a directory named "/tmp/swsmithy/x86/git/1.6/build3" should exist
     And a file named "/tmp/swsmithy/x86/git/description" should exist
 
-	Scenario: Add a new software build with a source tarball
+  Scenario: Add a new software build with a source tarball
     Given a tarfile named "somepackage.tar.gz"
-		When I successfully run `smithy new --tarball=somepackage.tar.gz zlib/1.2.6/build1`
-		Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source" should exist
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should exist
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should be group writable
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should have a group name of "ccsstaff"
+    When I successfully run `smithy new --tarball=somepackage.tar.gz zlib/1.2.6/build1`
+    Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should be group writable
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should have a group name of "ccsstaff"
 
-	Scenario: Add a new software build with disabled group permissions
-		When I successfully run `smithy --disable-group-writable new --tarball=../../zlib-1.2.6.tar.gz zlib/1.2.6/build2`
-		Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source" should exist
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should exist
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should not be group writable
-		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should have a group name of "ccsstaff"
+  Scenario: Add a new software build with disabled group permissions
+    When I successfully run `smithy --disable-group-writable new --tarball=../../zlib-1.2.6.tar.gz zlib/1.2.6/build2`
+    Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should not be group writable
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should have a group name of "ccsstaff"
