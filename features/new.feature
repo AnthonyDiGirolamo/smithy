@@ -46,7 +46,8 @@ Feature: Add new software builds
     And a file named "/tmp/swsmithy/x86/git/description" should exist
 
 	Scenario: Add a new software build with a source tarball
-		When I successfully run `smithy new --tarball=../../zlib-1.2.6.tar.gz zlib/1.2.6/build1`
+    Given a tarfile named "somepackage.tar.gz"
+		When I successfully run `smithy new --tarball=somepackage.tar.gz zlib/1.2.6/build1`
 		Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source" should exist
 		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should exist
 		And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should be group writable

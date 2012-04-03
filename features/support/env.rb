@@ -6,7 +6,7 @@ ENV['PATH'] = "#{File.expand_path(File.dirname(__FILE__) + '/../../bin')}#{File:
 ENV['GLI_DEBUG'] = 'true'
 
 Before do
-  @dirs = [".", "tmp/aruba"]
+  #@dirs = [".", "tmp/aruba"]
   @real_hostname = ENV['HOSTNAME']
 	@aruba_timeout_seconds = 360
   #@real_home = ENV['HOME']

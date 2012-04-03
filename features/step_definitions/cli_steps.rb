@@ -44,3 +44,13 @@ end
 Then /^a file named "([^"]*)" should have a group name of "([^"]*)"$/ do |file, group|
 	Etc.getgrgid(File.stat(file).gid).name.should == group
 end
+
+Given /^a tarfile named "([^"]*)"$/ do |tarfile|
+  tarfile =~ /(.*).tar.gz/
+  basename = $1
+  step "I run `mkdir -p #{basename}`"
+  step "I run `touch #{basename}/configure`"
+  step "I run `tar cf #{basename}.tar #{basename}`"
+  step "I run `gzip #{basename}.tar`"
+end
+
