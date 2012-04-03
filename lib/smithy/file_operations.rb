@@ -75,7 +75,7 @@ module Smithy
               when "n"
                 overwrite = false
               when "d"
-                puts `diff -uw #{source} #{dest}`
+                puts `diff -uw #{dest} #{source}`
               when "h"
                 puts %{Y - yes, overwrite
     n - no, do not overwrite

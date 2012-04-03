@@ -54,6 +54,12 @@ module Smithy
       :link         => "relink",
       :test         => "retest",
       :env          => "remodule" }
+    ExecutableBuildFileNames = [
+      BuildFileNames[:build],
+      BuildFileNames[:link],
+      BuildFileNames[:test],
+      BuildFileNames[:env]
+    ]
 
     def build_support_files
       file_list = BuildFileNames.values
@@ -314,7 +320,7 @@ module Smithy
         FileOperations.install_file file[:src], file[:dest], options
         FileOperations.set_group file[:dest], group, options
         FileOperations.make_group_writable file[:dest], options if group_writeable?
-        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(rebuild|relink|retest|remodule)/
+        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
       end
     end
 
@@ -344,7 +350,7 @@ module Smithy
           else
             puts "exists ".rjust(12).bright + f
           end
-          FileOperations.make_executable file[:dest], options if f =~ /(rebuild|remodule|relink|retest)/
+          FileOperations.make_executable file[:dest], options if f =~ /#{ExecutableBuildFileNames.join('|')}/
         else
           puts "missing ".rjust(12).bright + f
           # copy template?
@@ -356,7 +362,7 @@ module Smithy
       builds = Dir.glob(version_directory+"/*")
       # Delete anything that isn't a directory
       builds.reject! { |b| ! File.directory?(b) }
-      builds.delete("modulefile")
+      builds.reject! { |b| b =~ /#{ModuleFile::PackageModulePathName}/ }
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
       return builds.sort
@@ -368,17 +374,17 @@ module Smithy
 
     def self.all(args = {})
       # Array of full paths to rebuild scripts
-      software = Dir.glob(args[:root]+"/*/*/*/rebuild")
+      software = Dir.glob(args[:root]+"/*/*/*/#{BuildFileNames[:build]}")
       # Remove rebuild from each path
-      software.collect!{|s| s.gsub(/\/rebuild$/, '')}
+      software.collect!{|s| s.gsub(/\/#{BuildFileNames[:build]}$/, '')}
       #TODO allow sorting?
       software.sort!
     end
 
     def self.all_web(args = {})
       # Find all software with descriptions
-      software = Dir.glob(args[:root]+"/*/description")
-      software.collect!{|s| s.gsub(/\/description$/, '')}
+      software = Dir.glob(args[:root]+"/*/#{PackageFileNames[:description]}")
+      software.collect!{|s| s.gsub(/\/#{PackageFileNames[:description]}$/, '')}
       # Remove any with noweb in their exceptions file
       software.reject! do |s|
         ! Description.publishable?(s)

@@ -2,6 +2,9 @@ module Smithy
   class ModuleFile
     attr_accessor :package, :builds
 
+    PackageModulePathName = "modulefile"
+    SystemModulePathName  = "modulefiles"
+
     def initialize(args = {})
       @package = args[:package]
       @builds = @package.alternate_builds
@@ -12,7 +15,7 @@ module Smithy
     end
 
     def module_path
-      File.join(package.version_directory, "modulefile")
+      File.join(package.version_directory, PackageModulePathName)
     end
 
     def module_file
@@ -20,7 +23,7 @@ module Smithy
     end
 
     def system_module_path
-      File.join(package.software_root, "modulefiles")
+      File.join(package.software_root, SystemModulePathName)
     end
 
     def system_module_file
@@ -38,16 +41,13 @@ module Smithy
       new_module = module_file+"_#{Time.now.to_i}"
       old_module = module_file
 
-      unless args[:dry_run]
-        erb = ERB.new(File.read(erb_file), nil, "<>")
-        File.open(new_module, "w+") do |f|
-          f.write erb.result(binding)
-        end
+      erb = ERB.new(File.read(erb_file), nil, "<>")
+      File.open(new_module, "w+") do |f|
+        f.write erb.result(binding)
       end
 
-      if FileOperations.install_file(new_module, old_module, options)
-        FileUtils.rm_f(new_module, options)
-      end
+      FileOperations.install_file(new_module, old_module, options)
+      FileUtils.rm_f(new_module) # Always remove
 
       FileOperations.make_group_writable(module_path, options.merge(:recursive => true))
       FileOperations.set_group(module_path, package.group, options.merge(:recursive => true))
