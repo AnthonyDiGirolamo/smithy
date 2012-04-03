@@ -37,6 +37,10 @@ Then /^a file named "([^"]*)" should not be group writable$/ do |file|
 	end
 end
 
+Then /^a file named "([^"]*)" should be executable$/ do |file|
+  raise "#{file} is not executable" unless File.executable?(file)
+end
+
 Then /^a file named "([^"]*)" should have a group name of "([^"]*)"$/ do |file, group|
 	Etc.getgrgid(File.stat(file).gid).name.should == group
 end

@@ -1,7 +1,7 @@
 Feature: Add new software builds
   As a tired staff member
   I should be able to create new software builds in /sw
-  In a couple commands or less
+  In as few steps as possible
 
   Background:
     Given my hostname is "awesome_sauce"
@@ -22,8 +22,10 @@ Feature: Add new software builds
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should exist
 		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be group writable
 		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should have a group name of "ccsstaff"
+		And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be executable
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/remodule" should exist
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/retest" should exist
+    And a file named "/tmp/swsmithy/x86/git/1.6/modulefile/git/1.6" should exist
     When I successfully run `diff -q /tmp/swsmithy/x86/git/1.6/build1/rebuild ../../etc/templates/build/rebuild`
     Then the stdout should not contain "Files /tmp/swsmithy/x86/git/1.6/build1/rebuild and etc/templates/build/retest differ"
 
@@ -31,6 +33,11 @@ Feature: Add new software builds
     When I successfully run `smithy new git/1.6/build2`
     Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build2"
     And a file named "/tmp/swsmithy/x86/git/description" should not exist
+
+  Scenario: Add a new software build without a modulefile
+    When I successfully run `smithy new --skip-modulefile cool_package/1.0/build1`
+    Then the stdout should contain "/tmp/swsmithy/x86/cool_package/1.0/build1"
+    And a file named "/tmp/swsmithy/x86/cool_package/1.0/modulefile" should not exist
 
   Scenario: Add a new software build with a web metadata
     When I successfully run `smithy new --web-description git/1.6/build3`
