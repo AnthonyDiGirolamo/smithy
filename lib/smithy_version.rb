@@ -1,3 +1,3 @@
 module Smithy
-  VERSION = '0.5'
+  VERSION = '0.9'
 end

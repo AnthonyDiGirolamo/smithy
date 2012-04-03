@@ -72,7 +72,7 @@ Gets help for the application or its commands.  Can also list the commands in a 
 These options are specified *after* the command.
 
 [<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
-=== <tt>module NAME</tt>
+=== <tt>module create|use|deploy NAME</tt>
 
 Manage modulefiles for a package
 
@@ -86,7 +86,7 @@ Run the proper module command to add a package's modulefile to the MODULEPATH. T
 
 smithy module deploy NAME/VERSION/BUILD
 
-Copy a package's module_file to the system module path. This is typically done after you have tested a new module in isolation.
+Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
 
 
 ==== Options

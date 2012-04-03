@@ -242,20 +242,19 @@ command :new do |c|
            :disable_group => global_options[:"disable-group-writable"],
                     :root => global_options[:full_software_root_path]
 
-    if p.valid?
-      if options[:tarball]
-        archive = File.absolute_path options[:tarball]
-        raise "The archive #{archive} does not exist" unless File.exists? archive
-      end
-      p.create :dry_run => options[:"dry-run"],
-                   :web => options[:"web-description"]
+    p.valid?
+    if options[:tarball]
+      archive = File.absolute_path options[:tarball]
+      raise "The archive #{archive} does not exist" unless File.exists? archive
+    end
+    p.create :dry_run => options[:"dry-run"],
+                 :web => options[:"web-description"]
 
-      p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
+    p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
 
-      unless options[:"skip-modulefile"]
-        m = ModuleFile.new :package => p
-        m.create :dry_run => options[:"dry-run"]
-      end
+    unless options[:"skip-modulefile"]
+      m = ModuleFile.new :package => p
+      m.create :dry_run => options[:"dry-run"]
     end
   end
 end
@@ -311,8 +310,7 @@ command ['edit'] do |c|
       end
 
       file_before = File.stat(file_name)
-      arg_list = []
-      arg_list << editor
+      arg_list = [ editor ]
       arg_list << "-O" if editor =~ /vim/
 
       case operation
@@ -329,7 +327,6 @@ command ['edit'] do |c|
       if status && File.stat(file_name) > file_before
         notice "Modified #{file_name}"
       end
-
     end
   end
 end
@@ -356,9 +353,8 @@ command ['repair'] do |c|
              :disable_group => global_options[:"disable-group-writable"],
                       :root => global_options[:full_software_root_path]
 
-      if p.valid?
-        p.repair :dry_run => options[:"dry-run"]
-      end
+      p.valid?
+      p.repair :dry_run => options[:"dry-run"]
     end
   end
 end
@@ -417,9 +413,9 @@ Run the proper module command to add a package's modulefile to the MODULEPATH. T
 
 smithy module deploy NAME/VERSION/BUILD
 
-Copy a package's module_file to the system module path. This is typically done after you have tested a new module in isolation.
+Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
 EOS
-arg_name "NAME"
+arg_name "create|use|deploy NAME"
 command ['module'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"]
@@ -442,21 +438,20 @@ command ['module'] do |c|
 
     p = Package.new :path => arguments.first,
                     :root => global_options[:full_software_root_path]
-    if p.valid?
-      m = ModuleFile.new :package => p
-      case operation
-      when :use
-        mp = m.module_path
-        if Dir.exist?(mp)
-          puts "module use #{mp}"
-        else
-          raise "No modulefiles found in #{mp}"
-        end
-      when :create
-        m.create :dry_run => options[:"dry-run"]
-      when :deploy
-        m.deploy :dry_run => options[:"dry-run"]
+    p.valid?
+    m = ModuleFile.new :package => p
+    case operation
+    when :use
+      mp = m.module_path
+      if Dir.exist?(mp)
+        puts "module use #{mp}"
+      else
+        raise "No modulefiles found in #{mp}"
       end
+    when :create
+      m.create :dry_run => options[:"dry-run"]
+    when :deploy
+      m.deploy :dry_run => options[:"dry-run"]
     end
   end
 end
