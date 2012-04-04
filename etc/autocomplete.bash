@@ -38,8 +38,15 @@ __smithycomp ()
 		list="$list$s$sep"
 	done
 
-	IFS=$sep
-	COMPREPLY=($(compgen -W "$list" -- "$cur"))
+	case "$cur" in
+	--*=)
+		COMPREPLY=()
+		;;
+	*)
+    IFS=$sep
+    COMPREPLY=( $(compgen -W "$list" -- "$cur" | sed -e 's/[^=]$/& /g') )
+    ;;
+  esac
 }
 
 _smithy ()
@@ -47,6 +54,15 @@ _smithy ()
   #echo "cur: $cur, prev: $prev" > /dev/pts/33
 
 	local i=1 cmd
+
+	if [[ -n ${ZSH_VERSION-} ]]; then
+		emulate -L bash
+		setopt KSH_TYPESET
+
+		# workaround zsh's bug that leaves 'words' as a special
+		# variable in versions < 4.3.12
+		typeset -h words
+	fi
 
 	# find the subcommand
 	while [[ $i -lt $COMP_CWORD ]]; do
@@ -116,13 +132,12 @@ __smithy_complete_packages ()
 _smithy_build () {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
-  case "$prv" in
+	case "$cur" in
   --log-name=*)
-    COMPREPLY=($(compgen -f "$cur"))
+    local t=`echo "$cur" | sed -e 's/--log-name=//g'`
+    COMPREPLY=($(compgen -f "$t"))
     return
     ;;
-  esac
-	case "$cur" in
 	-*)
 		__smithycomp "
       --disable-log
@@ -147,6 +162,7 @@ _smithy_module () {
   esac
 	case "$cur" in
 	-*)
+
 		__smithycomp "
       --dry-run"
 		return
@@ -163,12 +179,17 @@ _smithy_edit () {
     __smithycomp "build test modules modulefile"
     return
     ;;
-  -e|--editor=*)
+  -e)
     COMPREPLY=($(compgen -c "$cur"))
     return
     ;;
   esac
 	case "$cur" in
+  --editor=*)
+    local t=`echo "$cur" | sed -e 's/--editor=//g'`
+    COMPREPLY=($(compgen -c "$t"))
+    return
+    ;;
 	-*)
 		__smithycomp "
       --editor="
@@ -202,12 +223,17 @@ _smithy_new () {
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
 
   case "$prv" in
-  --tarball=*)
+  -t)
     COMPREPLY=($(compgen -f "$cur"))
     return
     ;;
   esac
 	case "$cur" in
+  --tarball=*)
+    local t=`echo "$cur" | sed -e 's/--tarball=//g'`
+    COMPREPLY=($(compgen -f "$t"))
+    return
+    ;;
 	-*)
 		__smithycomp "
       --dry-run
@@ -217,6 +243,7 @@ _smithy_new () {
 		return
 		;;
 	esac
+  __smithy_complete_packages
 }
 
 _smithy_help () {
@@ -236,4 +263,4 @@ _smithy_repair () {
   __smithy_complete_packages
 }
 
-complete -F _smithy smithy
+complete -o bashdefault -o default -o nospace -F _smithy smithy
