@@ -15,6 +15,7 @@ Feature: Add new software builds
       hostname-architectures:
         awesome_sauce: x86
       """
+    And a tarfile named "somepackage.tar.gz"
 
   Scenario: Add a new software build
     When I successfully run `smithy new git/1.6/build1`
@@ -46,7 +47,6 @@ Feature: Add new software builds
     And a file named "/tmp/swsmithy/x86/git/description" should exist
 
   Scenario: Add a new software build with a source tarball
-    Given a tarfile named "somepackage.tar.gz"
     When I successfully run `smithy new --tarball=somepackage.tar.gz zlib/1.2.6/build1`
     Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should exist
@@ -54,8 +54,9 @@ Feature: Add new software builds
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should have a group name of "ccsstaff"
 
   Scenario: Add a new software build with disabled group permissions
-    When I successfully run `smithy --disable-group-writable new --tarball=../../zlib-1.2.6.tar.gz zlib/1.2.6/build2`
+    When I successfully run `smithy --disable-group-writable new --tarball=somepackage.tar.gz zlib/1.2.6/build2`
     Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should not be group writable
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should have a group name of "ccsstaff"
+
