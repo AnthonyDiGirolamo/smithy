@@ -53,7 +53,7 @@ module Smithy
         if File.directory?(d)
           puts "exist ".rjust(12).bright + d
         else
-          FileUtils.mkdir d, options
+          FileUtils.mkdir_p d, options
           puts "create ".rjust(12).bright + d
         end
       end
