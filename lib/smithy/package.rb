@@ -341,7 +341,7 @@ module Smithy
       end
 
       notice "Checking support files"
-      build_support_files.each do |file|
+      (package_support_files+build_support_files).each do |file|
         f = file[:dest]
 
         if File.exists?(f)
