@@ -154,6 +154,8 @@ module Smithy
         return false
       else
         FileUtils.touch(lock_file)
+        FileOperations.set_group(lock_file, group)
+        FileOperations.make_group_writable(lock_file) if group_writeable?
         return true
       end
     end
