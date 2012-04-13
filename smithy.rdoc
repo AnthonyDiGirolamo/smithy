@@ -43,7 +43,7 @@ These options are specified *after* the command.
 [<tt>-f, --force</tt>] Ignore .lock file and run anyway
 [<tt>--log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
 [<tt>-n, --dry-run</tt>] See what scripts will be run without running them
-[<tt>-s, --send-to-stdout</tt>] Send messages from test scripts to STDOUT.
+[<tt>-s, --suppress-stdout</tt>] Suppress messages from STDOUT.
 === <tt>deploy NAME</tt>
 
 Deploy a package
@@ -147,4 +147,4 @@ These options are specified *after* the command.
 [<tt>-f, --force</tt>] Ignore .lock file and run anyway
 [<tt>--log-name=FILE</tt>] Test log file name located within the software prefix. <i>( default: <tt>test.log</tt>)</i>
 [<tt>-n, --dry-run</tt>] See what scripts will be run without running them
-[<tt>-s, --send-to-stdout</tt>] Send messages from test scripts to STDOUT.
+[<tt>-s, --suppress-stdout</tt>] Suppress messages from STDOUT.

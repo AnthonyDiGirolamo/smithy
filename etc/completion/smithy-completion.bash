@@ -144,7 +144,7 @@ _smithy_build () {
       --force
       --log-name=
       --dry-run
-      --send-to-stdout"
+      --suppress-stdout"
 		return
 		;;
 	esac

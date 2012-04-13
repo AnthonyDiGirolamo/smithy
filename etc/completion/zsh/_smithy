@@ -50,7 +50,7 @@ case "$words[1]" in
       '(-f --force)'{-f,--force}'[Ignore .lock file and run anyway]' \
       '(--log-name=)--log-name=[Log file name located within the software prefix]:file:_files' \
       '(-n --dry-run)'{-n,--dry-run}'[See what scripts will be run without running them]' \
-      '(-s --send-to-stdout)'{-s,--send-to-stdout}'[Send messages from scripts to STDOUT.]' \
+      '(-s --suppress-stdout)'{-s,--suppress-stdout}'[Suppress messages from STDOUT.]' \
       '1: :->forms' &&  return 0
 
     if [[ "$state" == forms ]]; then
