@@ -11,8 +11,8 @@ spec = Gem::Specification.new do |s|
   s.files = %w(
 bin/smithy
 bin/smithy
-etc/autocomplete.bash
-etc/autocomplete.zsh
+etc/completion/smithy-completion.bash
+etc/completion/zsh/_smithy
 etc/smithyrc
 etc/templates/modulefile.erb
 etc/templates/build/.owners
