@@ -123,8 +123,8 @@ command ['test'] do |c|
   c.desc "Disable logging"
   c.switch ["disable-log"]
 
-  c.desc 'Send messages from test scripts to STDOUT.'
-  c.switch [:s, "send-to-stdout"]
+  c.desc 'Suppress messages from STDOUT.'
+  c.switch [:s, "suppress-stdout"]
 
   c.desc 'Ignore .lock file and run anyway'
   c.switch [:f, "force"]
@@ -151,7 +151,7 @@ command ['test'] do |c|
                   :dry_run => options[:"dry-run"],
           :disable_logging => options[:"disable-log"],
                  :log_name => options[:"log-name"],
-           :send_to_stdout => options[:"send-to-stdout"],
+          :suppress_stdout => options[:"suppress-stdout"],
                     :force => options[:"force"]
     end
   end
@@ -170,8 +170,8 @@ command ['build'] do |c|
   c.desc "Disable logging"
   c.switch ["disable-log"]
 
-  c.desc 'Send messages from test scripts to STDOUT.'
-  c.switch [:s, "send-to-stdout"]
+  c.desc 'Suppress messages from STDOUT.'
+  c.switch [:s, "suppress-stdout"]
 
   c.desc 'Ignore .lock file and run anyway'
   c.switch [:f, "force"]
@@ -199,7 +199,7 @@ command ['build'] do |c|
                   :dry_run => options[:"dry-run"],
           :disable_logging => options[:"disable-log"],
                  :log_name => options[:"log-name"],
-           :send_to_stdout => options[:"send-to-stdout"],
+          :suppress_stdout => options[:"suppress-stdout"],
                     :force => options[:"force"]
     end
   end

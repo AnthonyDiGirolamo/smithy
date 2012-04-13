@@ -208,7 +208,7 @@ module Smithy
         begin
           t = Open4.background(script, 0=>'', 1=>stdout, 2=>stderr)
           while t.status do
-            process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
+            process_ouput(stdout, stderr, args[:suppress_stdout], log_file)
             sleep 0.25
           end
 
@@ -217,7 +217,7 @@ module Smithy
           exit_status = exception.exitstatus
         end
         # There is usually some leftover output
-        process_ouput(stdout, stderr, args[:send_to_stdout], log_file)
+        process_ouput(stdout, stderr, args[:suppress_stdout], log_file)
 
         log_file.close unless log_file.nil?
 
