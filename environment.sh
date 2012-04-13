@@ -10,3 +10,13 @@ smithy () {
     /sw/tools/smithy/bin/smithy $@
   fi
 }
+
+if [[ -n ${ZSH_VERSION-} ]]; then
+  fpath=(/sw/tools/smithy/gems/software_smithy-1.0/etc/completion/zsh $fpath)
+  compinit
+fi
+
+if [[ -n ${BASH_VERSION-} ]]; then
+  source /sw/tools/smithy/gems/software_smithy-1.0/etc/completion/smithy-completion.bash
+fi
+
