@@ -61,7 +61,7 @@ module Smithy
       begin
         if File.exist? description_file
           f = File.open description_file
-          d = Maruku.new(f.read)
+          d = Kramdown::Document.new(f.read, :auto_ids => false)
           description_text = d.to_html
         else
           description_file = File.join(path, "description")

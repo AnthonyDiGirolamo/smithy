@@ -46,13 +46,13 @@ lib/smithy_version.rb
   s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'smithy'
-  s.add_development_dependency('ruby-debug19')
+  s.add_development_dependency('debugger')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
   s.add_development_dependency('ronn')
   s.add_dependency('gli')
-  s.add_dependency('maruku')
+  s.add_dependency('kramdown')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
   s.add_dependency('terminal-table', '< 1.4.5')
