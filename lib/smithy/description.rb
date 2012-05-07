@@ -44,6 +44,7 @@ module Smithy
     end
 
     def deploy(args = {})
+      debugger rescue nil
       options = {:verbose => false, :noop => false}
       options = {:verbose => true, :noop => true} if args[:dry_run]
 
@@ -68,7 +69,7 @@ module Smithy
           description_text = f.read
         end
       rescue => exception
-        raise "#{exception}\nCannot read #{description_file} or #{description_file}.markdown"
+        raise "#{exception}\nCannot read #{description_file}"
       end
 
       description_output  = File.join(www_arch, "/#{name.downcase}.html")

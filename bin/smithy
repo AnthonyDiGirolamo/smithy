@@ -25,6 +25,7 @@ require 'readline'
 require 'terminal-table'
 require 'erb'
 require 'smithy'
+require 'maruku'
 
 include GLI
 include Smithy
@@ -359,17 +360,17 @@ command ['repair'] do |c|
   end
 end
 
-desc "Deploy a package"
+desc "Publish a package"
 long_desc "Publish packages to web"
 arg_name "NAME"
-command ['deploy'] do |c|
+command ['publish'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
     swroot = global_options[:full_software_root_path]
     www_root = global_options.try(:[], :"web-root")
-    raise """Cannot determine where to deploy web descriptions.\n       Please add a 'web-root: PATH' entry to the smithy config file.""" if www_root.nil?
+    raise """Cannot determine where to publish web descriptions.\n       Please add a 'web-root: PATH' entry to the smithy config file.""" if www_root.nil?
 
     packages = args.dup
     if args.empty?
@@ -377,20 +378,20 @@ command ['deploy'] do |c|
       packages = STDIN.readlines.map{|p| p.chomp}
     end
 
-    raise "You must supply at least one package to deploy" if packages.empty?
+    raise "You must supply at least one package to publish" if packages.empty?
 
     if packages.include?("all")
       packages = Package.all_web :root => swroot
     end
 
-    notice "Deploying #{packages.size} package#{'s' if packages.size>1}#{' (dry-run)' if options[:"dry-run"]}"
+    notice "Publishing #{packages.size} package#{'s' if packages.size>1}#{' (dry-run)' if options[:"dry-run"]}"
 
     packages.each do |package|
       d = Description.new :root => swroot, :package => package, :www_root => www_root
       if d.valid? && d.publishable?
         d.deploy :dry_run => options[:"dry-run"]
       else
-        notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-deploy."
+        notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-publish."
       end
     end
 
