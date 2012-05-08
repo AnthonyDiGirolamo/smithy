@@ -26,6 +26,7 @@ require 'terminal-table'
 require 'erb'
 require 'smithy'
 require 'kramdown'
+#require 'debugger'
 
 include GLI
 include Smithy

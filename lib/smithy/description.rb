@@ -44,7 +44,6 @@ module Smithy
     end
 
     def deploy(args = {})
-      debugger rescue nil
       options = {:verbose => false, :noop => false}
       options = {:verbose => true, :noop => true} if args[:dry_run]
 
@@ -61,8 +60,21 @@ module Smithy
       begin
         if File.exist? description_file
           f = File.open description_file
-          d = Kramdown::Document.new(f.read, :auto_ids => false)
+          d = Kramdown::Document.new(f.read, :auto_ids => false, :line_width => 200)
           description_text = d.to_html
+          # Find paragraph tag contents
+          results = []
+          description_text.scan(/<p>(.*?)<\/p>/m) {|m| results << [m.first, Regexp.last_match.offset(0)[0]] }
+          newlines = []
+          # For each paragraph
+          results.each do |string, index|
+            # Find newlines and save their index
+            # index + 3 to accomodate '<p>'
+            string.scan(/\n/) {|m| newlines << index+3+Regexp.last_match.offset(0)[0] }
+          end
+          # Replace the newlines with spaces
+          newlines.each {|i| description_text[i] = ' '}
+          #description_text.gsub!(/<pre>/,'<pre class="kb-code-block">')
         else
           description_file = File.join(path, "description")
           f = File.open description_file
