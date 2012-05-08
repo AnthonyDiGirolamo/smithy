@@ -1,0 +1,17 @@
+#%Module1.0
+proc ModulesHelp { } {
+  puts stderr "Smithy 0.5"
+  puts stderr "See 'smithy help'"
+}
+
+module-whatis "Smithy 0.5"
+
+prereq ruby
+
+set PREFIX /sw/tools/smithy
+
+prepend-path PATH          $PREFIX/bin
+prepend-path GEM_PATH      $PREFIX
+setenv       SMITHY_CONFIG $PREFIX/smithyrc
+
+# vim: ft=tcl
