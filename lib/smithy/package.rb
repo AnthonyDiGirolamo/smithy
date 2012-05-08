@@ -21,7 +21,11 @@ module Smithy
     def initialize(args = {})
       @root = File.dirname args[:root]
       @arch = File.basename args[:root]
-      @path = Package.normalize_name(:name => args[:path], :root => @root, :arch => @arch)
+      if args[:path].try(:downcase) == 'last'
+        @path = last_prefix
+      else
+        @path = Package.normalize_name(:name => args[:path], :root => @root, :arch => @arch)
+      end
       @path =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
       @version = $2
@@ -82,6 +86,8 @@ module Smithy
       else
         return true
       end
+      # If good, save as last prefix
+      save_last_prefix(qualified_name)
     end
 
     def qualified_name

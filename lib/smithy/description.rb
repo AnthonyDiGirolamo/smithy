@@ -13,7 +13,11 @@ module Smithy
       else
         @root    = File.dirname args[:root]
         @arch    = File.basename args[:root]
-        @name    = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
+        if @package == 'last'
+          @name = last_prefix.split('/').try(:first)
+        else
+          @name = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
+        end
         @path    = File.join @root, @arch, @name
       end
     end

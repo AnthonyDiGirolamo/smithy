@@ -170,4 +170,22 @@ module Smithy
     return output
   end
 
+  def last_prefix
+    rc_file = File.join(ENV['HOME'], '.smithyrc')
+    if File.exists?(rc_file)
+      h = YAML.load_file(rc_file) rescue nil
+      return h[:last]
+    else
+      return nil
+    end
+  end
+
+  def save_last_prefix(prefix)
+    rc_file = File.join(ENV['HOME'], '.smithyrc')
+    h = {:last => prefix}
+    File.open(rc_file, "w+") do |f|
+      f.write(h.to_yaml)
+    end
+  end
+
 end

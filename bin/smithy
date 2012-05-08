@@ -273,8 +273,6 @@ command ['edit'] do |c|
     raise """Please specify which editor to launch using the
        $EDITOR environment variable or the --editor option.""" if editor.blank?
 
-    raise "You must supply a package name to edit" if args.empty?
-
     operations = [:build, :test, :config, :env, :modulefile]
     arguments = args.dup
     operation = nil
@@ -286,6 +284,8 @@ command ['edit'] do |c|
       end
     end
     operation = operations.first if operation.nil?
+
+    raise "You must supply a package name to edit" if arguments.empty?
 
     if operation == :config
       file_name = @smithy_config_file
