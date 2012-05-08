@@ -12,7 +12,7 @@ Smithy will help you build, test, and distribute software with ease.
 These options are available for any command and are specified before the name of the command
 
 [<tt>--arch=NAME</tt>] Machine architecure to operate on
-[<tt>--config-file=FILE</tt>] Alternate config file (default: /autofs/na1_home/lmd/smithy/etc/smithyrc)
+[<tt>--config-file=FILE</tt>] Alternate config file, also set by $SMITHY_CONFIG
 [<tt>--disable-group-writable</tt>] Disable group writable file creation
 [<tt>--file-group-name=GROUP</tt>] Group name for files created by smithy
 [<tt>--help</tt>] Show this message

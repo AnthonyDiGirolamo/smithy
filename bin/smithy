@@ -60,7 +60,7 @@ flag ["web-root"]
 desc "Don't use colors"
 switch "no-color"
 
-desc "Alternate config file"
+desc "Alternate config file, also set by $SMITHY_CONFIG"
 arg_name "FILE"
 flag [:"config-file"]
 
