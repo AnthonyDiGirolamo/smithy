@@ -63,6 +63,8 @@ module Smithy
   def load_system_config(global = {})
     if global[:"config-file"]
       sysconfig_path = File.expand_path(global[:"config-file"])
+    elsif ENV['SMITHY_CONFIG']
+      sysconfig_path = File.expand_path(ENV['SMITHY_CONFIG'])
     else
       sysconfig_path = File.expand_path(@smithy_config_file)
     end
@@ -70,6 +72,7 @@ module Smithy
     options = {}
 
     if File.exists? sysconfig_path
+      @smithy_config_file = sysconfig_path
       @smithy_config_hash = YAML.load_file(sysconfig_path)
 
       options[:"software-root"]   = @smithy_config_hash.try(:[], "software-root")
