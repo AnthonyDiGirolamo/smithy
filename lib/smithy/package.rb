@@ -83,11 +83,11 @@ module Smithy
       if @name.nil? || @version.nil? || @build_name.nil? || @name.include?('/') || @version.include?('/') || @build_name.include?('/')
         raise "The package name \"#{@path}\" must be of the form: NAME/VERSION/BUILD"
         return false
-      else
-        return true
       end
+
       # If good, save as last prefix
       save_last_prefix(qualified_name)
+			return true
     end
 
     def qualified_name

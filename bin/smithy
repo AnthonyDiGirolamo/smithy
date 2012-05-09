@@ -258,11 +258,20 @@ command :new do |c|
       m = ModuleFile.new :package => p
       m.create :dry_run => options[:"dry-run"]
     end
+
+    notice "Next Steps"
+    notice_command " smithy edit build last"      , "Edit rebuild script"
+    notice_command " smithy edit env last"        , "Edit remodule script"
+    notice_command " smithy build last"           , "Run build script"
+    notice_command " smithy module create"        , "Generate a modulefile" if options[:"skip-modulefile"]
+    notice_command " smithy edit modulefile last" , "Edit generated modulefile"
+    notice_command " smithy module deploy last"   , "Install modulefile"
+    notice_command " smithy publish last"         , "Publish web description"
   end
 end
 
 desc "Edit package support files"
-arg_name "build|test|modules|modulefile NAME"
+arg_name "build|test|env|modulefile NAME"
 command ['edit'] do |c|
   c.desc "Editor for opening script files"
   c.arg_name "BINARY"
@@ -452,6 +461,9 @@ command ['module'] do |c|
       end
     when :create
       m.create :dry_run => options[:"dry-run"]
+      notice "Next Steps"
+      notice_command " smithy edit modulefile last" , "Edit generated modulefile"
+      notice_command " smithy module deploy last"   , "Install modulefile"
     when :deploy
       m.deploy :dry_run => options[:"dry-run"]
     end

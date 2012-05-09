@@ -5,15 +5,6 @@ module Smithy
     PackageModulePathName = "modulefile"
     SystemModulePathName  = "modulefiles"
 
-    Environments = [
-      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
-      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
-      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
-      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
-      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
-    ]
-
-
     def initialize(args = {})
       @package = args[:package]
       @builds = @package.alternate_builds
@@ -40,6 +31,8 @@ module Smithy
     end
 
     def create(args = {})
+      notice "Creating Modulefile for #{package.prefix}"
+
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
       erb_file = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
@@ -87,10 +80,18 @@ module Smithy
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
     end
 
+    Environments = [
+      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
+      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
+      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
+      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
+      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
+    ]
+
     def module_build_list(package, builds, args = {})
       output = ""
-      notice "Generating Modulefile for Multiple Builds"
-      notice_info "Build Name".rjust(25)+"  >  Required Modules"
+      notice "Multiple Builds Found"
+      notice_info "Build Name".rjust(25)+"   Required Modules"
       Environments.each_with_index do |e,i|
         if i == 0
           output << "if "
@@ -112,14 +113,14 @@ module Smithy
               end
               output << "[ is-loaded #{name}/#{version} ] {\n"
               output << "    set BUILD #{b}\n"
-              notice_info b.rjust(25) + "  >  #{e[:prg_env]} + #{name}/#{version}"
+              notice_info b.rjust(25) + "   #{e[:prg_env]} + #{name}/#{version}"
             end
             output << "  } else {\n"
             output << "    set BUILD #{sub_builds.last}\n"
             output << "  }\n"
           else
             output << "  set BUILD #{builds[j]}\n"
-            notice_info builds[j].rjust(25) + "  >  #{e[:prg_env]}"
+            notice_info builds[j].rjust(25) + "   #{e[:prg_env]}"
           end
         else
           output << "  puts stderr \"Not implemented for the #{e[:human_name]} compiler\"\n"
