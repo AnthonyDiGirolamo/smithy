@@ -64,7 +64,7 @@ module Smithy
       begin
         if File.exist? description_file
           f = File.open description_file
-          d = Kramdown::Document.new(f.read, :auto_ids => false, :line_width => 200)
+          d = Kramdown::Document.new(f.read, :auto_ids => false)
           description_text = d.to_html
           # Find paragraph tag contents
           results = []

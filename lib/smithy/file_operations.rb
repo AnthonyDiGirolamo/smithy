@@ -68,7 +68,7 @@ module Smithy
             puts "conflict ".rjust(12).color(:red) + dest
             overwrite = nil
             while overwrite.nil? do
-              prompt = Readline.readline("Overwrite #{dest}? (enter \"h\" for help) [ynqdh] ")
+              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [ynqdh] ")
               case prompt.downcase
               when "y"
                 overwrite = true
@@ -77,11 +77,11 @@ module Smithy
               when "d"
                 puts `diff -uw #{dest} #{source}`
               when "h"
-                puts %{Y - yes, overwrite
-    n - no, do not overwrite
-    q - quit, abort
-    d - diff, show the differences between the old and the new
-    h - help, show this help}
+                puts %{y - yes, overwrite
+n - no, do not overwrite
+q - quit, abort
+d - diff, show the differences between the old and the new
+h - help, show this help}
               when "q"
                 raise "Abort new package"
               #else

@@ -5,6 +5,15 @@ module Smithy
     PackageModulePathName = "modulefile"
     SystemModulePathName  = "modulefiles"
 
+    Environments = [
+      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
+      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
+      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
+      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
+      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
+    ]
+
+
     def initialize(args = {})
       @package = args[:package]
       @builds = @package.alternate_builds
@@ -43,7 +52,7 @@ module Smithy
 
       erb = ERB.new(File.read(erb_file), nil, "<>")
       File.open(new_module, "w+") do |f|
-        f.write erb.result(binding)
+        f.write erb.result(get_binding)
       end
 
       FileOperations.install_file(new_module, old_module, options)
@@ -76,6 +85,56 @@ module Smithy
       FileOperations.install_file module_file, destination, options
       FileOperations.make_group_writable(install_dir, options.merge(:recursive => true))
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
+    end
+
+    def module_build_list(package, builds, args = {})
+      output = ""
+      notice "Generating Modulefile for Multiple Builds"
+      notice_info "Build Name".rjust(25)+"  >  Required Modules"
+      Environments.each_with_index do |e,i|
+        if i == 0
+          output << "if "
+        else
+          output << "} elseif "
+        end
+        output << "[ is-loaded #{e[:prg_env]} ] {\n"
+        if j=builds.index{|b|b=~e[:regex]}
+          sub_builds = builds.select{|b|b=~e[:regex]}
+          if sub_builds.size > 1
+            sub_builds.each_with_index do |b,k|
+              b =~ e[:regex]
+              name = e[:compiler_name]
+              version = $2
+              if k == 0
+                output << "  if "
+              else
+                output << "  } elseif "
+              end
+              output << "[ is-loaded #{name}/#{version} ] {\n"
+              output << "    set BUILD #{b}\n"
+              notice_info b.rjust(25) + "  >  #{e[:prg_env]} + #{name}/#{version}"
+            end
+            output << "  } else {\n"
+            output << "    set BUILD #{sub_builds.last}\n"
+            output << "  }\n"
+          else
+            output << "  set BUILD #{builds[j]}\n"
+            notice_info builds[j].rjust(25) + "  >  #{e[:prg_env]}"
+          end
+        else
+          output << "  puts stderr \"Not implemented for the #{e[:human_name]} compiler\"\n"
+        end
+      end
+
+      output << "}\n"
+      output << "if {![info exists BUILD]} {\n"
+      output << "  puts stderr \"[module-info name] is only available for the following environments:\"\n"
+      builds.each do |build|
+        output << "  puts stderr \"#{build}\"\n"
+      end
+      output << "  break\n}\n"
+
+      return output
     end
 
   end

@@ -267,9 +267,9 @@ module Smithy
             overwrite = false
           when "h"
             puts %{y - yes, overwrite
-  n - no, do not overwrite
-  q - quit, abort
-  h - help, show this help}
+n - no, do not overwrite
+q - quit, abort
+h - help, show this help}
           when "q"
             raise "Abort new package"
           end
