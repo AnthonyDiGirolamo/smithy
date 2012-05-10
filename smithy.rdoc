@@ -23,6 +23,7 @@ These options are available for any command and are specified before the name of
 [<tt>build</tt>] Build software
 [<tt>edit</tt>] Edit package support files
 [<tt>help</tt>] Shows list of commands or help for one command
+[<tt>last</tt>] Display last package
 [<tt>module</tt>] Manage modulefiles for a package
 [<tt>new</tt>] Generate a new build and all necessary files
 [<tt>publish</tt>] Publish a package
@@ -62,6 +63,12 @@ Gets help for the application or its commands.  Can also list the commands in a 
 These options are specified *after* the command.
 
 [<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
+=== <tt>last </tt>
+
+Display last package
+
+Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file.
+
 === <tt>module create|use|deploy NAME</tt>
 
 Manage modulefiles for a package
