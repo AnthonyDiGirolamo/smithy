@@ -20,7 +20,7 @@ etc/templates/build/build-notes
 etc/templates/build/dependencies
 etc/templates/build/rebuild
 etc/templates/build/relink
-etc/templates/build/remodule
+etc/templates/build/remodule.erb
 etc/templates/build/retest
 etc/templates/build/status
 etc/templates/package/.check4newver
