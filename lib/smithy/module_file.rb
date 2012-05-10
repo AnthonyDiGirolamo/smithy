@@ -37,6 +37,8 @@ module Smithy
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
 
+      FileUtils.mkdir_p(File.join(module_path, package.name), options)
+
       FileOperations.render_erb :destination => module_file,
         :erb => File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb"),
         :binding => get_binding, :options => options
