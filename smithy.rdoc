@@ -44,7 +44,7 @@ These options are specified *after* the command.
 [<tt>--log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
 [<tt>-n, --dry-run</tt>] See what scripts will be run without running them
 [<tt>-s, --suppress-stdout</tt>] Suppress messages from STDOUT.
-=== <tt>edit build|test|modules|modulefile NAME</tt>
+=== <tt>edit build|test|env|modulefile NAME</tt>
 
 Edit package support files
 

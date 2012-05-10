@@ -68,7 +68,7 @@ module Smithy
             puts "conflict ".rjust(12).color(:red) + dest
             overwrite = nil
             while overwrite.nil? do
-              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [ynqdh] ")
+              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [yndh] ")
               case prompt.downcase
               when "y"
                 overwrite = true
@@ -79,11 +79,10 @@ module Smithy
               when "h"
                 puts %{y - yes, overwrite
 n - no, do not overwrite
-q - quit, abort
 d - diff, show the differences between the old and the new
 h - help, show this help}
-              when "q"
-                raise "Abort new package"
+              #when "q"
+                #raise "Abort new package"
               #else
                 #overwrite = true
               end
@@ -104,6 +103,22 @@ h - help, show this help}
         end
 
         return installed
+      end
+
+      def render_erb(args = {})
+        options = {:noop => false, :verbose => false}
+        options.merge!(args[:options])
+        erb_filename  = args[:erb]
+        dest          = args[:destination]
+        rendered_file = "#{File.dirname(dest)}/.#{File.basename(dest)}_#{Time.now.to_i}"
+
+        erb = ERB.new(File.read(erb_filename), nil, "<>")
+        File.open(rendered_file, "w+") do |f|
+          f.write erb.result(args[:binding])
+        end
+
+        FileOperations.install_file(rendered_file, dest, options)
+        FileUtils.rm_f(rendered_file) # Always remove
       end
 
     end

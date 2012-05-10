@@ -32,24 +32,14 @@ module Smithy
 
     def create(args = {})
       notice "Creating Modulefile for #{package.prefix}"
+      notice_warn "Dry Run! (no files will be created or changed)" if args[:dry_run]
 
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
-      erb_file = File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb")
 
-      module_dir = File.join(module_path, package.name)
-      FileUtils.mkdir_p(module_dir, options)
-
-      new_module = module_file+"_#{Time.now.to_i}"
-      old_module = module_file
-
-      erb = ERB.new(File.read(erb_file), nil, "<>")
-      File.open(new_module, "w+") do |f|
-        f.write erb.result(get_binding)
-      end
-
-      FileOperations.install_file(new_module, old_module, options)
-      FileUtils.rm_f(new_module) # Always remove
+      FileOperations.render_erb :destination => module_file,
+        :erb => File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb"),
+        :binding => get_binding, :options => options
 
       FileOperations.make_group_writable(module_path, options.merge(:recursive => true))
       FileOperations.set_group(module_path, package.group, options.merge(:recursive => true))

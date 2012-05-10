@@ -1,7 +1,7 @@
 #!/bin/bash
 # Smithy wrapper function: Will exit if given command fails
 run () {
-  if $@
+  if "$@"
     then echo "==> SUCCESS $@"
     else echo "==> FAILED $@" && exit 1
   fi
@@ -10,12 +10,11 @@ run () {
 # Load module environment
 source ${MODULESHOME}/init/bash
 
+# Set source directory
+export SMITHY_SOURCE=$SMITHY_PREFIX/source
+
 module unload PrgEnv-gnu
 module unload PrgEnv-pgi
 module unload PrgEnv-cray
 module unload PrgEnv-intel
 module unload PrgEnv-pathscale
-
-# Set source directory
-export SMITHY_SOURCE=$SMITHY_PREFIX/source
-

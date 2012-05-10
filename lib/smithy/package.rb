@@ -36,6 +36,10 @@ module Smithy
       @group_writeable = false if args[:disable_group]
     end
 
+    def get_binding
+      binding
+    end
+
     PackageFileNames = {
       :exception   => ".exceptions",
       :description => "description",
@@ -64,12 +68,15 @@ module Smithy
       BuildFileNames[:test],
       BuildFileNames[:env]
     ]
+    BuildFileERBs = [
+      BuildFileNames[:env] ]
 
     def build_support_files
       file_list = BuildFileNames.values
       file_list.collect! do |f|
-        { :src  => File.join(@@smithy_bin_root, "etc/templates/build", f),
-          :dest => File.join(prefix, f) }
+        src = File.join(@@smithy_bin_root, "etc/templates/build", f)
+        src += ".erb" if BuildFileERBs.include?(f)
+        { :src  => src, :dest => File.join(prefix, f) }
       end
       return file_list
     end
@@ -125,7 +132,7 @@ module Smithy
     end
 
     def remodule_script
-      File.join(prefix,"remodule")
+      File.join(prefix, BuildFileNames[:env])
     end
     def remodule_script_exists?
       File.exist?(remodule_script)
@@ -183,6 +190,8 @@ module Smithy
       else
         return nil
       end
+
+      notice_warn "Dry Run! (scripts will not run)" if args[:dry_run]
 
       ENV['SMITHY_PREFIX'] = prefix
       ENV['SW_BLDDIR'] = prefix
@@ -259,16 +268,15 @@ module Smithy
       overwrite = nil
       if File.exists?(source_dir)
         while overwrite.nil? do
-          prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynqh] ")
+          prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
           when "y"
             overwrite = true
           when "n"
             overwrite = false
           when "h"
-            puts %{y - yes, overwrite
+            puts %{y - yes, delete existing folder and re-extract
 n - no, do not overwrite
-q - quit, abort
 h - help, show this help}
           when "q"
             raise "Abort new package"
@@ -311,7 +319,8 @@ h - help, show this help}
     end
 
     def create(args = {})
-      notice "New #{prefix} #{args[:dry_run] ? "(dry run)" : ""}"
+      notice "New #{prefix}"
+      notice_warn "Dry Run! (no files will be created or changed)" if args[:dry_run]
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
 
@@ -325,11 +334,23 @@ h - help, show this help}
       all_files = package_support_files + all_files if args[:web]
 
       all_files.each do |file|
-        FileOperations.install_file file[:src], file[:dest], options
+        if file[:src] =~ /\.erb$/
+          FileOperations.render_erb :erb => file[:src], :binding => get_binding, :options => options, :destination => file[:dest]
+        else
+          FileOperations.install_file file[:src], file[:dest], options
+        end
         FileOperations.set_group file[:dest], group, options
         FileOperations.make_group_writable file[:dest], options if group_writeable?
         FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
       end
+
+      #ModuleFile::Environments.each do |e|
+        #if build_name =~ e[:regex]
+            #"\nmodule load #{e[:prg_env]}"
+          #end
+          #break
+        #end
+      #end
     end
 
     def repair(args = {})
