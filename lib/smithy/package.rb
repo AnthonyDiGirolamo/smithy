@@ -344,13 +344,17 @@ h - help, show this help}
         FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
       end
 
-      #ModuleFile::Environments.each do |e|
-        #if build_name =~ e[:regex]
-            #"\nmodule load #{e[:prg_env]}"
-          #end
-          #break
-        #end
-      #end
+    end
+
+    def module_load_prgenv
+      output = ""
+      ModuleFile::Environments.each do |e|
+        if build_name =~ e[:regex]
+          output = "module load #{e[:prg_env]}"
+          break
+        end
+      end
+      return output
     end
 
     def repair(args = {})
