@@ -277,12 +277,15 @@ command ['edit'] do |c|
   c.arg_name "BINARY"
   c.flag [:e, :editor]
 
+  c.desc "Split editing window with requested file and the environment (remodule) file"
+  c.switch [:s, :split]
+
   c.action do |global_options,options,args|
     editor = options[:editor] || ENV['EDITOR']
     raise """Please specify which editor to launch using the
        $EDITOR environment variable or the --editor option.""" if editor.blank?
 
-    operations = [:build, :test, :config, :env, :modulefile]
+    operations = [:build, :environment, :modulefile, :test, :config]
     arguments = args.dup
     operation = nil
     operations.each do |o|
@@ -292,7 +295,6 @@ command ['edit'] do |c|
         break
       end
     end
-    operation = operations.first if operation.nil?
 
     raise "You must supply a package name to edit" if arguments.empty?
 
@@ -307,12 +309,38 @@ command ['edit'] do |c|
       p.prefix_exists!
       p.rebuild_script_exists!
 
+      # if no file, prompt
+      if operation.nil?
+        puts "Edit which file? (default is 1)"
+        width = 25
+        notice_command "1. build", p.rebuild_script, width
+        notice_command "2. environment", p.remodule_script, width
+        notice_command "3. modulefile", ModuleFile.new(:package => p).module_file, width
+        notice_command "4. test", p.retest_script, width
+
+        while operation.nil? do
+          prompt = Readline.readline("> ")
+          case prompt.downcase
+          when "1"
+            operation = :build
+          when "2"
+            operation = :environment
+          when "3"
+            operation = :modulefile
+          when "4"
+            operation = :test
+          else
+            operation = :build
+          end
+        end
+      end
+
       file_name = case operation
       when :build
         p.rebuild_script
       when :test
         p.retest_script
-      when :env
+      when :environment
         p.remodule_script
       when :modulefile
         ModuleFile.new(:package => p).module_file
@@ -322,12 +350,12 @@ command ['edit'] do |c|
 
       file_before = File.stat(file_name)
       arg_list = [ editor ]
-      arg_list << "-O" if editor =~ /vim/
+      arg_list << "-O" if editor =~ /vim/ && options[:split]
 
       case operation
       when :build || :test
         arg_list << file_name
-        arg_list << p.remodule_script
+        arg_list << p.remodule_script if options[:split]
       else
         arg_list << file_name
       end

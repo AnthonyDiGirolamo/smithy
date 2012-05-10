@@ -35,8 +35,8 @@ module Smithy
     STDOUT.puts (message).color(:blue) if STDOUT.tty?
   end
 
-  def notice_command(command, comment)
-    STDOUT.puts command.bright.ljust(40)+comment.color(:blue) if STDOUT.tty?
+  def notice_command(command, comment, width=40)
+    STDOUT.puts command.bright.ljust(width)+comment.color(:blue) if STDOUT.tty?
   end
 
   def notice_success(message)

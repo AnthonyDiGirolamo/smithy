@@ -53,6 +53,7 @@ Edit package support files
 These options are specified *after* the command.
 
 [<tt>-e, --editor=BINARY</tt>] Editor for opening script files
+[<tt>-s, --split</tt>] Split editing window with requested file and the environment (remodule) file
 === <tt>help [command]</tt>
 
 Shows list of commands or help for one command
