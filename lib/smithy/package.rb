@@ -363,24 +363,36 @@ h - help, show this help}
       options[:noop] = true if args[:dry_run]
       options[:verbose] = true if args[:dry_run] || args[:verbose]
 
+      missing_web = false
+
       notice "Checking support files"
       (package_support_files+build_support_files).each do |file|
         f = file[:dest]
 
         if File.exists?(f)
           if File.size(f) == 0
-            puts "empty ".rjust(12).color(:red) + f
+            puts "empty ".rjust(12).color(:yellow) + f
           else
             puts "exists ".rjust(12).bright + f
           end
           FileOperations.make_executable file[:dest], options if f =~ /#{ExecutableBuildFileNames.join('|')}/
         else
-          puts "missing ".rjust(12).bright + f
-          # copy template?
+          puts "missing ".rjust(12).color(:red) + f
+
+          missing_web = true if PackageFileNames.values.include?(File.basename(f))
         end
       end
 
-      notice "Setting permissions"
+      if missing_web
+        notice "Creating missing files"
+        package_support_files.each do |file|
+          FileOperations.install_file file[:src], file[:dest], options
+          FileOperations.set_group file[:dest], group, options
+          FileOperations.make_group_writable file[:dest], options if group_writeable?
+        end
+      end
+
+      notice "Setting permissions for #{prefix}"
 
       FileOperations.set_group prefix, group, options.merge(:recursive => true)
       FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writeable?

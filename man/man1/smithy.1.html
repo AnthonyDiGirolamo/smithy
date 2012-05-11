@@ -213,6 +213,26 @@ module load       petsc/3.2
 <p>For out petsc example, this command will copy
 <code>/sw/xk6/petsc/3.2/modulefile/petsc/3.2</code> to <code>/sw/xk6/modulefiles/petsc/3.2</code></p>
 
+<h3 id="4-Website-Description">4. Website Description</h3>
+
+<p>If this is a new application you will need to add some information to the
+description file. For petsc this lives in: <code>/sw/xk6/petsc/description</code> This is
+an html formatted file.  Alternatively, it can live in
+<code>/sw/xk6/petsc/description.markdown</code> this file is in markdown format and is a
+bit simpler to write than html. See http://kramdown.rubyforge.org/quickref.html
+for more information on markdown syntax. If both exist the markdown file take
+precedence.</p>
+
+<p>If the description file is missing you can generate one by running:</p>
+
+<pre><code>smithy repair last
+</code></pre>
+
+<p>To publish to the website run:</p>
+
+<pre><code>smithy publish petsc
+</code></pre>
+
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
