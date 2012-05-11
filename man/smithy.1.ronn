@@ -1,0 +1,135 @@
+smithy(1) -- build, test, and distribute software with ease.
+=====================================================
+
+## SYNOPSIS
+
+`smithy` `new` APPLICATION/VERSION/BUILD<br>
+`smithy` `edit` last<br>
+`smithy` `build` last<br>
+
+## DESCRIPTION
+
+`smithy` will help you get software installed quickly and painlessly. This tool
+follows all the same conventions as swtools. That is, directory structures,
+support files, and scripts are all in the same locations.  Smithy's goal is to
+make using those conventions easier.
+
+This is still a work in progress. If you have any questions, suggestions, or
+encounter any errors please send me an email: anthonyd@ornl.gov
+
+## COMMANDS
+
+For help on all options and commands run `smithy help`
+
+## EXAMPLES
+
+This section shows the typical work-flow for adding a new software build.  Lets
+imagine we want to install petsc 3.2 using the cray compiler. We must create a
+place for the software build, build it, and create a module.
+
+### 1. Creating The Build
+
+All software builds have the following name format: **APPLICATION/VERSION/BUILD**
+That is three different parts separated by forward slashes `/` Each part consists of:
+
+  * **APPLICATION**:
+    The name using lowercase characters
+  * **VERSION**:
+    Numbers with periods. I recommend that whatever you choose as a version
+    allows it to be lexigraphically sorted from oldest to newest.
+  * **BUILD**:
+    Build is somewhat different, it consists of the intended operating system
+    and compiler separated by underscores (`_`). It is important to use compiler
+    version numbers that correspond to module versions. This will allow smithy
+    to auto-generate modulefiles for software with multiple builds. As an
+    example:
+
+    `sles11.1_gnu4.6.2` corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2
+
+    `cle4.0_pgi12.1.0` corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile
+
+Let's use `petsc/3.2/cle4.0_cray8.0.1` as the name. This would be petsc designed
+to run on a cle4.0 compute node and compiled with the cray cce 8.0.1 compiler.
+This can be accomplished by running:
+
+    smithy new petsc/3.2/cle4.0_cray8.0.1
+
+You can save yourself some extra time by telling smithy where the tar file for
+petsc is:
+
+    smithy new -t /sw/sources/petsc/3.2/petsc-lite-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
+
+Using the `-t`, `--tarfile=` option smithy will extract a given archive to the
+`source` directory.
+
+If this is a brand new piece of software add the `--web-description` switch. This will
+create the application description files too.
+
+### 2. Editing and Building the Software:
+
+Once you have created the build you may need to update the build (`rebuild`) and
+environment (`remodule`) scripts before building the software. Both files live
+within the software prefix. For our example it is located in
+`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1`. You can this and other related files using
+the `edit` command:
+
+    smithy edit build petsc/3.2/cle4.0_cray8.0.1
+
+This is just a convenience command to editing the rebuild script. It will expect
+the `$EDITOR` environment variable to be set to the edior of your choice. You
+can alternatively use the `-e`,`--editor=` option. To make things easier you
+can run:
+
+    smithy edit last
+
+By omitting the build argument, smithy will prompt you to select the file to
+edit.  The `last` argument will tell smithy to use the last software build it
+worked with. If you are not sure what the last one is you can run `smithy last`
+to see.
+
+Once you have edited the files, it's time to build. Do so by running:
+
+    smithy build last
+
+The results of the run will be shown on the screen and simultaneously logged to
+`build.log` withing the software prefix folder.
+
+### 3. Create and edit a modulefile:
+
+This step is best done after all builds for a particular application have been
+created.  When you create a new software build a modulefile is created too.  For
+our petsc install it lives in: `/sw/xk6/petsc/3.2/modulefile` All builds of a
+particular application share a single modulefile.
+
+Smithy does some guessing as to what should be inside the modulefile based on
+what builds you have. If there is only one build the modulefile is relatively
+simple. If you have multiple builds for different compilers then it will be more
+complicated.
+
+To be sure the modulefile is up to date on each build, regenerate it with:
+
+    smithy module create last
+
+Launch your editor with:
+
+    smithy edit modulefile last
+
+Add any relevant variables to your application. Next you will need to test it to
+make sure it is loading properly for each build and that there are no errors.
+You can add the modulefile to your `$MODULEPATH` using:
+
+    smithy module use last
+
+Now you are free to display and load it using the normal module commands:
+
+    module avail      petsc
+    module display    petsc/3.2
+    module load       petsc/3.2
+
+Once the modulefile is ready, you can copy it into place using:
+
+    smithy module deploy last
+
+For out petsc example, this command will copy
+`/sw/xk6/petsc/3.2/modulefile/petsc/3.2` to `/sw/xk6/modulefiles/petsc/3.2`
+

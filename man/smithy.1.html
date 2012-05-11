@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>smithy(1) - build, test, and distribute software with ease.</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#COMMANDS">COMMANDS</a>
+    <a href="#EXAMPLES">EXAMPLES</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>smithy(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>smithy(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>smithy</code> - <span class="man-whatis">build, test, and distribute software with ease.</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>smithy</code> <code>new</code> APPLICATION/VERSION/BUILD<br />
+<code>smithy</code> <code>edit</code> last<br />
+<code>smithy</code> <code>build</code> last<br /></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><code>smithy</code> will help you get software installed quickly and painlessly. This tool
+follows all the same conventions as swtools. That is, directory structures,
+support files, and scripts are all in the same locations.  Smithy's goal is to
+make using those conventions easier.</p>
+
+<p>This is still a work in progress. If you have any questions, suggestions, or
+encounter any errors please send me an email: anthonyd@ornl.gov</p>
+
+<h2 id="COMMANDS">COMMANDS</h2>
+
+<p>For help on all options and commands run <code>smithy help</code></p>
+
+<h2 id="EXAMPLES">EXAMPLES</h2>
+
+<p>This section shows the typical work-flow for adding a new software build.  Lets
+imagine we want to install petsc 3.2 using the cray compiler. We must create a
+place for the software build, build it, and create a module.</p>
+
+<h3 id="1-Creating-The-Build">1. Creating The Build</h3>
+
+<p>All software builds have the following name format: <strong>APPLICATION/VERSION/BUILD</strong>
+That is three different parts separated by forward slashes <code>/</code> Each part consists of:</p>
+
+<dl>
+<dt><strong>APPLICATION</strong></dt><dd>The name using lowercase characters</dd>
+<dt class="flush"><strong>VERSION</strong></dt><dd>Numbers with periods. I recommend that whatever you choose as a version
+allows it to be lexigraphically sorted from oldest to newest.</dd>
+<dt class="flush"><strong>BUILD</strong></dt><dd><p>Build is somewhat different, it consists of the intended operating system
+and compiler separated by underscores (<code>_</code>). It is important to use compiler
+version numbers that correspond to module versions. This will allow smithy
+to auto-generate modulefiles for software with multiple builds. As an
+example:</p>
+
+<p><code>sles11.1_gnu4.6.2</code> corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2</p>
+
+<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p></dd>
+</dl>
+
+
+<p>Let's use <code>petsc/3.2/cle4.0_cray8.0.1</code> as the name. This would be petsc designed
+to run on a cle4.0 compute node and compiled with the cray cce 8.0.1 compiler.
+This can be accomplished by running:</p>
+
+<pre><code>smithy new petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>You can save yourself some extra time by telling smithy where the tar file for
+petsc is:</p>
+
+<pre><code>smithy new -t /sw/sources/petsc/3.2/petsc-lite-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>Using the <code>-t</code>, <code>--tarfile=</code> option smithy will extract a given archive to the
+<code>source</code> directory.</p>
+
+<p>If this is a brand new piece of software add the <code>--web-description</code> switch. This will
+create the application description files too.</p>
+
+<h3 id="2-Editing-and-Building-the-Software-">2. Editing and Building the Software:</h3>
+
+<p>Once you have created the build you may need to update the build (<code>rebuild</code>) and
+environment (<code>remodule</code>) scripts before building the software. Both files live
+within the software prefix. For our example it is located in
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1</code>. You can this and other related files using
+the <code>edit</code> command:</p>
+
+<pre><code>smithy edit build petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>This is just a convenience command to editing the rebuild script. It will expect
+the <code>$EDITOR</code> environment variable to be set to the edior of your choice. You
+can alternatively use the <code>-e</code>,<code>--editor=</code> option. To make things easier you
+can run:</p>
+
+<pre><code>smithy edit last
+</code></pre>
+
+<p>By omitting the build argument, smithy will prompt you to select the file to
+edit.  The <code>last</code> argument will tell smithy to use the last software build it
+worked with. If you are not sure what the last one is you can run <code>smithy last</code>
+to see.</p>
+
+<p>Once you have edited the files, it's time to build. Do so by running:</p>
+
+<pre><code>smithy build last
+</code></pre>
+
+<p>The results of the run will be shown on the screen and simultaneously logged to
+<code>build.log</code> withing the software prefix folder.</p>
+
+<h3 id="3-Create-and-edit-a-modulefile-">3. Create and edit a modulefile:</h3>
+
+<p>This step is best done after all builds for a particular application have been
+created.  When you create a new software build a modulefile is created too.  For
+our petsc install it lives in: <code>/sw/xk6/petsc/3.2/modulefile</code> All builds of a
+particular application share a single modulefile.</p>
+
+<p>Smithy does some guessing as to what should be inside the modulefile based on
+what builds you have. If there is only one build the modulefile is relatively
+simple. If you have multiple builds for different compilers then it will be more
+complicated.</p>
+
+<p>To be sure the modulefile is up to date on each build, regenerate it with:</p>
+
+<pre><code>smithy module create last
+</code></pre>
+
+<p>Launch your editor with:</p>
+
+<pre><code>smithy edit modulefile last
+</code></pre>
+
+<p>Add any relevant variables to your application. Next you will need to test it to
+make sure it is loading properly for each build and that there are no errors.
+You can add the modulefile to your <code>$MODULEPATH</code> using:</p>
+
+<pre><code>smithy module use last
+</code></pre>
+
+<p>Now you are free to display and load it using the normal module commands:</p>
+
+<pre><code>module avail      petsc
+module display    petsc/3.2
+module load       petsc/3.2
+</code></pre>
+
+<p>Once the modulefile is ready, you can copy it into place using:</p>
+
+<pre><code>smithy module deploy last
+</code></pre>
+
+<p>For out petsc example, this command will copy
+<code>/sw/xk6/petsc/3.2/modulefile/petsc/3.2</code> to <code>/sw/xk6/modulefiles/petsc/3.2</code></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>May 2012</li>
+    <li class='tr'>smithy(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

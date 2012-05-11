@@ -1,0 +1,204 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "SMITHY" "1" "May 2012" "" ""
+.
+.SH "NAME"
+\fBsmithy\fR \- build, test, and distribute software with ease\.
+.
+.SH "SYNOPSIS"
+\fBsmithy\fR \fBnew\fR APPLICATION/VERSION/BUILD
+.
+.br
+\fBsmithy\fR \fBedit\fR last
+.
+.br
+\fBsmithy\fR \fBbuild\fR last
+.
+.br
+.
+.SH "DESCRIPTION"
+\fBsmithy\fR will help you get software installed quickly and painlessly\. This tool follows all the same conventions as swtools\. That is, directory structures, support files, and scripts are all in the same locations\. Smithy\'s goal is to make using those conventions easier\.
+.
+.P
+This is still a work in progress\. If you have any questions, suggestions, or encounter any errors please send me an email: anthonyd@ornl\.gov
+.
+.SH "COMMANDS"
+For help on all options and commands run \fBsmithy help\fR
+.
+.SH "EXAMPLES"
+This section shows the typical work\-flow for adding a new software build\. Lets imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
+.
+.SS "1\. Creating The Build"
+All software builds have the following name format: \fBAPPLICATION/VERSION/BUILD\fR That is three different parts separated by forward slashes \fB/\fR Each part consists of:
+.
+.TP
+\fBAPPLICATION\fR
+The name using lowercase characters
+.
+.TP
+\fBVERSION\fR
+Numbers with periods\. I recommend that whatever you choose as a version allows it to be lexigraphically sorted from oldest to newest\.
+.
+.TP
+\fBBUILD\fR
+Build is somewhat different, it consists of the intended operating system and compiler separated by underscores (\fB_\fR)\. It is important to use compiler version numbers that correspond to module versions\. This will allow smithy to auto\-generate modulefiles for software with multiple builds\. As an example:
+.
+.IP
+\fBsles11\.1_gnu4\.6\.2\fR corresponds to SuSE Linux Enterprise Server 11\.1 and the GNU gcc compiler 4\.6\.2
+.
+.IP
+\fBcle4\.0_pgi12\.1\.0\fR corresponds to Cray Linux Environment 4\.0 and the PGI 12\.1\.0 compile
+.
+.P
+Let\'s use \fBpetsc/3\.2/cle4\.0_cray8\.0\.1\fR as the name\. This would be petsc designed to run on a cle4\.0 compute node and compiled with the cray cce 8\.0\.1 compiler\. This can be accomplished by running:
+.
+.IP "" 4
+.
+.nf
+
+smithy new petsc/3\.2/cle4\.0_cray8\.0\.1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can save yourself some extra time by telling smithy where the tar file for petsc is:
+.
+.IP "" 4
+.
+.nf
+
+smithy new \-t /sw/sources/petsc/3\.2/petsc\-lite\-3\.2\-p7\.tar\.gz petsc/3\.2/cle4\.0_cray8\.0\.1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Using the \fB\-t\fR, \fB\-\-tarfile=\fR option smithy will extract a given archive to the \fBsource\fR directory\.
+.
+.P
+If this is a brand new piece of software add the \fB\-\-web\-description\fR switch\. This will create the application description files too\.
+.
+.SS "2\. Editing and Building the Software:"
+Once you have created the build you may need to update the build (\fBrebuild\fR) and environment (\fBremodule\fR) scripts before building the software\. Both files live within the software prefix\. For our example it is located in \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1\fR\. You can this and other related files using the \fBedit\fR command:
+.
+.IP "" 4
+.
+.nf
+
+smithy edit build petsc/3\.2/cle4\.0_cray8\.0\.1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This is just a convenience command to editing the rebuild script\. It will expect the \fB$EDITOR\fR environment variable to be set to the edior of your choice\. You can alternatively use the \fB\-e\fR,\fB\-\-editor=\fR option\. To make things easier you can run:
+.
+.IP "" 4
+.
+.nf
+
+smithy edit last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+By omitting the build argument, smithy will prompt you to select the file to edit\. The \fBlast\fR argument will tell smithy to use the last software build it worked with\. If you are not sure what the last one is you can run \fBsmithy last\fR to see\.
+.
+.P
+Once you have edited the files, it\'s time to build\. Do so by running:
+.
+.IP "" 4
+.
+.nf
+
+smithy build last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The results of the run will be shown on the screen and simultaneously logged to \fBbuild\.log\fR withing the software prefix folder\.
+.
+.SS "3\. Create and edit a modulefile:"
+This step is best done after all builds for a particular application have been created\. When you create a new software build a modulefile is created too\. For our petsc install it lives in: \fB/sw/xk6/petsc/3\.2/modulefile\fR All builds of a particular application share a single modulefile\.
+.
+.P
+Smithy does some guessing as to what should be inside the modulefile based on what builds you have\. If there is only one build the modulefile is relatively simple\. If you have multiple builds for different compilers then it will be more complicated\.
+.
+.P
+To be sure the modulefile is up to date on each build, regenerate it with:
+.
+.IP "" 4
+.
+.nf
+
+smithy module create last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Launch your editor with:
+.
+.IP "" 4
+.
+.nf
+
+smithy edit modulefile last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Add any relevant variables to your application\. Next you will need to test it to make sure it is loading properly for each build and that there are no errors\. You can add the modulefile to your \fB$MODULEPATH\fR using:
+.
+.IP "" 4
+.
+.nf
+
+smithy module use last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Now you are free to display and load it using the normal module commands:
+.
+.IP "" 4
+.
+.nf
+
+module avail      petsc
+module display    petsc/3\.2
+module load       petsc/3\.2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Once the modulefile is ready, you can copy it into place using:
+.
+.IP "" 4
+.
+.nf
+
+smithy module deploy last
+.
+.fi
+.
+.IP "" 0
+.
+.P
+For out petsc example, this command will copy \fB/sw/xk6/petsc/3\.2/modulefile/petsc/3\.2\fR to \fB/sw/xk6/modulefiles/petsc/3\.2\fR
