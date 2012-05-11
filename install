@@ -1,5 +1,6 @@
 #!/bin/sh
 bundle exec smithy rdoc
+bundle exec ronn man/smithy.1.ronn
 bundle exec rake rerdoc
 bundle exec rake repackage
 
