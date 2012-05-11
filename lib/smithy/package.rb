@@ -363,16 +363,6 @@ h - help, show this help}
       options[:noop] = true if args[:dry_run]
       options[:verbose] = true if args[:dry_run] || args[:verbose]
 
-      notice "Setting permissions"
-
-      FileOperations.set_group prefix, group, options.merge(:recursive => true)
-      FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writeable?
-
-      [version_directory, application_directory].each do |dir|
-        FileOperations.set_group dir, group, options
-        FileOperations.make_group_writable dir, options if group_writeable?
-      end
-
       notice "Checking support files"
       (package_support_files+build_support_files).each do |file|
         f = file[:dest]
@@ -388,6 +378,16 @@ h - help, show this help}
           puts "missing ".rjust(12).bright + f
           # copy template?
         end
+      end
+
+      notice "Setting permissions"
+
+      FileOperations.set_group prefix, group, options.merge(:recursive => true)
+      FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writeable?
+
+      [version_directory, application_directory].each do |dir|
+        FileOperations.set_group dir, group, options
+        FileOperations.make_group_writable dir, options if group_writeable?
       end
     end
 
