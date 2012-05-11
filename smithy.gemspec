@@ -10,7 +10,6 @@ spec = Gem::Specification.new do |s|
   s.summary = %q{Smithy can help maintain a collection of software installed from source. Typically, many different versions built with different compilers.}
   s.files = %w(
 bin/smithy
-bin/smithy
 etc/completion/smithy-completion.bash
 etc/completion/zsh/_smithy
 etc/smithyrc
@@ -39,9 +38,9 @@ lib/smithy/package.rb
 lib/smithy/module_file.rb
 lib/smithy/file_operations.rb
 lib/smithy_version.rb
-man/smithy.1
-man/smithy.1.html
-man/smithy.1.ronn
+man/man1/smithy.1
+man/man1/smithy.1.html
+man/man1/smithy.1.ronn
   )
   s.require_paths << 'lib'
   s.has_rdoc = true
