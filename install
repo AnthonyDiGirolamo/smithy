@@ -1,6 +1,6 @@
 #!/bin/sh
 bundle exec smithy rdoc
-bundle exec ronn man/smithy.1.ronn
+bundle exec ronn man/man1/smithy.1.ronn
 bundle exec rake rerdoc
 bundle exec rake repackage
 
@@ -12,5 +12,8 @@ export GEM_HOME=/sw/tools/smithy
 gem uninstall software_smithy --all --executables
 gem install pkg/software_smithy-*.gem
 sed -i 's/#!\/.*/#!\/usr\/bin\/env ruby/g' /sw/tools/smithy/bin/*
+
+cp -rv modulefiles /sw/tools/smithy/
+cp -rv environment.sh /sw/tools/smithy/
 
 export GEM_HOME=$HOME/.gem/ruby/1.9.1

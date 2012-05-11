@@ -39,8 +39,6 @@ lib/smithy/module_file.rb
 lib/smithy/file_operations.rb
 lib/smithy_version.rb
 man/man1/smithy.1
-man/man1/smithy.1.html
-man/man1/smithy.1.ronn
   )
   s.require_paths << 'lib'
   s.has_rdoc = true
