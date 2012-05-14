@@ -93,9 +93,11 @@ encounter any errors please send me an email: anthonyd@ornl.gov</p>
 
 <h2 id="EXAMPLES">EXAMPLES</h2>
 
-<p>This section shows the typical work-flow for adding a new software build.  Lets
+<p>This section shows the typical work-flow for adding a new software build.  Let's
 imagine we want to install petsc 3.2 using the cray compiler. We must create a
 place for the software build, build it, and create a module.</p>
+
+<p>Note: all commands, options, and arguments have tab-completion when using bash or zsh</p>
 
 <h3 id="1-Creating-The-Build">1. Creating The Build</h3>
 
@@ -131,8 +133,9 @@ petsc is:</p>
 <pre><code>smithy new -t /sw/sources/petsc/3.2/petsc-lite-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
 </code></pre>
 
-<p>Using the <code>-t</code>, <code>--tarfile=</code> option smithy will extract a given archive to the
-<code>source</code> directory.</p>
+<p>When using the <code>-t</code>, <code>--tarfile=</code> option smithy will extract the given archive
+to the <code>source</code> directory. For the petsc example above this would be
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source</code></p>
 
 <p>If this is a brand new piece of software add the <code>--web-description</code> switch. This will
 create the application description files too.</p>
@@ -142,15 +145,15 @@ create the application description files too.</p>
 <p>Once you have created the build you may need to update the build (<code>rebuild</code>) and
 environment (<code>remodule</code>) scripts before building the software. Both files live
 within the software prefix. For our example it is located in
-<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1</code>. You can this and other related files using
-the <code>edit</code> command:</p>
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1</code>. You can edit this and other related files
+using the <code>edit</code> command:</p>
 
 <pre><code>smithy edit build petsc/3.2/cle4.0_cray8.0.1
 </code></pre>
 
 <p>This is just a convenience command to editing the rebuild script. It will expect
 the <code>$EDITOR</code> environment variable to be set to the edior of your choice. You
-can alternatively use the <code>-e</code>,<code>--editor=</code> option. To make things easier you
+can alternatively use the <code>-e</code>,<code>--editor=</code> option. To make things quicker you
 can run:</p>
 
 <pre><code>smithy edit last
@@ -158,8 +161,8 @@ can run:</p>
 
 <p>By omitting the build argument, smithy will prompt you to select the file to
 edit.  The <code>last</code> argument will tell smithy to use the last software build it
-worked with. If you are not sure what the last one is you can run <code>smithy last</code>
-to see.</p>
+worked with. If you are not sure what the last one is you can run <code>smithy show
+last</code> to see.</p>
 
 <p>Once you have edited the files, it's time to build. Do so by running:</p>
 

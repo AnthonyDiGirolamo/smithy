@@ -23,9 +23,11 @@ For help on all options and commands run `smithy help`
 
 ## EXAMPLES
 
-This section shows the typical work-flow for adding a new software build.  Lets
+This section shows the typical work-flow for adding a new software build.  Let's
 imagine we want to install petsc 3.2 using the cray compiler. We must create a
 place for the software build, build it, and create a module.
+
+Note: all commands, options, and arguments have tab-completion when using bash or zsh
 
 ### 1. Creating The Build
 
@@ -59,8 +61,9 @@ petsc is:
 
     smithy new -t /sw/sources/petsc/3.2/petsc-lite-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
 
-Using the `-t`, `--tarfile=` option smithy will extract a given archive to the
-`source` directory.
+When using the `-t`, `--tarfile=` option smithy will extract the given archive
+to the `source` directory. For the petsc example above this would be
+`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source`
 
 If this is a brand new piece of software add the `--web-description` switch. This will
 create the application description files too.
@@ -70,14 +73,14 @@ create the application description files too.
 Once you have created the build you may need to update the build (`rebuild`) and
 environment (`remodule`) scripts before building the software. Both files live
 within the software prefix. For our example it is located in
-`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1`. You can this and other related files using
-the `edit` command:
+`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1`. You can edit this and other related files
+using the `edit` command:
 
     smithy edit build petsc/3.2/cle4.0_cray8.0.1
 
 This is just a convenience command to editing the rebuild script. It will expect
 the `$EDITOR` environment variable to be set to the edior of your choice. You
-can alternatively use the `-e`,`--editor=` option. To make things easier you
+can alternatively use the `-e`,`--editor=` option. To make things quicker you
 can run:
 
     smithy edit last

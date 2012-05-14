@@ -27,7 +27,10 @@ This is still a work in progress\. If you have any questions, suggestions, or en
 For help on all options and commands run \fBsmithy help\fR
 .
 .SH "EXAMPLES"
-This section shows the typical work\-flow for adding a new software build\. Lets imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
+This section shows the typical work\-flow for adding a new software build\. Let\'s imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
+.
+.P
+Note: all commands, options, and arguments have tab\-completion when using bash or zsh
 .
 .SS "1\. Creating The Build"
 All software builds have the following name format: \fBAPPLICATION/VERSION/BUILD\fR That is three different parts separated by forward slashes \fB/\fR Each part consists of:
@@ -77,13 +80,13 @@ smithy new \-t /sw/sources/petsc/3\.2/petsc\-lite\-3\.2\-p7\.tar\.gz petsc/3\.2/
 .IP "" 0
 .
 .P
-Using the \fB\-t\fR, \fB\-\-tarfile=\fR option smithy will extract a given archive to the \fBsource\fR directory\.
+When using the \fB\-t\fR, \fB\-\-tarfile=\fR option smithy will extract the given archive to the \fBsource\fR directory\. For the petsc example above this would be \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1/source\fR
 .
 .P
 If this is a brand new piece of software add the \fB\-\-web\-description\fR switch\. This will create the application description files too\.
 .
 .SS "2\. Editing and Building the Software:"
-Once you have created the build you may need to update the build (\fBrebuild\fR) and environment (\fBremodule\fR) scripts before building the software\. Both files live within the software prefix\. For our example it is located in \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1\fR\. You can this and other related files using the \fBedit\fR command:
+Once you have created the build you may need to update the build (\fBrebuild\fR) and environment (\fBremodule\fR) scripts before building the software\. Both files live within the software prefix\. For our example it is located in \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1\fR\. You can edit this and other related files using the \fBedit\fR command:
 .
 .IP "" 4
 .
@@ -96,7 +99,7 @@ smithy edit build petsc/3\.2/cle4\.0_cray8\.0\.1
 .IP "" 0
 .
 .P
-This is just a convenience command to editing the rebuild script\. It will expect the \fB$EDITOR\fR environment variable to be set to the edior of your choice\. You can alternatively use the \fB\-e\fR,\fB\-\-editor=\fR option\. To make things easier you can run:
+This is just a convenience command to editing the rebuild script\. It will expect the \fB$EDITOR\fR environment variable to be set to the edior of your choice\. You can alternatively use the \fB\-e\fR,\fB\-\-editor=\fR option\. To make things quicker you can run:
 .
 .IP "" 4
 .
@@ -109,7 +112,7 @@ smithy edit last
 .IP "" 0
 .
 .P
-By omitting the build argument, smithy will prompt you to select the file to edit\. The \fBlast\fR argument will tell smithy to use the last software build it worked with\. If you are not sure what the last one is you can run \fBsmithy last\fR to see\.
+By omitting the build argument, smithy will prompt you to select the file to edit\. The \fBlast\fR argument will tell smithy to use the last software build it worked with\. If you are not sure what the last one is you can run \fBsmithy show last\fR to see\.
 .
 .P
 Once you have edited the files, it\'s time to build\. Do so by running:
