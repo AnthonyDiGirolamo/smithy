@@ -68,7 +68,7 @@ module Smithy
     end
   end
 
-  def load_system_config(global = {})
+  def system_config_file(global = {})
     if global[:"config-file"]
       sysconfig_path = File.expand_path(global[:"config-file"])
     elsif ENV['SMITHY_CONFIG']
@@ -77,12 +77,23 @@ module Smithy
       sysconfig_path = File.expand_path(@smithy_config_file)
     end
 
-    options = {}
-
     if File.exists? sysconfig_path
       @smithy_config_file = sysconfig_path
       @smithy_config_hash = YAML.load_file(sysconfig_path)
+      return @smithy_config_hash
+    else
+      return nil
+    end
+  end
 
+  def architectures
+    @smithy_config_hash['hostname-architectures'].values.uniq
+  end
+
+  def load_system_config(global = {})
+    options = {}
+    @smithy_config_hash = system_config_file(global)
+    if @smithy_config_hash
       options[:"software-root"]   = @smithy_config_hash.try(:[], "software-root")
       options[:"web-root"]        = @smithy_config_hash.try(:[], "web-root")
       options[:"file-group-name"] = @smithy_config_hash.try(:[], "file-group-name")
@@ -95,7 +106,7 @@ module Smithy
         :root => options[:"software-root"],
         :arch => options[:arch])
     else
-      STDERR.puts "warning: Cannot read config file: #{sysconfig_path}"
+      STDERR.puts "warning: Cannot read config file: #{@smithy_config_file}"
     end
 
     return options

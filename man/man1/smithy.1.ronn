@@ -84,8 +84,8 @@ can run:
 
 By omitting the build argument, smithy will prompt you to select the file to
 edit.  The `last` argument will tell smithy to use the last software build it
-worked with. If you are not sure what the last one is you can run `smithy last`
-to see.
+worked with. If you are not sure what the last one is you can run `smithy show
+last` to see.
 
 Once you have edited the files, it's time to build. Do so by running:
 

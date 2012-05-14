@@ -211,11 +211,11 @@ desc "Generate a new build and all necessary files"
 long_desc <<-EOS
 The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
 
-NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+- NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
 
-VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
+- VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
 
-BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
+- BUILD names should consist of two pieces of information separated by an underscore '_', the package's intended operating system and compiler.
 
 EXAMPLES:
 
@@ -442,15 +442,15 @@ desc "Manage modulefiles for a package"
 long_desc <<-EOS
 smithy module create NAME/VERSION/BUILD
 
-Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
+- Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
 
 smithy module use NAME/VERSION/BUILD
 
-Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
+- Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
 
 smithy module deploy NAME/VERSION/BUILD
 
-Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
+- Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
 EOS
 arg_name "create|use|deploy NAME"
 command ['module'] do |c|
@@ -496,11 +496,40 @@ command ['module'] do |c|
   end
 end
 
-desc "Display last package"
-long_desc "Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file."
-command ['last'] do |c|
+desc "Display internal smithy values"
+arg_name "last|arch"
+long_desc <<-EOS
+smithy show last
+
+- Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file.
+
+smithy show arch
+
+- List all architectures know to smithy.
+EOS
+command ['show'] do |c|
   c.action do |global_options,options,args|
-		puts last_prefix
+
+    sub_commands = [:last, :arch]
+
+    arguments = args.dup
+    sub_command = nil
+    sub_commands.each do |o|
+      if arguments.include? o.to_s
+        sub_command = o
+        arguments.delete o.to_s
+        break
+      end
+    end
+
+    case sub_command
+    when :last
+      puts last_prefix
+    when :arch
+      puts architectures
+    else
+      raise "Please specify a subcommand (#{sub_commands.join(', ')})"
+    end
   end
 end
 
