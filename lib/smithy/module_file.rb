@@ -66,7 +66,7 @@ module Smithy
 
       notice "Deploying modulefile #{destination}"
       install_dir = File.join(system_module_path, package.name)
-      FileOperations.make_directory install_dir
+      FileOperations.make_directory install_dir, options
       FileOperations.install_file module_file, destination, options
       FileOperations.make_group_writable(install_dir, options.merge(:recursive => true))
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
