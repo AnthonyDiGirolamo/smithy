@@ -71,7 +71,7 @@ case "$words[1]" in
     _subsub_commands=(
       'build:Edit a build script'
       'test:Edit a test script'
-      'modules:Edit modules loaded for the build script'
+      'environment:Edit modules loaded for the build script'
       'modulefile:Edit modules loaded for the build script'
     )
     # Match subsub-command
