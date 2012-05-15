@@ -72,7 +72,7 @@ case "$words[1]" in
       'build:Edit a build script'
       'test:Edit a test script'
       'environment:Edit modules loaded for the build script'
-      'modulefile:Edit modules loaded for the build script'
+      'modulefile:Edit modulefile'
     )
     # Match subsub-command
     if (( CURRENT == 2 )); then
