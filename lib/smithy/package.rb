@@ -325,9 +325,11 @@ h - help, show this help}
       options[:noop] = true if args[:dry_run]
 
       directories.each do |dir|
-        FileOperations.make_directory dir, options
-        FileOperations.set_group dir, group, options
-        FileOperations.make_group_writable dir, options if group_writeable?
+        if dir == prefix
+          FileOperations.make_directory dir, options
+          FileOperations.set_group dir, group, options
+          FileOperations.make_group_writable dir, options if group_writeable?
+        end
       end
 
       all_files = build_support_files

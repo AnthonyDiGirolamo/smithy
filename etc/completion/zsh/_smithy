@@ -24,6 +24,7 @@ _arguments \
   '(--arch=)--arch=[Machine architecture to operate on]' \
   '(--config-file=)--config-file=[Alternate config file]:file:_files' \
   '(--disable-group-writeable)--disable-group-writeable[Disable group writable file creation]' \
+  '(--file-group-name=)--file-group-name=[Group name for files created by smithy]' \
   '(--help)--help[Show help]' \
   '(--no-color)--no-color[Hide coloring]' \
   '(--software-root=)--software-root=[The root level directory for software]:directory:_files -/' \
