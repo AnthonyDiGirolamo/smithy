@@ -56,10 +56,6 @@ module Smithy
             row << 'unknown'
             row << 'unknown'
           end
-          unless user.blank?
-            row << user.try(:name)
-            row << user.try(:gecos)
-          end
           puts row.join(',')
         end
       end
