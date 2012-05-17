@@ -16,9 +16,14 @@ module Smithy
             f = File.stat(s)
           end
           row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
-          user = Etc.getpwuid(f.uid)
-          row << user.try(:name)
-          row << user.try(:gecos)
+          begin
+            user = Etc.getpwuid(f.uid)
+            row << user.try(:name)
+            row << user.try(:gecos)
+          rescue
+            row << 'unknown'
+            row << 'unknown'
+          end
           @@table << row
         end
       end
@@ -34,21 +39,28 @@ module Smithy
 
       def format(software, root)
         software.each do |s|
-          output = []
-          output << s
+          row = []
+          row << s
           source = s+'/rebuild'
           if File.exist?(source)
             f = File.stat(source)
           else
             f = File.stat(s)
           end
-          output << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
-          user = Etc.getpwuid(f.uid)
-          unless user.blank?
-            output << user.try(:name)
-            output << user.try(:gecos)
+          row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
+          begin
+            user = Etc.getpwuid(f.uid)
+            row << user.try(:name)
+            row << user.try(:gecos)
+          rescue
+            row << 'unknown'
+            row << 'unknown'
           end
-          puts output.join(',')
+          unless user.blank?
+            row << user.try(:name)
+            row << user.try(:gecos)
+          end
+          puts row.join(',')
         end
       end
 
