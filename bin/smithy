@@ -443,7 +443,7 @@ smithy module edit NAME/VERSION/BUILD
 - alias for 'smithy edit modulefile'
 EOS
 arg_name "create|use|deploy NAME"
-command ['modulefile', 'module'] do |c|
+command ['module', 'modulefile'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"]
   c.action do |global_options,options,args|

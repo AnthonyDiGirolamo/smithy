@@ -25,7 +25,7 @@ These options are available for any command and are specified before the name of
 [<tt>help</tt>] Shows list of commands or help for one command
 [<tt>module</tt>] Manage modulefiles for a package
 [<tt>new</tt>] Generate a new build and all necessary files
-[<tt>publish</tt>] Publish a package
+[<tt>publish</tt>] Publish packages to web
 [<tt>repair</tt>] Repair a package
 [<tt>search</tt>] Search currently installed software
 [<tt>show</tt>] Display internal smithy values
@@ -68,6 +68,9 @@ These options are specified *after* the command.
 
 Manage modulefiles for a package
 
+*Aliases*
+* <tt><b>modulefile</b></tt>
+
 smithy module create NAME/VERSION/BUILD
 
 - Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
@@ -79,6 +82,10 @@ smithy module use NAME/VERSION/BUILD
 smithy module deploy NAME/VERSION/BUILD
 
 - Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
+
+smithy module edit NAME/VERSION/BUILD
+
+- alias for 'smithy edit modulefile'
 
 
 ==== Options
@@ -111,8 +118,6 @@ These options are specified *after* the command.
 [<tt>-t, --tarball=FILE</tt>] Provide a source tarball to unpack (optional)
 [<tt>--web-description</tt>] Create description file for website
 === <tt>publish NAME</tt>
-
-Publish a package
 
 Publish packages to web
 
