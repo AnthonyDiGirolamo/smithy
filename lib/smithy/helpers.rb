@@ -153,4 +153,21 @@ module Smithy
     end
   end
 
+  def launch_editor(args = {})
+    editor = args[:editor] || ENV['EDITOR']
+    raise """Please specify which editor to launch using the
+       $EDITOR environment variable or the --editor option.""" if editor.blank?
+
+    arg_list = [ editor ]
+    arg_list << "-O" if args[:split] && editor =~ /vim/
+
+    if args[:split]
+      args[:files].each{|f| arg_list << f}
+    else
+      arg_list << args[:files].first
+    end
+
+    status = Kernel::system(*arg_list)
+  end
+
 end

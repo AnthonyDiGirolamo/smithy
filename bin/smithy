@@ -279,10 +279,6 @@ command ['edit'] do |c|
   c.switch [:s, :split]
 
   c.action do |global_options,options,args|
-    editor = options[:editor] || ENV['EDITOR']
-    raise """Please specify which editor to launch using the
-       $EDITOR environment variable or the --editor option.""" if editor.blank?
-
     operations = [:build, :environment, :modulefile, :test, :config]
     arguments = args.dup
     operation = nil
@@ -333,37 +329,28 @@ command ['edit'] do |c|
         end
       end
 
-      file_name = case operation
+      file_names = []
+      case operation
       when :build
-        p.rebuild_script
+        file_names << p.rebuild_script
       when :test
-        p.retest_script
+        file_names << p.retest_script
       when :environment
-        p.remodule_script
+        file_names << p.remodule_script
       when :modulefile
-        ModuleFile.new(:package => p).module_file
+        file_names << ModuleFile.new(:package => p).module_file
       else
-        p.rebuild_script
+        file_names << p.rebuild_script
       end
-
-      file_before = File.stat(file_name)
-      arg_list = [ editor ]
-      arg_list << "-O" if editor =~ /vim/ && options[:split]
 
       case operation
       when :build || :test
-        arg_list << file_name
-        arg_list << p.remodule_script if options[:split]
-      else
-        arg_list << file_name
+        file_names << p.remodule_script if options[:split]
       end
 
-      status = Kernel::system(*arg_list)
-
-      # Compare modification times
-      if status && File.stat(file_name) > file_before
-        notice "Modified #{file_name}"
-      end
+      launch_editor :editor => options[:editor],
+        :split => options[:split],
+        :files => file_names
     end
   end
 end
@@ -396,8 +383,7 @@ command ['repair'] do |c|
   end
 end
 
-desc "Publish a package"
-long_desc "Publish packages to web"
+desc "Publish packages to web"
 arg_name "NAME"
 command ['publish'] do |c|
   c.desc "See what files will be created without creating them"
@@ -451,15 +437,19 @@ smithy module use NAME/VERSION/BUILD
 smithy module deploy NAME/VERSION/BUILD
 
 - Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
+
+smithy module edit NAME/VERSION/BUILD
+
+- alias for 'smithy edit modulefile'
 EOS
 arg_name "create|use|deploy NAME"
-command ['module'] do |c|
+command ['modulefile', 'module'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"]
   c.action do |global_options,options,args|
     raise "You must supply a package name" if args.empty?
 
-    operations = [:use, :create, :deploy]
+    operations = [:use, :create, :deploy, :edit]
 
     arguments = args.dup
     operation = nil
@@ -492,6 +482,9 @@ command ['module'] do |c|
       notice_command " smithy module deploy last"   , "Install modulefile"
     when :deploy
       m.deploy :dry_run => options[:"dry-run"]
+    when :edit
+      m = ModuleFile.new :package => p
+      launch_editor :files => [m.module_file]
     end
   end
 end
