@@ -115,11 +115,11 @@ module Smithy
   def get_arch
     @hostname = ENV['HOSTNAME'].chomp || `hostname -s`.chomp
     # Remove trailing numbers (if they exist) and a possible single trailing period
-    machine = @hostname.gsub(/(\d*)\.?$/,'')
+    @hostname.gsub!(/\.?$/,'')
+    machine = @hostname.gsub(/(\d*)$/,'')
     arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], machine)
     # Match against hostname if previous attempt fails
     arch = @smithy_config_hash.try(:[], "hostname-architectures").try(:[], @hostname) if arch.nil?
-    #TODO Check for nil arch and print coherent error message
     return arch
   end
 
