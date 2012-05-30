@@ -33,7 +33,7 @@ Feature: Add new software builds
   Scenario: Add a new software build without a web description
     When I successfully run `smithy new git/1.6/build2`
     Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build2"
-    And a file named "/tmp/swsmithy/x86/git/description" should not exist
+    And a file named "/tmp/swsmithy/x86/git/description.markdown" should not exist
 
   Scenario: Add a new software build without a modulefile
     When I successfully run `smithy new --skip-modulefile cool_package/1.0/build1`
@@ -44,7 +44,7 @@ Feature: Add new software builds
     When I successfully run `smithy new --web-description git/1.6/build3`
     Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build3"
     And a directory named "/tmp/swsmithy/x86/git/1.6/build3" should exist
-    And a file named "/tmp/swsmithy/x86/git/description" should exist
+    And a file named "/tmp/swsmithy/x86/git/description.markdown" should exist
 
   Scenario: Add a new software build with a source tarball
     When I successfully run `smithy new --tarball=somepackage.tar.gz zlib/1.2.6/build1`
