@@ -34,7 +34,7 @@ module Smithy
 
     def self.publishable?(path)
       exceptions_file = File.join(path, Package::PackageFileNames[:exception])
-      description_file = File.join(path, Package::PackageFileNames[:description])
+      description_file = File.join(path, "description")
       publishable = true
       if File.exists?(exceptions_file) && ( File.exists?(description_file) || File.exists?(description_file+".markdown") )
         File.open(exceptions_file).readlines.each do |line|
@@ -167,7 +167,7 @@ module Smithy
           f.write erb.result(binding)
         end
       end
-      puts erb.result(binding)
+      #puts erb.result(binding)
 
       puts "updated ".rjust(12).bright + output
     end
