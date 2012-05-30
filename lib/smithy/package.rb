@@ -42,7 +42,7 @@ module Smithy
 
     PackageFileNames = {
       :exception   => ".exceptions",
-      :description => "description",
+      :description => "description.markdown",
       :support     => "support",
       :versions    => "versions" }
 
@@ -163,7 +163,7 @@ module Smithy
 
     def create_lock_file
       if File.exists? lock_file
-        notice_fail "#{lock_file} exists, is someone else building this package? If not delete and rerun."
+        notice_fail "#{lock_file} exists, is someone else building this package? If not, use --force or delete and rerun."
         return false
       else
         FileUtils.touch(lock_file)
@@ -436,14 +436,7 @@ h - help, show this help}
       software.reject! do |s|
         ! Description.publishable?(s)
       end
-
-      #software.collect! do |s|
-        #builds = Dir.glob(s+"/*/*/rebuild")
-        #builds.collect!{|s| s.gsub(/\/rebuild$/, '')}
-        #builds.first
-      #end
-      #software.compact!
-
+			software.sort!
       return software
     end
 
