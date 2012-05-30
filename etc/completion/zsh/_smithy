@@ -81,7 +81,8 @@ case "$words[1]" in
     fi
 
     _arguments \
-      '(--editor=)--editor=[Editor for opening script files]:file:_files' \
+      '(-e --editor=)'{-e,--editor=}'[Editor for opening script files]:file:_files' \
+      '(-s --split)'{-s,--split}'[Split editing window with requested file and the environment (remodule) file]' \
       '2: :->forms' &&  return 0
 
     if [[ "$state" == forms ]]; then

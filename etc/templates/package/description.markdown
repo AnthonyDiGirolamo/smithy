@@ -1,13 +1,15 @@
-##### Title
+# Title
 
 Category:
 
 Website:
 
-##### Description
+## Description
 
 This software is...
 
-##### Use
+## Use
+
+To use run:
 
     module load
