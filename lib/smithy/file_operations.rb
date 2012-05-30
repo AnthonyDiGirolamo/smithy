@@ -110,7 +110,12 @@ h - help, show this help}
         options.merge!(args[:options])
         erb_filename  = args[:erb]
         dest          = args[:destination]
-        rendered_file = "#{File.dirname(dest)}/.#{File.basename(dest)}_#{Time.now.to_i}"
+
+        if options[:noop]
+          rendered_file = ENV["HOME"]+"/.#{File.basename(dest)}_#{Time.now.to_i}"
+        else
+          rendered_file = "#{File.dirname(dest)}/.#{File.basename(dest)}_#{Time.now.to_i}"
+        end
 
         erb = ERB.new(File.read(erb_filename), nil, "<>")
         File.open(rendered_file, "w+") do |f|
