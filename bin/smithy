@@ -402,25 +402,30 @@ command ['publish'] do |c|
 
     raise "You must supply at least one package to publish" if packages.empty?
 
-    if packages.include?("all")
-      packages = Package.all_web :root => swroot
-    end
+    packages = Package.all_web :root => swroot if packages.include?("all")
 
     notice "Publishing #{packages.size} package#{'s' if packages.size>1}#{' (dry-run)' if options[:"dry-run"]}"
+
+    descriptions = []
 
     packages.each do |package|
       d = Description.new :root => swroot, :package => package, :www_root => www_root
       if d.valid? && d.publishable?
         d.deploy :dry_run => options[:"dry-run"]
+        descriptions << d
       else
         notice_fail "Flagged for no publishing, remove 'noweb' from #{d.exceptions_file} and re-publish."
       end
     end
 
-    Description.alpha_update :www_root => www_root,
-                              :dry_run => options[:"dry-run"],
-                                 :arch => global_options[:arch],
-                                 :root => global_options[:"software-root"]
+    ["alphabetical","all"].each do |p|
+      Description.update_page p,
+        :descriptions => descriptions,
+        :dry_run      => options[:"dry-run"],
+        :www_root     => www_root,
+        :arch         => global_options[:arch],
+        :root         => global_options[:"software-root"]
+    end
   end
 end
 
