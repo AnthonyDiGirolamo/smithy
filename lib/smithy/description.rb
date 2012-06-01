@@ -48,7 +48,7 @@ module Smithy
       Description.publishable?(path)
     end
 
-    def sanitize_content!
+    def remove_ptag_linebreaks!
       # Find paragraph tag contents
       results = []
       @content.scan(/<p>(.*?)<\/p>/m) {|m| results << [m.first, Regexp.last_match.offset(0)[0]] }
@@ -61,7 +61,9 @@ module Smithy
       end
       # Replace the newlines with spaces
       newlines.each {|i| @content[i] = ' '}
+    end
 
+    def sanitize_content!
       # Increment h tags by 2
       @content.gsub!(/<h(\d)>/)   {|m| "<h#{$1.to_i+1}>"}
       @content.gsub!(/<\/h(\d)>/) {|m| "</h#{$1.to_i+1}>"}
@@ -99,6 +101,7 @@ module Smithy
           f = File.open description_file
           d = Kramdown::Document.new(f.read, :auto_ids => false)
           @content = d.to_html
+          remove_ptag_linebreaks!
         else
           description_file = File.join(path, "description")
           f = File.open description_file
