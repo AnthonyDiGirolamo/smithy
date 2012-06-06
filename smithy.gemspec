@@ -25,6 +25,7 @@ etc/templates/build/status
 etc/templates/package/.check4newver
 etc/templates/package/.exceptions
 etc/templates/package/description
+etc/templates/package/description.markdown
 etc/templates/package/support
 etc/templates/package/versions
 etc/templates/web/alphabetical.html.erb
