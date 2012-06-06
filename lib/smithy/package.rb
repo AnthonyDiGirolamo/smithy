@@ -430,8 +430,9 @@ h - help, show this help}
 
     def self.all_web(args = {})
       # Find all software with descriptions
-      software = Dir.glob(args[:root]+"/*/description")
+      software = Dir.glob(args[:root]+"/*/description*")
       software.collect!{|s| s.gsub(/\/description.*$/, '')}
+      software.uniq!
       # Remove any with noweb in their exceptions file
       software.reject! do |s|
         ! Description.publishable?(s)
