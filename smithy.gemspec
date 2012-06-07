@@ -31,6 +31,7 @@ etc/templates/package/versions
 etc/templates/web/alphabetical.html.erb
 etc/templates/web/category.html.erb
 etc/templates/web/package.html.erb
+etc/templates/web/all.html.erb
 lib/smithy.rb
 lib/smithy/description.rb
 lib/smithy/format.rb
