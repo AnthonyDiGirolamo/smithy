@@ -49,7 +49,8 @@ module Smithy
     def package_support_files
       file_list = PackageFileNames.values
       file_list.collect! do |f|
-        { :src  => File.join(@@smithy_bin_root, "etc/templates/package", f),
+        { :name => f,
+          :src  => File.join(@@smithy_bin_root, "etc/templates/package", f),
           :dest => File.join(application_directory, f) }
       end
       return file_list
@@ -75,7 +76,7 @@ module Smithy
       file_list.collect! do |f|
         src = File.join(@@smithy_bin_root, "etc/templates/build", f)
         src += ".erb" if BuildFileERBs.include?(f)
-        { :src  => src, :dest => File.join(prefix, f) }
+        { :name => f, :src => src, :dest => File.join(prefix, f) }
       end
       return file_list
     end
@@ -364,7 +365,8 @@ h - help, show this help}
       options[:noop] = true if args[:dry_run]
       options[:verbose] = true if args[:dry_run] || args[:verbose]
 
-      missing_web = false
+      missing_package   = []
+      missing_build = []
 
       notice "Checking support files"
       (package_support_files+build_support_files).each do |file|
@@ -380,16 +382,30 @@ h - help, show this help}
         else
           puts "missing ".rjust(12).color(:red) + f
 
-          missing_web = true if PackageFileNames.values.include?(File.basename(f))
+          missing_package << File.basename(f) if PackageFileNames.values.include?(File.basename(f))
+          missing_build << File.basename(f) if BuildFileNames.values.include?(File.basename(f))
         end
       end
 
-      if missing_web
-        notice "Creating missing files"
+      notice "Creating missing files" if !missing_package.empty? || !missing_build.empty?
+
+      if !missing_package.empty?
         package_support_files.each do |file|
-          FileOperations.install_file file[:src], file[:dest], options
-          FileOperations.set_group file[:dest], group, options
-          FileOperations.make_group_writable file[:dest], options if group_writeable?
+          if missing_package.include?(file[:name])
+            FileOperations.install_file file[:src], file[:dest], options
+            FileOperations.set_group file[:dest], group, options
+            FileOperations.make_group_writable file[:dest], options if group_writeable?
+          end
+        end
+      end
+
+      if !missing_build.empty?
+        build_support_files.each do |file|
+          if missing_build.include?(file[:name])
+            FileOperations.install_file file[:src], file[:dest], options
+            FileOperations.set_group file[:dest], group, options
+            FileOperations.make_group_writable file[:dest], options if group_writeable?
+          end
         end
       end
 
