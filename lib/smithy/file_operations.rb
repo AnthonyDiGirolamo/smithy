@@ -59,6 +59,8 @@ module Smithy
       end
 
       def install_file(source, dest, options = {})
+        current_time = Time.now.to_i
+        duplicate_dest = dest+"_copy_"+current_time.to_s
         installed = false
         if File.exists?(dest)
           if FileUtils.identical?(source, dest)
@@ -68,17 +70,21 @@ module Smithy
             puts "conflict ".rjust(12).color(:red) + dest
             overwrite = nil
             while overwrite.nil? do
-              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [yndh] ")
+              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [ynsdh] ")
               case prompt.downcase
               when "y"
                 overwrite = true
               when "n"
                 overwrite = false
+              when "s"
+                overwrite = false
+                duplicate = true
               when "d"
                 puts `diff -uw #{dest} #{source}`
               when "h"
                 puts %{y - yes, overwrite
 n - no, do not overwrite
+s - save to a separate file (#{duplicate_dest})
 d - diff, show the differences between the old and the new
 h - help, show this help}
               #when "q"
@@ -88,12 +94,17 @@ h - help, show this help}
               end
             end
 
-            if overwrite == true
+            if overwrite
               puts "force ".rjust(12).bright + dest
               FileUtils.install source, dest, options
               installed = true
             else
-              puts "skip ".rjust(12).bright + dest
+              if duplicate
+                FileUtils.install source, duplicate_dest, options
+                puts "create ".rjust(12).bright + duplicate_dest
+              else
+                puts "skip ".rjust(12).bright + dest
+              end
             end
           end
         else
