@@ -531,6 +531,24 @@ command ['show'] do |c|
   end
 end
 
+# command ['generate_markdown'] do |c|
+#   c.action do |global_options,options,args|
+#     description_file = args.first
+#     markdown_file = args.first+".markdown"
+#     notice_command description_file, " -> "+markdown_file
+#     begin
+#       f = File.open description_file
+#       @content = f.read
+#         d = File.open(markdown_file, "w+")
+#         k = Kramdown::Document.new(@content, :input => 'html')
+#         d.write(k.to_kramdown)
+#         d.close
+#     rescue => exception
+#       raise "#{exception}\nCannot parse #{description_file}"
+#     end
+#   end
+# end
+
 pre do |global,command,options,args|
   # Load and merge the system config values with command line values, options on
   # the command line take precedence.

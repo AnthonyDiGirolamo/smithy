@@ -59,7 +59,6 @@ module Smithy
       :notes        => "build-notes",
       :dependencies => "dependencies",
       :build        => "rebuild",
-      :link         => "relink",
       :test         => "retest",
       :env          => "remodule" }
     ExecutableBuildFileNames = [
