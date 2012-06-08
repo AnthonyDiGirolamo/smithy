@@ -143,8 +143,8 @@ description file. For petsc this lives in: `/sw/xk6/petsc/description` This is
 an html formatted file.  Alternatively, it can live in
 `/sw/xk6/petsc/description.markdown` this file is in markdown format and is a
 bit simpler to write than html. See http://kramdown.rubyforge.org/quickref.html
-for more information on markdown syntax. If both exist the markdown file take
-precedence.
+for more information on markdown syntax. If both files exist, the markdown file
+takes precedence.
 
 If the description file is missing you can generate one by running:
 
