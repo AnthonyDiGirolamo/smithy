@@ -469,7 +469,9 @@ command ['module', 'modulefile'] do |c|
     raise "Missing module command, run 'smithy module #{operations.join("|")} NAME/VERSION/BUILD'" if operation.nil?
 
     p = Package.new :path => arguments.first,
-                    :root => global_options[:full_software_root_path]
+                    :root => global_options[:full_software_root_path],
+              :file_group => global_options[:"file-group-name"],
+           :disable_group => global_options[:"disable-group-writable"]
     p.valid?
     m = ModuleFile.new :package => p
     case operation
