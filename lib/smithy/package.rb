@@ -421,6 +421,10 @@ h - help, show this help}
     end
 
     def alternate_builds
+      Package.alternate_builds(self.version_directory)
+    end
+
+    def self.alternate_builds(version_directory)
       builds = Dir.glob(version_directory+"/*")
       # Delete anything that isn't a directory
       builds.reject! { |b| ! File.directory?(b) }
@@ -428,6 +432,19 @@ h - help, show this help}
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
       return builds.sort
+    end
+
+    def alternate_versions
+      Package.alternate_builds(self.application_directory)
+    end
+
+    def self.alternate_versions(application_directory)
+      versions = Dir.glob(application_directory+"/*")
+      # Delete anything that isn't a directory
+      versions.reject! { |b| ! File.directory?(b) }
+      # Get the directory name from the full path
+      versions.collect! { |b| File.basename(b) }
+      return versions.sort
     end
 
     def publishable?

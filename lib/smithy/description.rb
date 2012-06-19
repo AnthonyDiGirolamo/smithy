@@ -83,6 +83,17 @@ module Smithy
       end
     end
 
+    def render_version_table
+      @version_table = {}
+      Package.alternate_versions(@path).each do |v|
+        @version_table[v] = Package.alternate_builds(File.join(@path, v))
+      end
+
+      erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
+      erb = ERB.new(File.read(erb_file), nil, "<>")
+      erb.result(binding)
+    end
+
     def deploy(args = {})
       options = {:verbose => false, :noop => false}
       options = {:verbose => true, :noop => true} if args[:dry_run]
@@ -106,18 +117,12 @@ module Smithy
           description_file = File.join(path, "description")
           f = File.open description_file
           @content = f.read
-
-          #if !File.exists?(File.join(path, "description.markdown")) && name != "vasp" && name != "vasp5"
-            #d = File.open(File.join(path, "description.markdown"), "w+")
-            #k = Kramdown::Document.new(@content, :input => 'html')
-            #d.write(k.to_kramdown)
-            #d.close
-          #end
         end
       rescue => exception
         raise "#{exception}\nCannot read #{description_file}"
       end
 
+      @content += render_version_table
       sanitize_content!
       parse_categories
 

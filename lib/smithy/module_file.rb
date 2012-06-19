@@ -5,6 +5,14 @@ module Smithy
     PackageModulePathName = "modulefile"
     SystemModulePathName  = "modulefiles"
 
+    Environments = [
+      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
+      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
+      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
+      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
+      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
+    ]
+
     def initialize(args = {})
       @package = args[:package]
       @builds = @package.alternate_builds
@@ -71,14 +79,6 @@ module Smithy
       FileOperations.make_group_writable(install_dir, options.merge(:recursive => true))
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
     end
-
-    Environments = [
-      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
-      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
-      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
-      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/},
-      {:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
-    ]
 
     def module_build_list(package, builds, args = {})
       output = ""
