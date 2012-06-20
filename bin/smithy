@@ -562,6 +562,9 @@ pre do |global,command,options,args|
     end
   end
 
+  #TODO make this not so ugly
+  global[:full_software_root_path] = File.join(global[:"software-root"], global[:arch])
+
   Sickill::Rainbow.enabled = false if global[:"no-color"]
 
   # Pre logic here
