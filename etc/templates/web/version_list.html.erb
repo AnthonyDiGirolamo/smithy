@@ -1,0 +1,7 @@
+<h2>Available Versions</h2>
+
+<ul>
+  <% @version_table.each do |version, builds| %>
+  <li><%= "#{@name}/#{version}" %></li>
+  <% end %>
+</ul>

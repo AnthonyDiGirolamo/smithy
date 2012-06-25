@@ -30,6 +30,7 @@ etc/templates/package/support
 etc/templates/package/versions
 etc/templates/web/alphabetical.html.erb
 etc/templates/web/version_table.html.erb
+etc/templates/web/version_list.html.erb
 etc/templates/web/category.html.erb
 etc/templates/web/package.html.erb
 etc/templates/web/all.html.erb

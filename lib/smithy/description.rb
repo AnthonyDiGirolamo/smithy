@@ -84,14 +84,20 @@ module Smithy
     end
 
     def render_version_table
+      universal = false
       @version_table = {}
       Package.alternate_versions(@path).each do |v|
         @version_table[v] = Package.alternate_builds(File.join(@path, v))
+        universal = true if @version_table[v].include?("universal")
       end
 
-      erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
+      if universal
+        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_list.html.erb")
+      else
+        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
+      end
       erb = ERB.new(File.read(erb_file), nil, "<>")
-      erb.result(binding)
+      return erb.result(binding)
     end
 
     def deploy(args = {})
