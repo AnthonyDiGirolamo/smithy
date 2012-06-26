@@ -1,9 +1,4 @@
 #!/bin/sh
-bundle exec smithy rdoc
-bundle exec ronn man/man1/smithy.1.ronn
-bundle exec rake rerdoc
-bundle exec rake repackage
-
 source ${MODULESHOME}/init/bash
 module use /sw/tools/smithy/modulefiles
 module load smithy
