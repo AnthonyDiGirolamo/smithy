@@ -88,7 +88,7 @@ module Smithy
       @version_table = {}
       Package.alternate_versions(@path).each do |v|
         @version_table[v] = Package.alternate_builds(File.join(@path, v))
-        universal = true if @version_table[v].include?("universal")
+        universal = true if @version_table[v].include?("universal") || @version_table[v].include?("binary")
       end
 
       if universal

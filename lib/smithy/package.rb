@@ -319,33 +319,50 @@ h - help, show this help}
     end
 
     def create(args = {})
-      notice "New #{prefix}"
+      notice "New #{args[:stub] ? "stub " : ""}#{prefix}"
       notice_warn "Dry Run! (no files will be created or changed)" if args[:dry_run]
       options = {:noop => false, :verbose => false}
       options[:noop] = true if args[:dry_run]
 
-      directories.each do |dir|
-        #if dir == prefix
+      if args[:stub]
+        [application_directory].each do |dir|
           FileOperations.make_directory dir, options
           FileOperations.set_group dir, group, options
           FileOperations.make_group_writable dir, options if group_writeable?
-        #end
-      end
-
-      all_files = build_support_files
-      all_files = package_support_files + all_files if args[:web]
-
-      all_files.each do |file|
-        if file[:src] =~ /\.erb$/
-          FileOperations.render_erb :erb => file[:src], :binding => get_binding, :options => options, :destination => file[:dest]
-        else
-          FileOperations.install_file file[:src], file[:dest], options
         end
-        FileOperations.set_group file[:dest], group, options
-        FileOperations.make_group_writable file[:dest], options if group_writeable?
-        FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
-      end
 
+        version_table_file = File.join(application_directory, ".versions")
+        version_table = YAML.load_file(version_table_file) rescue {}
+        version_table.merge!({version => build_name})
+
+        FileOperations.install_from_string version_table.to_yaml, version_table_file, options
+        FileOperations.set_group version_table_file, group, options
+        FileOperations.make_group_writable version_table_file, options if group_writeable?
+      else
+
+        directories.each do |dir|
+          #if dir == prefix
+            FileOperations.make_directory dir, options
+            FileOperations.set_group dir, group, options
+            FileOperations.make_group_writable dir, options if group_writeable?
+          #end
+        end
+
+        all_files = build_support_files
+        all_files = package_support_files + all_files if args[:web] || args[:stub]
+
+        all_files.each do |file|
+          if file[:src] =~ /\.erb$/
+            FileOperations.render_erb :erb => file[:src], :binding => get_binding, :options => options, :destination => file[:dest]
+          else
+            FileOperations.install_file file[:src], file[:dest], options
+          end
+          FileOperations.set_group file[:dest], group, options
+          FileOperations.make_group_writable file[:dest], options if group_writeable?
+          FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
+        end
+
+      end
     end
 
     def module_load_prgenv
@@ -425,12 +442,24 @@ h - help, show this help}
     end
 
     def self.alternate_builds(version_directory)
+      version = File.basename(version_directory)
       builds = Dir.glob(version_directory+"/*")
       # Delete anything that isn't a directory
       builds.reject! { |b| ! File.directory?(b) }
       builds.reject! { |b| b =~ /#{ModuleFile::PackageModulePathName}/ }
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
+
+      stubbed_builds = YAML.load_file(File.join(File.dirname(version_directory), ".versions")) rescue {}
+      if stubbed_builds[version]
+        if stubbed_builds[version].class == String
+          builds += [ stubbed_builds[version] ]
+        else
+          builds += stubbed_builds[version]
+        end
+      end
+      builds.uniq!
+
       return builds.sort
     end
 
@@ -444,6 +473,11 @@ h - help, show this help}
       versions.reject! { |b| ! File.directory?(b) }
       # Get the directory name from the full path
       versions.collect! { |b| File.basename(b) }
+
+      stubbed_builds = YAML.load_file(File.join(application_directory, ".versions")) rescue {}
+      versions += stubbed_builds.keys
+      versions.uniq!
+
       return versions.sort
     end
 

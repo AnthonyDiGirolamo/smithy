@@ -116,6 +116,21 @@ h - help, show this help}
         return installed
       end
 
+      def install_from_string(content, dest, options = {})
+        if options[:noop]
+          updated_file = File.join(ENV["HOME"]+"/.smithy_#{File.basename(dest)}_#{Time.now.to_i}")
+        else
+          updated_file = File.join(File.dirname(dest), ".#{File.basename(dest)}_#{Time.now.to_i}")
+        end
+
+        File.open(updated_file , "w+") do |f|
+          f.write(content)
+        end
+
+        FileOperations.install_file updated_file, dest, options
+        FileUtils.rm_f(updated_file) # Always remove
+      end
+
       def render_erb(args = {})
         options = {:noop => false, :verbose => false}
         options.merge!(args[:options])

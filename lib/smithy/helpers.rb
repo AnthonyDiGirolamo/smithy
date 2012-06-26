@@ -170,4 +170,38 @@ module Smithy
     status = Kernel::system(*arg_list)
   end
 
+  def modulehelp(name)
+    raise "$MODULEPATH is not set" unless ENV.has_key?('MODULEPATH')
+    sout = ""
+    #serr = ""
+    status = Open4::popen4("script -q -c '#{ENV['MODULESHOME']}/bin/modulecmd sh help #{name}' /dev/null") do |pid, stdin, stdout, stderr|
+      sout += stdout.read.strip
+      #serr += stderr.read.strip
+    end
+    #if status.exitstatus.eql?(0)
+    sout.gsub!(/\r/, '')
+    #serr.gsub!(/\r/, '')
+    return sout
+    #list = ""
+    # status = Open4::popen4(ENV['MODULESHOME']+"/bin/modulecmd ruby avail -t") do |pid, stdin, stdout, stderr|
+    #   list = stderr.read.strip
+    # end
+    # if status.exitstatus.eql?(0)
+    #   m = {}
+    #   key = nil
+    #   list.split(/^(.*:)$/).each do |line|
+    #     next if line.empty?
+    #     if key.nil?
+    #       if line =~ /^(.*):$/
+    #         key = $1
+    #       end
+    #     else
+    #       m[key] = line.split("\n")
+    #       m[key].reject!{|l| l.empty?}
+    #       key = nil
+    #     end
+    #   end
+    # end
+  end
+
 end
