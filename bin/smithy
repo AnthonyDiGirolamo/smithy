@@ -552,117 +552,117 @@ end
 #   end
 # end
 
-command ['generate_stubs_from_modules'] do |c|
-  #c.desc "Output folder"
-  #c.arg_name "DIRECTORY"
-  #c.default_value "~/"
-  #c.flag [:except]
-
-  c.desc "See what files will be created without creating them"
-  c.switch [:n, "dry-run"]
-
-  c.desc "Exclude directories specified in $MODULEPATH"
-  c.flag [:except]
-
-  c.desc "Parse given directories only, $MODULEPATH is not checked"
-  c.flag [:only]
-
-  c.action do |global_options,options,args|
-    if options[:only]
-      module_dirs = options[:only].split(':')
-      raise "No module directories could be found" if module_dirs.empty?
-    else
-      raise "$MODULEPATH is not set" unless ENV.has_key?('MODULEPATH')
-      module_dirs = ENV['MODULEPATH'].split(':')
-      raise "$MODULEPATH is empty" if module_dirs.empty?
-    end
-
-    system_module_names = []
-    system_module_defaults = []
-    if options[:except]
-      module_dirs.delete_if{|p| options[:except].split(":").include?(p)}
-    end
-    module_dirs.each do |p|
-      module_files          = Dir.glob(p+"/*/*").sort
-      module_files_defaults = module_files.dup
-      version_files         = Dir.glob(p+"/*/.version").sort
-
-      version_files.each do |version_file|
-        module_name = File.basename(File.dirname(version_file))
-        file_content = ""
-        File.open(version_file).readlines.each { |line| file_content << line.chomp }
-
-        if file_content =~ /ModulesVersion "(.*?)"/
-          version = $1
-          module_files_defaults.collect! do |m|
-            if m =~ /#{module_name}\/#{version}$/
-              m+"(default)"
-            else
-              m
-            end
-          end
-        end
-
-      end
-
-      module_files.collect!{|s| s.gsub(p+"/", '')}
-      system_module_names += module_files
-      system_module_defaults += module_files_defaults
-    end
-
-    #desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
-    #stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
-    stub_packages = system_module_names
-
-    notice "Generating stubs for the following modules:"
-    Format.print_column_list(stub_packages)
-    proceed = nil
-    while proceed.nil? do
-      prompt = Readline.readline("Generate the above packages? [yn] ")
-      case prompt.downcase
-      when "y"
-        proceed = true
-      when "n"
-        proceed = false
-      end
-    end
-
-    raise "aborting package generation" if proceed == false
-
-    stub_packages.each do |module_name|
-      name, version = module_name.split("/")
-      p = Package.new :path => "#{name}/#{version}/universal",
-                      :root => global_options[:full_software_root_path],
-                :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"]
-      p.create :stub => true, :dry_run => options[:"dry-run"]
-
-      default_module = ""
-      possible_defaults = system_module_defaults.select{ |m| m =~ %r{\/#{name}\/} }
-      defaulted = possible_defaults.select{ |m| m =~ %r{\(default\)$} }
-      if defaulted.size > 0
-        default_module = defaulted.first
-      else
-        default_module = possible_defaults.first
-      end
-
-      help_content = modulehelp(name)
-      help_content.gsub!(/^[\t ]+/, '')
-      help_content.gsub!(/^--* Module Specific Help.*-$/, '')
-      help_content.gsub!(/^===================================================================$/, '')
-      help_content.gsub!(/\A\n*/, '')
-
-      help_dest = File.join(p.application_directory, "description.markdown")
-
-      ops = {:noop => options[:"dry-run"] ? true : false}
-      FileOperations.install_from_string(help_content, help_dest, ops)
-      FileOperations.set_group help_dest, p.group, ops
-      FileOperations.make_group_writable help_dest, ops if p.group_writeable?
-
-      #TODO Create support file?
-    end
-  end
-end
+# command ['generate_stubs_from_modules'] do |c|
+#   #c.desc "Output folder"
+#   #c.arg_name "DIRECTORY"
+#   #c.default_value "~/"
+#   #c.flag [:except]
+#
+#   c.desc "See what files will be created without creating them"
+#   c.switch [:n, "dry-run"]
+#
+#   c.desc "Exclude directories specified in $MODULEPATH"
+#   c.flag [:except]
+#
+#   c.desc "Parse given directories only, $MODULEPATH is not checked"
+#   c.flag [:only]
+#
+#   c.action do |global_options,options,args|
+#     if options[:only]
+#       module_dirs = options[:only].split(':')
+#       raise "No module directories could be found" if module_dirs.empty?
+#     else
+#       raise "$MODULEPATH is not set" unless ENV.has_key?('MODULEPATH')
+#       module_dirs = ENV['MODULEPATH'].split(':')
+#       raise "$MODULEPATH is empty" if module_dirs.empty?
+#     end
+#
+#     system_module_names = []
+#     system_module_defaults = []
+#     if options[:except]
+#       module_dirs.delete_if{|p| options[:except].split(":").include?(p)}
+#     end
+#     module_dirs.each do |p|
+#       module_files          = Dir.glob(p+"/*/*").sort
+#       module_files_defaults = module_files.dup
+#       version_files         = Dir.glob(p+"/*/.version").sort
+#
+#       version_files.each do |version_file|
+#         module_name = File.basename(File.dirname(version_file))
+#         file_content = ""
+#         File.open(version_file).readlines.each { |line| file_content << line.chomp }
+#
+#         if file_content =~ /ModulesVersion "(.*?)"/
+#           version = $1
+#           module_files_defaults.collect! do |m|
+#             if m =~ /#{module_name}\/#{version}$/
+#               m+"(default)"
+#             else
+#               m
+#             end
+#           end
+#         end
+#
+#       end
+#
+#       module_files.collect!{|s| s.gsub(p+"/", '')}
+#       system_module_names += module_files
+#       system_module_defaults += module_files_defaults
+#     end
+#
+#     #desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
+#     #stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
+#     stub_packages = system_module_names
+#
+#     notice "Generating stubs for the following modules:"
+#     Format.print_column_list(stub_packages)
+#     proceed = nil
+#     while proceed.nil? do
+#       prompt = Readline.readline("Generate the above packages? [yn] ")
+#       case prompt.downcase
+#       when "y"
+#         proceed = true
+#       when "n"
+#         proceed = false
+#       end
+#     end
+#
+#     raise "aborting package generation" if proceed == false
+#
+#     stub_packages.each do |module_name|
+#       name, version = module_name.split("/")
+#       p = Package.new :path => "#{name}/#{version}/universal",
+#                       :root => global_options[:full_software_root_path],
+#                 :file_group => global_options[:"file-group-name"],
+#              :disable_group => global_options[:"disable-group-writable"]
+#       p.create :stub => true, :dry_run => options[:"dry-run"]
+#
+#       default_module = ""
+#       possible_defaults = system_module_defaults.select{ |m| m =~ %r{\/#{name}\/} }
+#       defaulted = possible_defaults.select{ |m| m =~ %r{\(default\)$} }
+#       if defaulted.size > 0
+#         default_module = defaulted.first
+#       else
+#         default_module = possible_defaults.first
+#       end
+#
+#       help_content = modulehelp(name)
+#       help_content.gsub!(/^[\t ]+/, '')
+#       help_content.gsub!(/^--* Module Specific Help.*-$/, '')
+#       help_content.gsub!(/^===================================================================$/, '')
+#       help_content.gsub!(/\A\n*/, '')
+#
+#       help_dest = File.join(p.application_directory, "description.markdown")
+#
+#       ops = {:noop => options[:"dry-run"] ? true : false}
+#       FileOperations.install_from_string(help_content, help_dest, ops)
+#       FileOperations.set_group help_dest, p.group, ops
+#       FileOperations.make_group_writable help_dest, ops if p.group_writeable?
+#
+#       #TODO Create support file?
+#     end
+#   end
+# end
 
 pre do |global,command,options,args|
   # Load and merge the system config values with command line values, options on
