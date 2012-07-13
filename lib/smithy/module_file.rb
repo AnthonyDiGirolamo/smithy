@@ -6,10 +6,14 @@ module Smithy
     SystemModulePathName  = "modulefiles"
 
     Environments = [
-      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/},
-      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/},
-      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/},
-      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/}
+      {:prg_env => "PrgEnv-gnu",       :compiler_name => "gcc",       :human_name => "gnu",       :regex => /(gnu|gcc)(.*)/,
+        :build_name_regex => /(gnu|gcc)([\d\.]+)/ },
+      {:prg_env => "PrgEnv-pgi",       :compiler_name => "pgi",       :human_name => "pgi",       :regex => /(pgi)(.*)/,
+        :build_name_regex => /(pgi)([\d\.]+)/ },
+      {:prg_env => "PrgEnv-intel",     :compiler_name => "intel",     :human_name => "intel",     :regex => /(intel)(.*)/,
+        :build_name_regex => /(intel)([\d\.]+)/ },
+      {:prg_env => "PrgEnv-cray",      :compiler_name => "cce",       :human_name => "cray",      :regex => /(cce|cray)(.*)/,
+        :build_name_regex => /(cce|cray)([\d\.]+)/ }
     ]
       #{:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
 
@@ -95,7 +99,7 @@ module Smithy
           sub_builds = builds.select{|b|b=~e[:regex]}
           if sub_builds.size > 1
             sub_builds.each_with_index do |b,k|
-              b =~ e[:regex]
+              b =~ e[:build_name_regex]
               name = e[:compiler_name]
               version = $2
               if k == 0
