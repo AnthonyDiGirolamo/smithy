@@ -30,3 +30,36 @@ end
 # end
 
 task :default => :features
+
+require 'rainbow'
+require 'kramdown'
+require 'smithy'
+include Smithy
+#require 'debugger'
+
+desc "Generate markdown from html file"
+task :generate_markdown, [:html_file] do |t, args|
+  description_files = []
+  description_file = File.expand_path(args[:html_file])
+
+  if File.directory?(description_file)
+    description_files = Dir.glob(description_file+"/*.html")
+  else
+    description_files << description_file
+  end
+
+  description_files.each do |description_file|
+    markdown_file = description_file.gsub(/\.html$/,'') + ".markdown"
+    notice_command description_file, " -> "+markdown_file
+    begin
+      f = File.open description_file
+      content = f.read
+      d = File.open(markdown_file, "w+")
+      k = Kramdown::Document.new(content, :input => 'html')
+      d.write(k.to_kramdown)
+      d.close
+    rescue => exception
+      raise "#{exception}\nCannot parse #{description_file}"
+    end
+  end
+end
