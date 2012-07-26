@@ -552,7 +552,7 @@ end
 #   end
 # end
 
-# command ['generate_stubs_from_modules'] do |c|
+# command ['publish_cray'] do |c|
 #   #c.desc "Output folder"
 #   #c.arg_name "DIRECTORY"
 #   #c.default_value "~/"
@@ -643,14 +643,23 @@ end
 #       if defaulted.size > 0
 #         default_module = defaulted.first
 #       else
-#         default_module = possible_defaults.first
+#         default_module = possible_defaults.last
 #       end
 #
 #       help_content = modulehelp(name)
-#       help_content.gsub!(/^[\t ]+/, '')
+#       #help_content.gsub!(/^[\t ]+/, '')
 #       help_content.gsub!(/^--* Module Specific Help.*-$/, '')
 #       help_content.gsub!(/^===================================================================$/, '')
 #       help_content.gsub!(/\A\n*/, '')
+#       help_content = """# #{name}
+#
+# Categories:
+#
+# ## Description
+# ~~~~~~~~~~~~~~~~~~~~~
+# #{help_content}
+# ~~~~~~~~~~~~~~~~~~~~~
+# """
 #
 #       help_dest = File.join(p.application_directory, "description.markdown")
 #

@@ -1,0 +1,2 @@
+be smithy --software-root=/ccs/home/lmd/sw --web-root=/ccs/home/lmd/www publish_cray --except=/sw/xk6/modulefiles --only=/opt/cray/modulefiles:/opt/modulefiles
+be smithy --software-root=/ccs/home/lmd/sw --web-root=/ccs/home/lmd/www  publish all
