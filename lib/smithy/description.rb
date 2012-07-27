@@ -69,7 +69,7 @@ module Smithy
       @content.gsub!(/<\/h(\d)>/) {|m| "</h#{$1.to_i+1}>"}
 
       # Don't use <code> inside a <pre>
-      @content.gsub!(/<pre><code>/, "<pre>")
+      @content.gsub!(/<pre(.*?)><code>/) {|m| "<pre#{$1}>"}
       @content.gsub!(/<\/code><\/pre>/, "</pre>")
     end
 
