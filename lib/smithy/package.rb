@@ -335,7 +335,7 @@ h - help, show this help}
         version_table = YAML.load_file(version_table_file) rescue {}
         version_table.merge!({version => build_name})
 
-        FileOperations.install_from_string version_table.to_yaml, version_table_file, options
+        FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
         FileOperations.set_group version_table_file, group, options
         FileOperations.make_group_writable version_table_file, options if group_writeable?
       else

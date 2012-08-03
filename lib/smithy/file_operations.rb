@@ -62,7 +62,11 @@ module Smithy
         current_time = Time.now.to_i
         duplicate_dest = dest+"_copy_"+current_time.to_s
         installed = false
-        if File.exists?(dest)
+
+        force = options.try(:[],:force)
+        options.reject!{|k,v| k==:force}
+
+        if File.exists?(dest) && !force
           if FileUtils.identical?(source, dest)
             puts "identical ".rjust(12).bright + dest
             installed = true
