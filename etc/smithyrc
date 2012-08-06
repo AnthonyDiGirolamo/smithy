@@ -24,3 +24,6 @@ hostname-architectures:
   smokylogin: smoky
   yona-login: yona
   yona: yona
+programming-environment-prefix:
+  default: PrgEnv-
+  smoky: PE-

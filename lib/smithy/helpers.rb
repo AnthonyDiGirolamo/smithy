@@ -105,11 +105,26 @@ module Smithy
       options[:full_software_root_path] = get_software_root(
         :root => options[:"software-root"],
         :arch => options[:arch])
+
+      options[:"prgenv-prefix"] = get_prgenv_prefix(:arch => options[:arch])
     else
       STDERR.puts "warning: Cannot read config file: #{@smithy_config_file}"
     end
 
     return options
+  end
+
+  def get_prgenv_prefix(args = {})
+    default_prefix = "PrgEnv-"
+
+    default_prefix_from_config = @smithy_config_hash.try(:[], "programming-environment-prefix").try(:[], "default")
+    default_prefix = default_prefix_from_config unless default_prefix_from_config.blank?
+
+    prefix_from_config = @smithy_config_hash.try(:[], "programming-environment-prefix").try(:[], args[:arch])
+
+    return prefix_from_config unless prefix_from_config.blank?
+
+    return default_prefix
   end
 
   def get_arch
