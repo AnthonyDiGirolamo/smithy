@@ -134,5 +134,50 @@ module Smithy
       return output
     end
 
+    def self.get_module_names(options = {})
+      if options[:only]
+        module_dirs = options[:only].split(':')
+        raise "No module directories could be found" if module_dirs.empty?
+      else
+        raise "$MODULEPATH is not set" unless ENV.has_key?('MODULEPATH')
+        module_dirs = ENV['MODULEPATH'].split(':')
+        raise "$MODULEPATH is empty" if module_dirs.empty?
+      end
+
+      system_module_names = []
+      system_module_defaults = []
+      if options[:except]
+        module_dirs.delete_if{|p| options[:except].split(":").include?(p)}
+      end
+      module_dirs.each do |p|
+        module_files          = Dir.glob(p+"/*/*").sort
+        module_files_defaults = module_files.dup
+        version_files         = Dir.glob(p+"/*/.version").sort
+
+        version_files.each do |version_file|
+          module_name = File.basename(File.dirname(version_file))
+          file_content = ""
+          File.open(version_file).readlines.each { |line| file_content << line.chomp }
+
+          if file_content =~ /ModulesVersion "(.*?)"/
+            version = $1
+            module_files_defaults.collect! do |m|
+              if m =~ /#{module_name}\/#{version}$/
+                m+"(default)"
+              else
+                m
+              end
+            end
+          end
+
+        end
+
+        module_files.collect!{|s| s.gsub(p+"/", '')}
+        system_module_names += module_files
+        system_module_defaults += module_files_defaults
+      end
+      return system_module_names
+    end
+
   end
 end
