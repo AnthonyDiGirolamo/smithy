@@ -26,16 +26,13 @@ require 'terminal-table'
 require 'erb'
 require 'smithy'
 require 'kramdown'
-#require 'debugger'
-#require 'awesome_print'
+require 'debugger'
+require 'awesome_print'
 
 include GLI
 include Smithy
 
 version Smithy::VERSION
-
-# Absolute path to the smithy config file
-@smithy_config_file = File.join(@@smithy_bin_root,"etc/smithyrc")
 
 program_desc "Smithy will help you build, test, and distribute software with ease."
 
@@ -73,10 +70,10 @@ desc "Search currently installed software"
 arg_name "PATTERN"
 command ['search'] do |c|
   output_formats = {
-    'path'  => Smithy::Format::Path.new,
-    'name'  => Smithy::Format::Name.new,
-    'table' => Smithy::Format::Table.new,
-    'csv'   => Smithy::Format::CSV.new
+    'path'  => Format::Path.new,
+    'name'  => Format::Name.new,
+    'table' => Format::Table.new,
+    'csv'   => Format::CSV.new
   }
   c.desc 'Format of the output'
   c.arg_name output_formats.keys.join('|')
@@ -93,7 +90,7 @@ command ['search'] do |c|
   #c.flag :sort
 
   c.action do |global_options,options,args|
-    swroot = global_options[:full_software_root_path]
+    swroot = Smithy::Config.full_root
 
     formatter = output_formats[options[:format]]
     raise "Unknow format \"#{options[:format]}\" valid formats include: #{output_formats.keys.join(',')}" if formatter.nil?
@@ -149,10 +146,7 @@ command ['test'] do |c|
     raise "You must supply at least one package to test" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :path => package,
-                :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"],
-                      :root => global_options[:full_software_root_path]
+      p = Package.new :path => package
       p.valid?
       p.run_script :script => :test,
                   :dry_run => options[:"dry-run"],
@@ -196,11 +190,7 @@ command ['build'] do |c|
     raise "You must supply at least one package to build" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :path => package,
-                :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"],
-                      :root => global_options[:full_software_root_path]
-
+      p = Package.new :path => package
       p.valid?
       p.run_script :script => :build,
                   :dry_run => options[:"dry-run"],
@@ -228,7 +218,7 @@ silo/4.8/sles11.1_gnu4.5.3
 fftw/3.2.2/cle4.0_pgi11.10.0
 EOS
 arg_name "NAME"
-command :new do |c|
+command ['new'] do |c|
   c.desc "Create description file for website"
   c.switch ["web-description"]
 
@@ -244,10 +234,7 @@ command :new do |c|
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
-    p = Package.new :path => args.first,
-              :file_group => global_options[:"file-group-name"],
-           :disable_group => global_options[:"disable-group-writable"],
-                    :root => global_options[:full_software_root_path]
+    p = Package.new :path => args.first
 
     p.valid?
     if options[:tarball]
@@ -301,9 +288,7 @@ command ['edit'] do |c|
       file_name = @smithy_config_file
       status = Kernel::system(editor, file_name)
     else
-      p = Package.new :path => arguments.first,
-                :file_group => global_options[:"file-group-name"],
-                      :root => global_options[:full_software_root_path]
+      p = Package.new :path => arguments.first
       p.valid?
       p.prefix_exists!
       p.rebuild_script_exists!
@@ -377,11 +362,7 @@ command ['repair'] do |c|
     raise "You must supply at least one package to repair" if packages.empty?
 
     packages.each do |package|
-      p = Package.new :path => package,
-                :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"],
-                      :root => global_options[:full_software_root_path]
-
+      p = Package.new :path => package
       p.valid?
       p.repair :dry_run => options[:"dry-run"]
     end
@@ -395,8 +376,7 @@ command ['publish'] do |c|
   c.switch [:n, "dry-run"]
 
   c.action do |global_options,options,args|
-    swroot = global_options[:full_software_root_path]
-    www_root = global_options.try(:[], :"web-root")
+    www_root = Smithy::Config.web_root
     raise """Cannot determine where to publish web descriptions.\n       Please add a 'web-root: PATH' entry to the smithy config file.""" if www_root.nil?
 
     packages = args.dup
@@ -407,14 +387,14 @@ command ['publish'] do |c|
 
     raise "You must supply at least one package to publish" if packages.empty?
 
-    packages = Package.all_web :root => swroot if packages.include?("all")
+    packages = Package.all_web if packages.include?("all")
 
     notice "Publishing #{packages.size} package#{'s' if packages.size>1}#{' (dry-run)' if options[:"dry-run"]}"
 
     descriptions = []
 
     packages.each do |package|
-      d = Description.new :root => swroot, :package => package, :www_root => www_root
+      d = Description.new :package => package
       if d.valid? && d.publishable?
         d.deploy :dry_run => options[:"dry-run"]
         descriptions << d
@@ -426,10 +406,7 @@ command ['publish'] do |c|
     ["alphabetical","all"].each do |p|
       Description.update_page p,
         :descriptions => descriptions,
-        :dry_run      => options[:"dry-run"],
-        :www_root     => www_root,
-        :arch         => global_options[:arch],
-        :root         => global_options[:"software-root"]
+        :dry_run      => options[:"dry-run"]
     end
   end
 end
@@ -473,10 +450,7 @@ command ['module', 'modulefile'] do |c|
 
     raise "Missing module command, run 'smithy module #{operations.join("|")} NAME/VERSION/BUILD'" if operation.nil?
 
-    p = Package.new :path => arguments.first,
-                    :root => global_options[:full_software_root_path],
-              :file_group => global_options[:"file-group-name"],
-           :disable_group => global_options[:"disable-group-writable"]
+    p = Package.new :path => arguments.first
     p.valid?
     m = ModuleFile.new :package => p
     case operation
@@ -531,7 +505,7 @@ command ['show'] do |c|
     when :last
       puts last_prefix
     when :arch
-      puts architectures
+      puts Smithy::Config.architectures
     else
       raise "Please specify a subcommand (#{sub_commands.join(', ')})"
     end
@@ -576,81 +550,19 @@ command ['publish_cray'] do |c|
     #stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
     stub_packages = ModuleFile.get_module_names(options)
 
-    notice "Generating stubs for the following modules:"
-    Format.print_column_list(stub_packages)
-    proceed = nil
-    while proceed.nil? do
-      prompt = Readline.readline("Generate the above packages? [yn] ")
-      case prompt.downcase
-      when "y"
-        proceed = true
-      when "n"
-        proceed = false
-      end
-    end
+    Package.create_stubs_from_modules
 
-    raise "aborting package generation" if proceed == false
-
-    stub_packages.each do |module_name|
-      name, version = module_name.split("/")
-      p = Package.new :path => "#{name}/#{version}/universal",
-                      :root => global_options[:full_software_root_path],
-                :file_group => global_options[:"file-group-name"],
-             :disable_group => global_options[:"disable-group-writable"]
-      p.create :stub => true, :dry_run => options[:"dry-run"]
-
-      default_module = ""
-      possible_defaults = system_module_defaults.select{ |m| m =~ %r{\/#{name}\/} }
-      defaulted = possible_defaults.select{ |m| m =~ %r{\(default\)$} }
-      if defaulted.size > 0
-        default_module = defaulted.first
-      else
-        default_module = possible_defaults.last
-      end
-
-      help_content = modulehelp(name)
-      #help_content.gsub!(/^[\t ]+/, '')
-      help_content.gsub!(/^--* Module Specific Help.*-$/, '')
-      help_content.gsub!(/^===================================================================$/, '')
-      help_content.gsub!(/\A\n*/, '')
-      help_content = """# #{name}
-
-Categories:
-
-## Description
-
-The following information is available by running `module help #{name}`
-
-~~~~~~~~~~~~~~~~~~~~~
-#{help_content}
-~~~~~~~~~~~~~~~~~~~~~
-"""
-
-      help_dest = File.join(p.application_directory, "description.markdown")
-
-      ops = {:noop => options[:"dry-run"] ? true : false}
-      FileOperations.install_from_string(help_content, help_dest, ops)
-      FileOperations.set_group help_dest, p.group, ops
-      FileOperations.make_group_writable help_dest, ops if p.group_writeable?
-
-      #TODO Create support file?
-    end
   end
 end
 
 pre do |global,command,options,args|
-  # Load and merge the system config values with command line values, options on
-  # the command line take precedence.
-  global.merge! load_system_config(global) do |key, values_command_line, values_config|
-    if values_command_line.nil?
-      values_config
-    else
-      values_command_line
-    end
-  end
+  puts global
 
-  #TODO make this not so ugly
-  global[:full_software_root_path] = File.join(global[:"software-root"], global[:arch])
+  Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
+  Smithy::Config.load_configuration(global)
+
+  puts global
+  puts Smithy::Config.global
 
   Sickill::Rainbow.enabled = false if global[:"no-color"]
 

@@ -3,7 +3,7 @@ module Smithy
     attr_accessor :path, :package, :root, :arch, :www_root, :name, :content, :categories, :versions, :builds
 
     def initialize(args = {})
-      @www_root = args[:www_root]
+      @www_root = Smithy::Config.web_root
       @package = args[:package]
       if @package.class == Package
         @path = args[:package].application_directory
@@ -11,8 +11,8 @@ module Smithy
         @arch = @package.arch
         @name = @package.name
       else
-        @root    = File.dirname args[:root]
-        @arch    = File.basename args[:root]
+        @root = Smithy::Config.root
+        @arch = Smithy::Config.arch
         if @package == 'last'
           @name = last_prefix.split('/').try(:first)
         else
@@ -146,9 +146,9 @@ module Smithy
     end
 
     def self.update_page(file = 'alphabetical', args = {})
-      root = args[:root]
-      arch = args[:arch]
-      www_arch = File.join(args[:www_root], arch)
+      root = Smithy::Config.root
+      arch = Smithy::Config.arch
+      www_arch = File.join(Smithy::Config.web_root, arch)
 
       unless args[:descriptions].nil?
         @descriptions = args[:descriptions]

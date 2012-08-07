@@ -1,4 +1,5 @@
 require 'smithy_version'
+require 'smithy/config'
 require 'smithy/helpers'
 require 'smithy/format'
 require 'smithy/package'

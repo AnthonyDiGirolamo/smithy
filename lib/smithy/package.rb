@@ -19,10 +19,11 @@ module Smithy
     end
 
     def initialize(args = {})
-      @root = File.dirname args[:root]
-      @arch = File.basename args[:root]
+      @root = File.dirname(Smithy::Config.full_root)
+      @arch = File.basename(Smithy::Config.full_root)
+
       if args[:path].try(:downcase) == 'last'
-        @path = last_prefix
+        @path = Smithy::Config.last_prefix
       else
         @path = Package.normalize_name(:name => args[:path], :root => @root, :arch => @arch)
       end
@@ -30,10 +31,9 @@ module Smithy
       @name = $1
       @version = $2
       @build_name = $3
-      @group = args[:file_group]
+      @group = Smithy::Config.file_group
 
-      @group_writeable = true
-      @group_writeable = false if args[:disable_group]
+      @group_writeable = Smithy::Config.group_writeable?
     end
 
     def get_binding
@@ -93,7 +93,7 @@ module Smithy
       end
 
       # If good, save as last prefix
-      save_last_prefix(qualified_name)
+      Smithy::Config.save_last_prefix(qualified_name)
 			return true
     end
 
@@ -496,7 +496,7 @@ h - help, show this help}
 
     def self.all_web(args = {})
       # Find all software with descriptions
-      software = Dir.glob(args[:root]+"/*/description*")
+      software = Dir.glob(Smithy::Config.full_root+"/*/description*")
       software.collect!{|s| s.gsub(/\/description.*$/, '')}
       software.uniq!
       # Remove any with noweb in their exceptions file
@@ -505,6 +505,66 @@ h - help, show this help}
       end
 			software.sort!
       return software
+    end
+
+    def self.create_stubs_from_modules(args = {})
+      notice "Generating stubs for the following modules:"
+      Format.print_column_list(stub_packages)
+      proceed = nil
+      while proceed.nil? do
+        prompt = Readline.readline("Generate the above packages? [yn] ")
+        case prompt.downcase
+        when "y"
+          proceed = true
+        when "n"
+          proceed = false
+        end
+      end
+
+      raise "aborting package generation" if proceed == false
+
+      stub_packages.each do |module_name|
+        name, version = module_name.split("/")
+        p = Package.new :path => "#{name}/#{version}/universal",
+                        :root => global_options[:full_software_root_path],
+                  :file_group => global_options[:"file-group-name"],
+               :disable_group => global_options[:"disable-group-writable"]
+        p.create :stub => true, :dry_run => options[:"dry-run"]
+
+        default_module = ""
+        possible_defaults = system_module_defaults.select{ |m| m =~ %r{\/#{name}\/} }
+        defaulted = possible_defaults.select{ |m| m =~ %r{\(default\)$} }
+        if defaulted.size > 0
+          default_module = defaulted.first
+        else
+          default_module = possible_defaults.last
+        end
+
+        help_content = modulehelp(name)
+        #help_content.gsub!(/^[\t ]+/, '')
+        help_content.gsub!(/^--* Module Specific Help.*-$/, '')
+        help_content.gsub!(/^===================================================================$/, '')
+        help_content.gsub!(/\A\n*/, '')
+        help_content = """# #{name}
+
+Categories:
+
+## Description
+
+The following information is available by running `module help #{name}`
+
+~~~~~~~~~~~~~~~~~~~~~
+#{help_content}
+~~~~~~~~~~~~~~~~~~~~~
+"""
+
+        help_dest = File.join(p.application_directory, "description.markdown")
+
+        ops = {:noop => options[:"dry-run"] ? true : false}
+        FileOperations.install_from_string(help_content, help_dest, ops)
+        FileOperations.set_group help_dest, p.group, ops
+        FileOperations.make_group_writable help_dest, ops if p.group_writeable?
+      end
     end
 
   end
