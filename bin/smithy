@@ -26,8 +26,8 @@ require 'terminal-table'
 require 'erb'
 require 'smithy'
 require 'kramdown'
-require 'debugger'
-require 'awesome_print'
+#require 'debugger'
+#require 'awesome_print'
 
 include GLI
 include Smithy
@@ -556,13 +556,8 @@ command ['publish_cray'] do |c|
 end
 
 pre do |global,command,options,args|
-  puts global
-
   Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
   Smithy::Config.load_configuration(global)
-
-  puts global
-  puts Smithy::Config.global
 
   Sickill::Rainbow.enabled = false if global[:"no-color"]
 

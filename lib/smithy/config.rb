@@ -60,7 +60,9 @@ module Smithy
       end
 
       def architectures
-        @config_file_hash['hostname-architectures'].values.uniq
+        notice_command "Current Hostname: ", @hostname, 30
+        notice_command "Current Architecture: ", @arch, 30
+        notice_command "All Architectures: ", @config_file_hash["hostname-architectures"].values.uniq.sort.join(", "), 30
       end
 
       def get_prgenv_prefix
