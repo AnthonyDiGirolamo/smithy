@@ -97,7 +97,7 @@ module Smithy
         end
 
         s = File.join(@root, @arch)
-        raise "The software-root directory '#{s}' is not valid" unless Dir.exist?(s)
+        raise "The software-root directory '#{s}' does not exist" unless Dir.exist?(s)
         return s
       end
 

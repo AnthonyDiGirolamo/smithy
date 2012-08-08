@@ -176,7 +176,11 @@ module Smithy
         system_module_names += module_files
         system_module_defaults += module_files_defaults
       end
-      return system_module_names
+
+			# desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
+			# stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
+
+      return system_module_names, system_module_defaults
     end
 
   end

@@ -507,7 +507,7 @@ h - help, show this help}
       return software
     end
 
-    def self.create_stubs_from_modules(args = {})
+    def self.create_stubs_from_modules(stub_packages, system_module_defaults, options = {})
       notice "Generating stubs for the following modules:"
       Format.print_column_list(stub_packages)
       proceed = nil
@@ -525,10 +525,7 @@ h - help, show this help}
 
       stub_packages.each do |module_name|
         name, version = module_name.split("/")
-        p = Package.new :path => "#{name}/#{version}/universal",
-                        :root => global_options[:full_software_root_path],
-                  :file_group => global_options[:"file-group-name"],
-               :disable_group => global_options[:"disable-group-writable"]
+        p = Package.new :path => "#{name}/#{version}/universal"
         p.create :stub => true, :dry_run => options[:"dry-run"]
 
         default_module = ""

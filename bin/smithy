@@ -512,48 +512,21 @@ command ['show'] do |c|
   end
 end
 
-# command ['generate_markdown'] do |c|
+# command ['publish_cray'] do |c|
+#   c.desc "See what files will be created without creating them"
+#   c.switch [:n, "dry-run"]
+
+#   c.desc "Exclude directories specified in $MODULEPATH"
+#   c.flag [:except]
+
+#   c.desc "Parse given directories only, $MODULEPATH is not checked"
+#   c.flag [:only]
+
 #   c.action do |global_options,options,args|
-#     description_file = args.first
-#     markdown_file = args.first+".markdown"
-#     notice_command description_file, " -> "+markdown_file
-#     begin
-#       f = File.open description_file
-#       @content = f.read
-#         d = File.open(markdown_file, "w+")
-#         k = Kramdown::Document.new(@content, :input => 'html')
-#         d.write(k.to_kramdown)
-#         d.close
-#     rescue => exception
-#       raise "#{exception}\nCannot parse #{description_file}"
-#     end
+#     packages, default_names = ModuleFile.get_module_names(options)
+#     Package.create_stubs_from_modules(packages, default_names, options)
 #   end
 # end
-
-command ['publish_cray'] do |c|
-  #c.desc "Output folder"
-  #c.arg_name "DIRECTORY"
-  #c.default_value "~/"
-  #c.flag [:except]
-
-  c.desc "See what files will be created without creating them"
-  c.switch [:n, "dry-run"]
-
-  c.desc "Exclude directories specified in $MODULEPATH"
-  c.flag [:except]
-
-  c.desc "Parse given directories only, $MODULEPATH is not checked"
-  c.flag [:only]
-
-  c.action do |global_options,options,args|
-    #desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
-    #stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
-    stub_packages = ModuleFile.get_module_names(options)
-
-    Package.create_stubs_from_modules
-
-  end
-end
 
 pre do |global,command,options,args|
   Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")

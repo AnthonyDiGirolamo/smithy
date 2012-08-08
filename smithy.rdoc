@@ -17,6 +17,7 @@ These options are available for any command and are specified before the name of
 [<tt>--file-group-name=GROUP</tt>] Group name for files created by smithy
 [<tt>--help</tt>] Show this message
 [<tt>--no-color</tt>] Don't use colors
+[<tt>--prgenv-prefix=NAME</tt>] The prefix of programming environments for this machine
 [<tt>--software-root=PATH</tt>] The root level directory for software
 [<tt>--web-root=PATH</tt>] The root level directory for web files
 == Commands
