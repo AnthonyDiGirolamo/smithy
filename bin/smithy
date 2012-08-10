@@ -535,7 +535,7 @@ command ['show'] do |c|
 
     case sub_command
     when :last
-      puts last_prefix
+      puts Smithy::Config.last_prefix
     when :arch
       puts Smithy::Config.architectures
     else
