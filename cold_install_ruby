@@ -1,0 +1,107 @@
+#!/bin/bash
+SW_ROOT=$HOME/sw
+RUBY_INSTALL_DIR=$SW_ROOT/test
+RUBY_BUILD_NAME=rhel6.3_gnu4.4.6
+
+RUBY_PREFIX=$RUBY_INSTALL_DIR/ruby/1.9.3/$RUBY_BUILD_NAME
+export SMITHY_PREFIX=$RUBY_PREFIX
+echo $RUBY_PREFIX
+echo $SMITHY_PREFIX
+
+echo "==> Installing Ruby"
+
+mkdir -p $RUBY_INSTALL_DIR/modulefiles
+mkdir -p $RUBY_INSTALL_DIR/ruby/1.9.3/modulefile/ruby/
+
+cat > $RUBY_INSTALL_DIR/ruby/1.9.3/modulefile/ruby/1.9.3 << MODULE
+#%Module1.0
+proc ModulesHelp { } {
+  puts stderr "Ruby 1.9.3 patch 194"
+  puts stderr "The gem command will install gems to the ~/.gem directory."
+}
+
+module-whatis "Ruby 1.9.3-p194"
+
+set PREFIX $RUBY_PREFIX
+
+prepend-path PATH            $PREFIX/bin
+#prepend-path LD_LIBRARY_PATH $PREFIX/lib
+prepend-path MANPATH         $PREFIX/share/man
+setenv       GEM_HOME        $env(HOME)/.gem/ruby/1.9.1
+setenv       GEM_PATH        $env(HOME)/.gem/ruby/1.9.1:$PREFIX/lib/ruby/gems/1.9.1
+prepend-path PATH            $env(HOME)/.gem/ruby/1.9.1/bin:$PREFIX/lib/ruby/gems/1.9.1/bin
+
+# vim: ft=tcl
+MODULE
+
+cp -rv $RUBY_INSTALL_DIR/ruby/1.9.3/modulefile/ruby $RUBY_INSTALL_DIR/modulefiles/
+
+cd $RUBY_PREFIX
+
+# Smithy wrapper function: Will exit if given command fails
+run () {
+  if "$@"
+    then echo "==> SUCCESS $@"
+    else echo "==> FAILED $@" && exit 1
+  fi
+}
+# Load module environment
+source ${MODULESHOME}/init/bash
+module unload PrgEnv-gnu
+module unload PrgEnv-pgi
+module unload PrgEnv-cray
+module unload PrgEnv-intel
+module unload PrgEnv-pathscale
+
+unarchive () {
+  cd $SMITHY_PREFIX
+  rm -rf $@
+  if [ -e $@.tar.gz ]
+    then tar xf $@.tar.gz
+    else tar xf $@.tar.bz2
+  fi
+  cd $@
+  make clean
+}
+
+#unarchive openssl-0.9.8n
+#run ./config --prefix=$SMITHY_PREFIX shared
+#run make
+#run make install
+
+#unarchive ncurses-5.9
+#run ./configure --prefix=$SMITHY_PREFIX --with-shared --disable-rpath --without-debug --without-ada --enable-safe-sprintf --enable-sigwinch --without-progs
+#run make
+#run make install
+
+#if [ -e readline-6.2.tar.gz ]
+#  then echo "readline-6.2.tar.gz downloaded"
+#  else wget 'http://ftp.gnu.org/gnu/readline/readline-6.2.tar.gz'
+#fi
+#unarchive readline-6.2
+#run ./configure --prefix=$SMITHY_PREFIX --enable-shared --enable-static
+#run make
+#run make install
+
+if [ -e yaml-0.1.4.tar.gz ]
+  then echo "yaml-0.1.4.tar.gz downloaded"
+  else wget 'http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz'
+fi
+unarchive yaml-0.1.4
+run ./configure --prefix=$SMITHY_PREFIX
+run make
+run make install
+
+if [ -e ruby-1.9.3-p194.tar.bz2 ]
+  then echo "ruby-1.9.3-p194.tar.bz2 downloaded"
+  else wget 'http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p194.tar.bz2'
+fi
+unarchive ruby-1.9.3-p194
+#export CFLAGS=-I$SMITHY_PREFIX/include
+#export CXXFLAGS=-I$SMITHY_PREFIX/include
+#export LDFLAGS=-L$SMITHY_PREFIX/lib
+run ./configure --prefix=$SMITHY_PREFIX --with-opt-dir=$SMITHY_PREFIX --with-static-linked-ext
+run make
+run make install
+
+exit 0
