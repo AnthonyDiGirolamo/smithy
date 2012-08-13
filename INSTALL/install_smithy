@@ -1,31 +1,4 @@
-#!/bin/bash
-SW_ROOT=/sw
-SMITHY_DIR=$SW_ROOT/tools/smithy
-RUBY_INSTALL_DIR=$SW_ROOT/xt
-RUBY_BUILD_NAME=rhel6.3_gnu4.3.2
-
-RUBY_PREFIX=$RUBY_INSTALL_DIR/ruby/1.9.3/$RUBY_BUILD_NAME
-STARTING_DIR=`pwd`
-
-echo "==> Installing Ruby"
-rm -rf ruby
-tar xf ruby.tar
-sed -i "s#set PREFIX.*#set PREFIX $RUBY_PREFIX#g" ruby/ruby/1.9.3/modulefile/ruby/1.9.3
-
-mkdir -p $RUBY_INSTALL_DIR
-cp -r ruby/ruby $RUBY_INSTALL_DIR/
-
-mkdir -p $RUBY_INSTALL_DIR/modulefiles
-cp -rv $RUBY_INSTALL_DIR/ruby/1.9.3/modulefile/ruby $RUBY_INSTALL_DIR/modulefiles/
-
-cd $RUBY_INSTALL_DIR/ruby/1.9.3
-mv build $RUBY_BUILD_NAME
-cd $RUBY_PREFIX
-export SMITHY_PREFIX=`pwd`
-./rebuild
-
 echo "==> Installing Smithy"
-cd $STARTING_DIR
 rm -rf smithy
 tar xf smithy.tar
 cd smithy
@@ -34,6 +7,8 @@ for f in "environment.sh" "modulefiles/smithy/1.0"
 do
   sed -i "s#/sw/tools/smithy#$SMITHY_DIR#g" $f
 done
+
+SMITHY_DIR=/sw/tools/smithy
 
 mkdir -p $SMITHY_DIR
 
