@@ -6,39 +6,36 @@ require 'rubygems/package_task'
 require 'cucumber'
 require 'cucumber/rake/task'
 
-Cucumber::Rake::Task.new(:features) do |t|
-  t.cucumber_opts = "features --format pretty -x"
-  t.fork = false
-end
+task :default => :features
 
-Rake::RDocTask.new do |rd|
-  rd.main = "README.rdoc"
-  rd.rdoc_files.include("README.rdoc","lib/**/*.rb","bin/**/*")
-  rd.title = 'Your application title'
-end
-
+# Gem building
 spec = eval(File.read('smithy.gemspec'))
-
 Gem::PackageTask.new(spec) do |pkg|
 end
 
-# Unit Tests
-# require 'rake/testtask'
-# Rake::TestTask.new do |t|
-#   t.libs << "test"
-#   t.test_files = FileList['test/tc_*.rb']
-# end
+# Run Cucumber Tests
+Cucumber::Rake::Task.new(:features) do |t|
+  t.cucumber_opts = "features --format progress -x"
+  t.fork = false
+end
 
-task :default => :features
+# RDoc Generation
+Rake::RDocTask.new do |rd|
+  rd.main = "README.rdoc"
+  rd.rdoc_files.include("README.rdoc","lib/**/*.rb","bin/**/*")
+  rd.title = 'Smithy'
+end
 
-require 'rainbow'
-require 'kramdown'
-require 'smithy'
-include Smithy
-#require 'debugger'
-
+# Helper Tasks
+# rake 'generate_markdown[DIR]'
 desc "Generate markdown from html file"
 task :generate_markdown, [:html_file] do |t, args|
+  require 'rainbow'
+  require 'kramdown'
+  require 'smithy'
+  include Smithy
+  #require 'debugger'
+
   description_files = []
   description_file = File.expand_path(args[:html_file])
 

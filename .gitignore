@@ -1,10 +1,11 @@
 .DS_Store
 ._.DS_Store
+.bundle
 Gemfile.lock
-tags
-pkg
+commands
 doc
 html
-.bundle
-vendor/ruby
+pkg
+tags
 tmp
+vendor/ruby

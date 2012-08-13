@@ -7,6 +7,13 @@ Smithy's goals are:
 - Provide a simplified and intuitive command line interface
 - Reduce the number of steps necessary for each function
 
+= Installation
+
+The only requirement is ruby version 1.9.2 or greater. Once that is installed
+you can run `cold_install` to bootstrap the directory structure needed for
+smithy. The default install location is /sw/tools/smithy, edit `cold_install` if
+you wish to change it.
+
 The following is command line usage help:
 
 :include:smithy.rdoc

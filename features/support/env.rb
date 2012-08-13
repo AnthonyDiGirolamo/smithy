@@ -9,10 +9,13 @@ Before do
   #@dirs = [".", "tmp/aruba"]
   @real_hostname = ENV['HOSTNAME']
   @aruba_timeout_seconds = 360
+
   #@real_home = ENV['HOME']
   #fake_home = File.join('/tmp','fake_home')
   #FileUtils.rm_rf fake_home, :secure => true
   #ENV['HOME'] = fake_home
+
+  @original_config_file = ENV.delete 'SMITHY_CONFIG'
 end
 
 After do
@@ -30,5 +33,9 @@ After do
 
   if @config_backup
     FileUtils.cp "etc/smithyrc.original", "etc/smithyrc"
+  end
+
+  if @original_config_file
+    ENV['SMITHY_CONFIG'] = @original_config_file
   end
 end
