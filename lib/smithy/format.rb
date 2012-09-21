@@ -51,34 +51,35 @@ module Smithy
       puts table.to_s
     end
 
+    def self.software_row(s)
+      row = []
+      row << s
+      source = s+'/rebuild'
+      if File.exist?(source)
+        f = File.stat(source)
+      else
+        f = File.stat(s)
+      end
+      row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
+      begin
+        user = Etc.getpwuid(f.uid)
+        row << user.try(:name)
+        row << user.try(:gecos)
+      rescue
+        row << 'unknown'
+        row << 'unknown'
+      end
+    end
+
     class Table
       def before
-        @@table = Terminal::Table.new :headings => %w(Software Last_Modified User_ID User_Name)
+        @@table = Terminal::Table.new :headings => %w(Build LastModified Username Name)
       end
-
       def format(software, root)
         software.each do |s|
-          row = []
-          row << s
-          source = s+'/rebuild'
-          if File.exist?(source)
-            f = File.stat(source)
-          else
-            f = File.stat(s)
-          end
-          row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
-          begin
-            user = Etc.getpwuid(f.uid)
-            row << user.try(:name)
-            row << user.try(:gecos)
-          rescue
-            row << 'unknown'
-            row << 'unknown'
-          end
-          @@table << row
+          @@table << Smithy::Format.software_row(s)
         end
       end
-
       def after
         puts @@table.to_s
       end
@@ -87,51 +88,41 @@ module Smithy
     class CSV
       def before
       end
-
       def format(software, root)
         software.each do |s|
-          row = []
-          row << s
-          source = s+'/rebuild'
-          if File.exist?(source)
-            f = File.stat(source)
-          else
-            f = File.stat(s)
-          end
-          row << f.mtime.strftime("%Y-%m-%d %H:%M:%S")
-          begin
-            user = Etc.getpwuid(f.uid)
-            row << user.try(:name)
-            row << user.try(:gecos)
-          rescue
-            row << 'unknown'
-            row << 'unknown'
-          end
-          puts row.join(',')
+          puts Smithy::Format.software_row(s).join(',')
         end
       end
+      def after
+      end
+    end
 
+    class Doku
+      def before
+        puts "^ Build ^ Last Modified ^ Username ^ Name ^"
+      end
+      def format(software, root)
+        software.each do |s|
+          puts "| " + Smithy::Format.software_row(s).join(' | ') + " |"
+        end
+      end
       def after
       end
     end
 
     class Path
       def before ; end
-
       def format(software, root)
         puts software
       end
-
       def after ; end
     end
 
     class Name
       def before ; end
-
       def format(software, root)
         puts software.collect{|s| s.gsub(/#{root}\//, '')}
       end
-
       def after ; end
     end
   end

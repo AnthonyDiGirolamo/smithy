@@ -1,0 +1,10 @@
+#!/bin/sh
+for a in `smithy show arch`
+do
+  rm -f list_$a.csv
+  smithy --arch=$a search --format=csv > list_$a.csv
+  cat list_$a.csv >> list_all.csv
+done
+
+sort -t , -k 2 list_all.csv > list_all_by_date.csv
+sort -t , -k 4 list_all.csv > list_all_by_user.csv

@@ -1,0 +1,3 @@
+#!/bin/sh
+smithy --software-root=$HOME/sw --web-root=$HOME/www publish_cray --except=/sw/xk6/modulefiles --only=/opt/cray/modulefiles:/opt/modulefiles
+smithy --software-root=$HOME/sw --web-root=$HOME/www publish all

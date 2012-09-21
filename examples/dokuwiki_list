@@ -1,0 +1,10 @@
+#!/bin/bash
+DOKULIST=~/doku_list.txt
+echo "====== Currently Installed Software ======" > $DOKULIST
+for arch in xk6 analysis-x64 yona smoky sith frost
+do
+  echo "" >> $DOKULIST
+  echo "===== $arch =====" >> $DOKULIST
+  echo "" >> $DOKULIST
+  bundle exec smithy --arch=$arch search --format=dokuwiki >> $DOKULIST
+done
