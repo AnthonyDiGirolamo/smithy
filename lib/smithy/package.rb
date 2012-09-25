@@ -528,9 +528,13 @@ h - help, show this help}
 
     def self.all_web(args = {})
       # Find all software with descriptions
-      software = Dir.glob(Smithy::Config.full_root+"/*/description*")
+      descriptions_dir = Smithy::Config.full_root
+      descriptions_dir = Smithy::Config.descriptions_root if Smithy::Config.descriptions_root
+      software = Dir.glob(descriptions_dir+"/*/description*")
+
       software.collect!{|s| s.gsub(/\/description.*$/, '')}
       software.uniq!
+
       # Remove any with noweb in their exceptions file
       software.reject! do |s|
         ! Description.publishable?(s)

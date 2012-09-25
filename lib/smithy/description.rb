@@ -32,11 +32,14 @@
 
 module Smithy
   class Description
-    attr_accessor :path, :package, :root, :arch, :www_root, :name, :content, :categories, :versions, :builds
+    attr_accessor :path, :package, :root, :arch, :www_root, :name, :content,
+      :categories, :versions, :builds, :global_description
 
     def initialize(args = {})
       @www_root = Smithy::Config.web_root
       @package = args[:package]
+      @global_description = true if @package =~ /#{Smithy::Config.descriptions_root}/
+
       if @package.class == Package
         @path = args[:package].application_directory
         @root = @package.root
@@ -45,12 +48,18 @@ module Smithy
       else
         @root = Smithy::Config.root
         @arch = Smithy::Config.arch
-        if @package == 'last'
-          @name = last_prefix.split('/').try(:first)
+
+        if @global_description
+          @name = @package.gsub(/#{Smithy::Config.descriptions_root}\/?/, "")
+          @path = @package
         else
-          @name = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
+          if @package == 'last'
+            @name = last_prefix.split('/').try(:first)
+          else
+            @name = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
+          end
+          @path = File.join @root, @arch, @name
         end
-        @path    = File.join @root, @arch, @name
       end
       @categories = []
     end
@@ -137,6 +146,7 @@ module Smithy
       options = {:verbose => true, :noop => true} if args[:dry_run]
 
       www_arch = File.join(www_root, "/#{arch.downcase}")
+      www_arch = File.join(www_root, "all") if global_description
 
       FileUtils.mkdir_p www_root, options                  unless Dir.exists? www_root
       raise "Cannot access web-root directory #{www_root}" unless Dir.exists? www_root
@@ -181,6 +191,7 @@ module Smithy
       root = Smithy::Config.root
       arch = Smithy::Config.arch
       www_arch = File.join(Smithy::Config.web_root, arch)
+      www_arch = File.join(Smithy::Config.web_root, "all") if Smithy::Config.descriptions_root
 
       unless args[:descriptions].nil?
         @descriptions = args[:descriptions]

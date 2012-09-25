@@ -34,7 +34,7 @@ module Smithy
   class Config
     class << self
       attr_accessor :config_file_name, :config_file_hash, :global,
-                    :hostname, :arch, :root, :full_root, :web_root, :file_group
+                    :hostname, :arch, :root, :full_root, :web_root, :file_group, :descriptions_root
 
       def group_writeable?
         @global[:"disable-group-writable"] ? false : true
@@ -51,6 +51,7 @@ module Smithy
         options_to_merge[:"software-root"]   = @config_file_hash.try(:[], "software-root")
         options_to_merge[:"web-root"]        = @config_file_hash.try(:[], "web-root")
         options_to_merge[:"file-group-name"] = @config_file_hash.try(:[], "file-group-name")
+        options_to_merge[:"descriptions-root"] = @config_file_hash.try(:[], "descriptions-root")
 
         set_hostname_and_arch
         options_to_merge[:arch] = @arch
@@ -71,6 +72,7 @@ module Smithy
         @file_group = @global[:"file-group-name"]
         @full_root = get_software_root
         @web_root = @global[:"web-root"]
+        @descriptions_root = @global[:"descriptions-root"]
 
         # Add new info
         @global[:full_software_root_path] = @full_root

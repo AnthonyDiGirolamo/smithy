@@ -87,9 +87,13 @@ desc "The prefix of programming environments for this machine"
 arg_name "NAME"
 flag ["prgenv-prefix"]
 
-desc "The root level directory for web files"
+desc "The root level directory for published web files"
 arg_name "PATH"
 flag ["web-root"]
+
+desc "The root level directory global description files"
+arg_name "PATH"
+flag ["descriptions-root"]
 
 desc "Don't use colors"
 switch "no-color"
