@@ -28,4 +28,9 @@ programming-environment-prefix:
   smoky: PE-
 web-root: /sw/tools/www
 descriptions-root: /sw/descriptions
+web-architecture-names:
+  xk6: jaguar
+  analysis-x64: lens
+  smoky: smoky
+
 

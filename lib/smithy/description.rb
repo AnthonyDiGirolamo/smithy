@@ -38,7 +38,7 @@ module Smithy
     def initialize(args = {})
       @www_root = Smithy::Config.web_root
       @package = args[:package]
-      @global_description = true if @package =~ /#{Smithy::Config.descriptions_root}/
+      @global_description = true if Smithy::Config.descriptions_root
 
       if @package.class == Package
         @path = args[:package].application_directory
@@ -119,7 +119,6 @@ module Smithy
       @content.sub!(/(<h\d>.*?<\/h\d>\n)/) do
         "#{$&}\n<p>Systems: #{system_string}</p>\n"
       end
-      puts system_string
     end
 
     def parse_categories
@@ -198,8 +197,7 @@ module Smithy
       @content += render_version_table
       sanitize_content!
       parse_categories
-      add_system_info!
-
+      add_system_info! if global_description
 
       description_output  = File.join(www_arch, "/#{name.downcase}.html")
       unless args[:dry_run]
@@ -217,8 +215,11 @@ module Smithy
     def self.update_page(file = 'alphabetical', args = {})
       root = Smithy::Config.root
       arch = Smithy::Config.arch
-      www_arch = File.join(Smithy::Config.web_root, arch)
-      www_arch = File.join(Smithy::Config.web_root, "all") if Smithy::Config.descriptions_root
+      if Smithy::Config.descriptions_root
+        www_arch = File.join(Smithy::Config.web_root, "all")
+      else
+        www_arch = File.join(Smithy::Config.web_root, arch)
+      end
 
       unless args[:descriptions].nil?
         @descriptions = args[:descriptions]
@@ -251,7 +252,6 @@ module Smithy
           f.write erb.result(binding)
         end
       end
-      #puts erb.result(binding)
 
       puts "updated ".rjust(12).bright + output
     end
