@@ -532,7 +532,7 @@ h - help, show this help}
       descriptions_dir = Smithy::Config.descriptions_root if Smithy::Config.descriptions_root
       software = Dir.glob(descriptions_dir+"/*/description*")
 
-      software.collect!{|s| s.gsub(/\/description.*$/, '')}
+      software.collect!{|s| File.dirname(s) }
       software.uniq!
 
       # Remove any with noweb in their exceptions file
