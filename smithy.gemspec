@@ -57,9 +57,10 @@ man/man1/smithy.1
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
   s.add_development_dependency('ronn')
-  s.add_dependency('gli')
-  s.add_dependency('kramdown')
+  s.add_dependency('gli', '= 1.6.0')
+  s.add_dependency('kramdown', '= 0.14.0')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
+  s.add_dependency('activesupport')
   s.add_dependency('terminal-table', '< 1.4.5')
 end
