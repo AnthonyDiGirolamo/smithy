@@ -1,7 +1,8 @@
 # Title
 
-Categories: Cat1, Cat2
+Categories: Scientific Applications, Programming Libraries, Compilers, Development Tools, Debugging and Profiling, Visualization, Data Management
 
+Excerpt: Title is an application that...
 
 ## Description
 
