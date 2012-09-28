@@ -114,6 +114,14 @@ module Smithy
       @content.gsub!(/<\/code><\/pre>/, "</pre>")
     end
 
+    def add_system_info!
+      system_string = @machine_table.keys.reject{|m| @machine_table[m].empty?}.collect{|m| m.humanize}.sort.join(', ')
+      @content.sub!(/(<h\d>.*?<\/h\d>\n)/) do
+        "#{$&}\n<p>Systems: #{system_string}</p>\n"
+      end
+      puts system_string
+    end
+
     def parse_categories
       if @content =~ /Categor(y|ies):\s+(.*?)(<\/p>)$/i
         @categories = $2.split(',')
@@ -125,18 +133,35 @@ module Smithy
     end
 
     def render_version_table
-      universal = false
-      @version_table = {}
-      Package.alternate_versions(@path).each do |v|
-        @version_table[v] = Package.alternate_builds(File.join(@path, v))
-        universal = true if @version_table[v].select{|b| b =~ /(universal|binary)/}.size > 0
+      if Smithy::Config.descriptions_root
+        @machine_table = {}
+        web_arches = Smithy::Config.web_architecture_names.keys
+        web_arches.each do |a|
+          architecture_path = File.join( Smithy::Config.root, a, @name )
+          next unless Dir.exists? architecture_path
+          web_machine_name = Smithy::Config.web_architecture_names[a]
+          @machine_table[web_machine_name] = {}
+          Package.alternate_versions(architecture_path).each do |v|
+            @machine_table[web_machine_name][v] = Package.alternate_builds(File.join(architecture_path, v))
+          end
+        end
+        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/machine_version_table.html.erb")
+
+      else
+        @version_table = {}
+        universal = false
+        Package.alternate_versions(@path).each do |v|
+          @version_table[v] = Package.alternate_builds(File.join(@path, v))
+          universal = true if @version_table[v].select{|b| b =~ /(universal|binary)/}.size > 0
+        end
+        if universal
+          erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_list.html.erb")
+        else
+          erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
+        end
+
       end
 
-      if universal
-        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_list.html.erb")
-      else
-        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
-      end
       erb = ERB.new(File.read(erb_file), nil, "<>")
       return erb.result(binding)
     end
@@ -173,6 +198,8 @@ module Smithy
       @content += render_version_table
       sanitize_content!
       parse_categories
+      add_system_info!
+
 
       description_output  = File.join(www_arch, "/#{name.downcase}.html")
       unless args[:dry_run]

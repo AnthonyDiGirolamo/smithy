@@ -33,8 +33,9 @@
 module Smithy
   class Config
     class << self
-      attr_accessor :config_file_name, :config_file_hash, :global,
-                    :hostname, :arch, :root, :full_root, :web_root, :file_group, :descriptions_root
+      attr_accessor :config_file_name, :config_file_hash, :global, :hostname,
+        :arch, :root, :full_root, :web_root, :file_group, :descriptions_root,
+        :web_architecture_names
 
       def group_writeable?
         @global[:"disable-group-writable"] ? false : true
@@ -52,6 +53,7 @@ module Smithy
         options_to_merge[:"web-root"]        = @config_file_hash.try(:[], "web-root")
         options_to_merge[:"file-group-name"] = @config_file_hash.try(:[], "file-group-name")
         options_to_merge[:"descriptions-root"] = @config_file_hash.try(:[], "descriptions-root")
+        options_to_merge[:"web-architecture-names"] = @config_file_hash.try(:[], "web-architecture-names")
 
         set_hostname_and_arch
         options_to_merge[:arch] = @arch
@@ -73,6 +75,7 @@ module Smithy
         @full_root = get_software_root
         @web_root = @global[:"web-root"]
         @descriptions_root = @global[:"descriptions-root"]
+        @web_architecture_names = @global[:"web-architecture-names"]
 
         # Add new info
         @global[:full_software_root_path] = @full_root
@@ -86,7 +89,7 @@ module Smithy
 
         if File.exists? config_path
           @config_file_name = config_path
-          @config_file_hash = YAML.load_file(config_path)
+          @config_file_hash = YAML.load_file(config_path).stringify_keys
         else
           raise """warning: Cannot read config file: #{@config_file_name}
           Please update the file or set SMITHY_CONFIG """
@@ -138,7 +141,7 @@ module Smithy
       def last_prefix
         rc_file = File.join(ENV['HOME'], '.smithyrc')
         if File.exists?(rc_file)
-          h = YAML.load_file(rc_file) rescue nil
+          h = YAML.load_file(rc_file).stringify_keys rescue nil
           return h[:last]
         else
           return nil

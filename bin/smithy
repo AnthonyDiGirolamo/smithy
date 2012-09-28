@@ -58,8 +58,10 @@ require 'terminal-table'
 require 'erb'
 require 'smithy'
 require 'kramdown'
-#require 'debugger'
-#require 'awesome_print'
+require 'active_support/core_ext/hash'
+require 'active_support/core_ext/string'
+# require 'debugger'
+# require 'awesome_print'
 
 include GLI
 include Smithy

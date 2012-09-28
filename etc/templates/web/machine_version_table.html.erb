@@ -1,0 +1,35 @@
+<h2>Available Versions</h2>
+
+<table class="kb-table kb-table-bordered">
+  <thead>
+    <tr>
+      <td style="text-align:center;"><b>System</b></td>
+      <td style="text-align:center;"><b>Application/Version</b></td>
+      <td style="text-align:center;"><b>Build</b></td>
+      <!-- <%# ModuleFile::Environments.reject{|e| e[:human_name]=="pathscale"}.each do |e| %> -->
+      <!-- <td style="text-align:center;"> -->
+      <!--   <b> -->
+      <!--     <%#= e[:human_name].upcase %> -->
+      <!--   </b> -->
+      <!-- </td> -->
+      <!-- <%# end %> -->
+    </tr>
+  </thead>
+
+  <tbody>
+  <% @machine_table.each do |machine, version_table| %>
+    <% version_table.each do |version, builds| %>
+      <% builds.each do |build| %>
+        <tr>
+          <td style="text-align:center;"><%= machine.humanize %></td>
+          <td style="text-align:center;"><%= "#{@name}/#{version}" %></td>
+          <td style="text-align:center;"><%= build %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  <% end %>
+  </tbody>
+</table>
+
+
+

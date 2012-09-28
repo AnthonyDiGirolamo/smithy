@@ -364,7 +364,7 @@ h - help, show this help}
         end
 
         version_table_file = File.join(application_directory, ".versions")
-        version_table = YAML.load_file(version_table_file) rescue {}
+        version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
         version_table.merge!({version => build_name})
 
         FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
@@ -482,7 +482,7 @@ h - help, show this help}
       # Get the directory name from the full path
       builds.collect! { |b| File.basename(b) }
 
-      stubbed_builds = YAML.load_file(File.join(File.dirname(version_directory), ".versions")) rescue {}
+      stubbed_builds = YAML.load_file(File.join(File.dirname(version_directory), ".versions")).stringify_keys rescue {}
       if stubbed_builds[version]
         if stubbed_builds[version].class == String
           builds += [ stubbed_builds[version] ]
@@ -506,7 +506,7 @@ h - help, show this help}
       # Get the directory name from the full path
       versions.collect! { |b| File.basename(b) }
 
-      stubbed_builds = YAML.load_file(File.join(application_directory, ".versions")) rescue {}
+      stubbed_builds = YAML.load_file(File.join(application_directory, ".versions")).stringify_keys rescue {}
       versions += stubbed_builds.keys
       versions.uniq!
 
