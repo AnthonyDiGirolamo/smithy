@@ -11,7 +11,7 @@ Feature: Add new software builds
       """
       ---
       software-root: /tmp/swsmithy
-      file-group-name: ccsstaff
+      file-group-name: wheel
       hostname-architectures:
         awesome_sauce: x86
       """
@@ -22,7 +22,7 @@ Feature: Add new software builds
     Then the stdout should contain "/tmp/swsmithy/x86/git/1.6/build1"
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should exist
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be group writable
-    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should have a group name of "ccsstaff"
+    And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should have a group name of "wheel"
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/rebuild" should be executable
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/remodule" should exist
     And a file named "/tmp/swsmithy/x86/git/1.6/build1/retest" should exist
@@ -51,12 +51,12 @@ Feature: Add new software builds
     Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should be group writable
-    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should have a group name of "ccsstaff"
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build1/source/configure" should have a group name of "wheel"
 
   Scenario: Add a new software build with disabled group permissions
     When I successfully run `smithy --disable-group-writable new --tarball=somepackage.tar.gz zlib/1.2.6/build2`
     Then a directory named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should not be group writable
-    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should have a group name of "ccsstaff"
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.6/build2/source/configure" should have a group name of "wheel"
 

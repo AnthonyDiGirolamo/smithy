@@ -116,8 +116,8 @@ module Smithy
       end
 
       def set_hostname_and_arch
-        @hostname ||= ENV.try(:[], 'HOSTNAME')
-        @hostname ||= `hostname -s`
+        @hostname ||= ENV.try(:[], 'HOSTNAME').try(:dup)
+        @hostname ||= `hostname -s`.try(:dup)
         @hostname.chomp!
         # Remove trailing numbers (if they exist) and a possible single trailing period
         @hostname.gsub!(/\.?$/,'')
