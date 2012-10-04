@@ -116,7 +116,9 @@ module Smithy
       end
 
       def set_hostname_and_arch
-        @hostname = ENV['HOSTNAME'].chomp || `hostname -s`.chomp
+        @hostname ||= ENV.try(:[], 'HOSTNAME')
+        @hostname ||= `hostname -s`
+        @hostname.chomp!
         # Remove trailing numbers (if they exist) and a possible single trailing period
         @hostname.gsub!(/\.?$/,'')
         machine = @hostname.gsub(/(\d*)$/,'')
