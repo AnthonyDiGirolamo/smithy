@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Smithy is freely available under the terms of the BSD license given below.
+# Smithy is freely available under the terms of the BSD license given below. {{{
 #
 # Copyright (c) 2012. UT-BATTELLE, LLC. All rights reserved.
 #
@@ -29,7 +29,7 @@
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. }}}
 
 # Absolute path to the smithy gem prefix
 @@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
@@ -46,8 +46,8 @@ require 'erb'
 require 'kramdown'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
-require 'debugger'
-require 'awesome_print'
+# require 'debugger'      #XXX
+# require 'awesome_print' #XXX
 
 require 'gli'
 include GLI::App
@@ -516,8 +516,6 @@ smithy show arch
 EOS
 command ['show'] do |c|
   c.action do |global_options,options,args|
-    ap global_options
-
     sub_commands = [:last, :arch]
 
     arguments = args.dup
@@ -558,7 +556,7 @@ end
 # end
 
 pre do |global,command,options,args|
-  #ap global
+  # ap global #XXX
   Sickill::Rainbow.enabled = false if global[:"colors"] == false
 
   Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
