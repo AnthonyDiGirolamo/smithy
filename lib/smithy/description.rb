@@ -1,4 +1,4 @@
-# Smithy is freely available under the terms of the BSD license given below.
+# Smithy is freely available under the terms of the BSD license given below. {{{
 #
 # Copyright (c) 2012. UT-BATTELLE, LLC. All rights reserved.
 #
@@ -28,7 +28,7 @@
 # LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 # ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. }}}
 
 module Smithy
   class Description
@@ -41,10 +41,11 @@ module Smithy
       @global_description = true if Smithy::Config.descriptions_root
 
       if @package.class == Package
-        @path = args[:package].application_directory
         @root = @package.root
         @arch = @package.arch
         @name = @package.name
+        @path = args[:package].application_directory
+        @path = File.join(Smithy::Config.descriptions_root, @name) if @global_description
       else
         @root = Smithy::Config.root
         @arch = Smithy::Config.arch
@@ -62,6 +63,10 @@ module Smithy
         end
       end
       @categories = []
+    end
+
+    def description_file_path
+      File.join(@path, "description.markdown")
     end
 
     def valid?

@@ -79,11 +79,11 @@ module Smithy
       :versions    => "versions" }
 
     def package_support_files
-      file_list = PackageFileNames.values
-      file_list.collect! do |f|
-        { :name => f,
-          :src  => File.join(@@smithy_bin_root, "etc/templates/package", f),
-          :dest => File.join(application_directory, f) }
+      file_list = []
+      PackageFileNames.each do |name, file|
+        file_list << { :name => name,
+          :src  => File.join(@@smithy_bin_root, "etc/templates/package", file),
+          :dest => File.join(application_directory, file) }
       end
       return file_list
     end
@@ -104,11 +104,11 @@ module Smithy
       BuildFileNames[:env] ]
 
     def build_support_files
-      file_list = BuildFileNames.values
-      file_list.collect! do |f|
-        src = File.join(@@smithy_bin_root, "etc/templates/build", f)
-        src += ".erb" if BuildFileERBs.include?(f)
-        { :name => f, :src => src, :dest => File.join(prefix, f) }
+      file_list = []
+      BuildFileNames.each do |name, file|
+        src = File.join(@@smithy_bin_root, "etc/templates/build", file)
+        src += ".erb" if BuildFileERBs.include?(file)
+        file_list << { :name => name, :src => src, :dest => File.join(prefix, file) }
       end
       return file_list
     end
@@ -386,9 +386,17 @@ h - help, show this help}
         all_files.each do |file|
           if file[:src] =~ /\.erb$/
             FileOperations.render_erb :erb => file[:src], :binding => get_binding, :options => options, :destination => file[:dest]
+          elsif file[:name] == :description
+            d = Description.new(:package => self)
+            original_dest = file[:dest]
+            file[:dest] = d.description_file_path
+            FileOperations.make_directory(d.path, options) if d.global_description
+            FileOperations.install_file(file[:src], file[:dest], options)
+            FileOperations.make_symlink(file[:dest], original_dest, options) if d.global_description
           else
             FileOperations.install_file file[:src], file[:dest], options
           end
+
           FileOperations.set_group file[:dest], group, options
           FileOperations.make_group_writable file[:dest], options if group_writeable?
           FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/

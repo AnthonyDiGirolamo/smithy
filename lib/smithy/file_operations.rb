@@ -90,6 +90,16 @@ module Smithy
         end
       end
 
+      def make_symlink(old, new, options = {})
+        if File.symlink?(new)
+          puts "exist ".rjust(12).bright + new
+        else
+          FileUtils.rm_f(new, options)
+          FileUtils.ln_sf(old, new, options)
+          puts "link ".rjust(12).bright + old + " -> " + new
+        end
+      end
+
       def install_file(source, dest, options = {})
         current_time = Time.now.to_i
         duplicate_dest = dest+"_copy_"+current_time.to_s

@@ -54,3 +54,10 @@ Given /^a tarfile named "([^"]*)"$/ do |tarfile|
   step "I run `gzip #{basename}.tar`"
 end
 
+Then /^show me the files$/ do
+  puts `tree #{@temp_swroot}`
+end
+
+Then /^a symlink named "(.*?)" should exist$/ do |file|
+  File.symlink?(file).should == true
+end
