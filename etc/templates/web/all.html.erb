@@ -1,13 +1,13 @@
 <a name="top"></a>
 <h2>Contents</h2>
 
-<% @descriptions.each do |p| %>
 <ul>
+<% @descriptions.each do |p| %>
   <li>
     <a href="#<%= p.name.downcase %>"><%= p.name.downcase %></a>
   </li>
-</ul>
 <% end %>
+</ul>
 
 <% @descriptions.each do |p| %>
 <hr />
@@ -17,4 +17,3 @@
 
 <p><a href="#top">(back to top)</a></p>
 <% end %>
-

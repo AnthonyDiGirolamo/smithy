@@ -245,7 +245,13 @@ module Smithy
       end
 
       @packages = Package.all_web :root => File.join(root,arch)
-      @packages.collect!{|p| Package.normalize_name(:name => p, :root => root, :arch => arch)}
+      @packages.collect! do |p|
+        if Smithy::Config.descriptions_root
+          File.basename(p)
+        else
+          Package.normalize_name(:name => p, :root => root, :arch => arch)
+        end
+      end
       @packages.sort!
 
       erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/#{file}.html.erb")

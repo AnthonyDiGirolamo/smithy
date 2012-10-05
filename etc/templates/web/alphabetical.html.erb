@@ -1,22 +1,12 @@
-<!-- packages = <%= @packages.join(", ") %> --!>
+<!-- packages = <%= @packages.join(", ") %> -->
 
 <a name="top"></a>
 <h2>Contents</h2>
 
-<% @descriptions.each do |p| %>
 <ul>
-  <li>
-    <a href="#<%= p.name.downcase %>"><%= p.name.downcase %></a>
-  </li>
-</ul>
-<% end %>
-
 <% @descriptions.each do |p| %>
-<hr />
-
-<a name="<%= p.name.downcase %>"></a>
-<%= p.content %>
-
-<p><a href="#top">(back to top)</a></p>
+  <li>
+    <a href="<%= p.name.downcase %>.html"><%= p.name.downcase %></a>
+  </li>
 <% end %>
-
+</ul>
