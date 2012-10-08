@@ -1,76 +1,139 @@
-= <tt>smithy</tt>
+== smithy - Smithy will help you build, test, and distribute software with ease.
 
-Smithy will help you build, test, and distribute software with ease.
+v1.0
 
-    smithy [global options] command_name [command-specific options] [--] arguments...
+=== Global Options
+=== --arch NAME
 
-* Use the command +help+ to get a summary of commands
-* Use the command <tt>help command_name</tt> to get a help for +command_name+
-* Use <tt>--</tt> to stop command line argument processing; useful if your arguments have dashes in them
+Machine architecure to operate on
 
-== Global Options
-These options are available for any command and are specified before the name of the command
+[Default Value] None
 
-[<tt>--arch=NAME</tt>] Machine architecure to operate on
-[<tt>--config-file=FILE</tt>] Alternate config file, also set by $SMITHY_CONFIG
-[<tt>--disable-group-writable</tt>] Disable group writable file creation
-[<tt>--file-group-name=GROUP</tt>] Group name for files created by smithy
-[<tt>--help</tt>] Show this message
-[<tt>--no-color</tt>] Don't use colors
-[<tt>--prgenv-prefix=NAME</tt>] The prefix of programming environments for this machine
-[<tt>--software-root=PATH</tt>] The root level directory for software
-[<tt>--web-root=PATH</tt>] The root level directory for web files
-== Commands
-[<tt>build</tt>] Build software
-[<tt>edit</tt>] Edit package support files
-[<tt>help</tt>] Shows list of commands or help for one command
-[<tt>module</tt>] Manage modulefiles for a package
-[<tt>new</tt>] Generate a new build and all necessary files
-[<tt>publish</tt>] Publish packages to web
-[<tt>repair</tt>] Repair a package
-[<tt>search</tt>] Search currently installed software
-[<tt>show</tt>] Display internal smithy values
-[<tt>test</tt>] Test software
 
-=== <tt>build PATH</tt>
+=== --config-file FILE
 
+Alternate config file, also set by $SMITHY_CONFIG
+
+[Default Value] None
+
+
+=== --descriptions-root PATH
+
+The root level directory global description files
+
+[Default Value] None
+
+
+=== --file-group-name GROUP
+
+Group name for files created by smithy
+
+[Default Value] None
+
+
+=== --prgenv-prefix NAME
+
+The prefix of programming environments for this machine
+
+[Default Value] None
+
+
+=== --software-root PATH
+
+The root level directory for software
+
+[Default Value] None
+
+
+=== --web-root PATH
+
+The root level directory for published web files
+
+[Default Value] None
+
+
+=== --[no-]colors
+Disable or enable color output (default: enabled)
+
+
+
+=== --disable-group-writable
+Disable group writable file creation
+
+
+
+=== --help
+Show this message
+
+
+
+=== --version
+
+
+
+
+=== Commands
+==== Command: <tt>build  PATH</tt>
 Build software
 
 The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD.
+===== Options
+===== --log-name FILE
 
-==== Options
-These options are specified *after* the command.
+Build log file name located within the software prefix.
 
-[<tt>--disable-log</tt>] Disable logging
-[<tt>-f, --force</tt>] Ignore .lock file and run anyway
-[<tt>--log-name=FILE</tt>] Build log file name located within the software prefix. <i>( default: <tt>build.log</tt>)</i>
-[<tt>-n, --dry-run</tt>] See what scripts will be run without running them
-[<tt>-s, --suppress-stdout</tt>] Suppress messages from STDOUT.
-=== <tt>edit build|test|env|modulefile NAME</tt>
+[Default Value] build.log
 
+
+===== --disable-log
+Disable logging
+
+
+
+===== -f|--force
+Ignore .lock file and run anyway
+
+
+
+===== -n|--dry-run
+See what scripts will be run without running them
+
+
+
+===== -s|--suppress-stdout
+Suppress messages from STDOUT.
+
+
+
+==== Command: <tt>edit  build|test|env|modulefile NAME</tt>
 Edit package support files
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>-e, --editor=BINARY</tt>] Editor for opening script files
-[<tt>-s, --split</tt>] Split editing window with requested file and the environment (remodule) file
-=== <tt>help [command]</tt>
+===== Options
+===== -e|--editor BINARY
 
-Shows list of commands or help for one command
+Editor for opening script files
 
-Gets help for the application or its commands.  Can also list the commands in a way helpful to creating a bash-style completion function
+[Default Value] None
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>-c, --completion</tt>] List all commands one line at a time, for use with shell completion ([command] argument is partial command to match)
-=== <tt>module create|use|deploy NAME</tt>
+===== -s|--split
+Split editing window with requested file and the environment (remodule) file
 
+
+
+==== Command: <tt>help  command</tt>
+Shows a list of commands or help for one command
+
+Gets help for the application or its commands. Can also list the commands in a way helpful to creating a bash-style completion function
+===== Options
+===== -c
+List commands one per line, to assist with shell completion
+
+
+
+==== Command: <tt>module|modulefile  create|use|deploy NAME</tt>
 Manage modulefiles for a package
-
-*Aliases*
-* <tt><b>modulefile</b></tt>
 
 smithy module create NAME/VERSION/BUILD
 
@@ -87,14 +150,13 @@ smithy module deploy NAME/VERSION/BUILD
 smithy module edit NAME/VERSION/BUILD
 
 - alias for 'smithy edit modulefile'
+===== Options
+===== -n|--dry-run
+See what files will be created without creating them
 
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>-n, --dry-run</tt>] See what files will be created without creating them
-=== <tt>new NAME</tt>
-
+==== Command: <tt>new  NAME</tt>
 Generate a new build and all necessary files
 
 The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
@@ -109,43 +171,62 @@ EXAMPLES:
 
 silo/4.8/sles11.1_gnu4.5.3
 fftw/3.2.2/cle4.0_pgi11.10.0
+===== Options
+===== -t|--tarball FILE
+
+Provide a source tarball to unpack (optional)
+
+[Default Value] None
 
 
-==== Options
-These options are specified *after* the command.
+===== -n|--dry-run
+See what files will be created when running new without creating them
 
-[<tt>-n, --dry-run</tt>] See what files will be created when running new without creating them
-[<tt>--skip-modulefile</tt>] Skip modulefile generation
-[<tt>-t, --tarball=FILE</tt>] Provide a source tarball to unpack (optional)
-[<tt>--web-description</tt>] Create description file for website
-=== <tt>publish NAME</tt>
 
+
+===== --skip-modulefile
+Skip modulefile generation
+
+
+
+===== --web-description
+Create description file for website
+
+
+
+==== Command: <tt>publish  NAME</tt>
 Publish packages to web
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>-n, --dry-run</tt>] See what files will be created without creating them
-=== <tt>repair NAME</tt>
+===== Options
+===== -n|--dry-run
+See what files will be created without creating them
 
+
+
+==== Command: <tt>repair  NAME</tt>
 Repair a package
 
 Repair permissions and check that files exist
+===== Options
+===== -n|--dry-run
+Verify permissions only
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>-n, --dry-run</tt>] Verify permissions only
-=== <tt>search PATTERN</tt>
 
+==== Command: <tt>search  PATTERN</tt>
 Search currently installed software
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>--format=path|name|table|csv</tt>] Format of the output <i>( default: <tt>path</tt>)</i>
-=== <tt>show last|arch</tt>
+===== Options
+===== --format path|name|table|csv|dokuwiki
 
+Format of the output
+
+[Default Value] path
+
+
+==== Command: <tt>show  last|arch</tt>
 Display internal smithy values
 
 smithy show last
@@ -155,17 +236,35 @@ smithy show last
 smithy show arch
 
 - List all architectures know to smithy.
-
-
-=== <tt>test </tt>
-
+==== Command: <tt>test </tt>
 Test software
 
-==== Options
-These options are specified *after* the command.
 
-[<tt>--disable-log</tt>] Disable logging
-[<tt>-f, --force</tt>] Ignore .lock file and run anyway
-[<tt>--log-name=FILE</tt>] Test log file name located within the software prefix. <i>( default: <tt>test.log</tt>)</i>
-[<tt>-n, --dry-run</tt>] See what scripts will be run without running them
-[<tt>-s, --suppress-stdout</tt>] Suppress messages from STDOUT.
+===== Options
+===== --log-name FILE
+
+Test log file name located within the software prefix.
+
+[Default Value] test.log
+
+
+===== --disable-log
+Disable logging
+
+
+
+===== -f|--force
+Ignore .lock file and run anyway
+
+
+
+===== -n|--dry-run
+See what scripts will be run without running them
+
+
+
+===== -s|--suppress-stdout
+Suppress messages from STDOUT.
+
+
+
