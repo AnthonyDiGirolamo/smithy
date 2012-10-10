@@ -36,8 +36,10 @@
 # Add the smithy lib dir to the ruby library search path
 $: << File.expand_path(@@smithy_bin_root + '/lib')
 
-require 'rubygems'
 require 'English'
+require 'fileutils'
+
+require 'rubygems'
 require 'open4'
 require 'rainbow'
 require 'readline'
