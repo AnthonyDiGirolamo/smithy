@@ -308,6 +308,8 @@ module Smithy
       args << url
 
       if system(curl, *args)
+        FileOperations.set_group(downloaded_tarball, group)
+        FileOperations.make_group_writable(downloaded_tarball) if group_writeable?
         return downloaded_tarball
       else
         return false
