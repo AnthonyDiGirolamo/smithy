@@ -298,7 +298,8 @@ module Smithy
       return if args[:dry_run]
 
       overwrite = nil
-      if File.exists?(source_dir)
+      overwrite = Smithy::Config.global.try(:[], :force)
+      if File.exists?(source_dir) &&
         while overwrite.nil? do
           prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
