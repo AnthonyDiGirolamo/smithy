@@ -262,8 +262,8 @@ command ['new'] do |c|
   c.desc "Skip modulefile generation"
   c.switch ["skip-modulefile"], :negatable => false
 
-  c.desc "Provide a source tarball to unpack (optional)"
-  c.arg_name "FILE"
+  c.desc "Provide a tarball to unpack, either a file or URL (optional)"
+  c.arg_name "FILE|URL"
   c.flag [:t, :tarball]
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
