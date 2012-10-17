@@ -106,6 +106,7 @@ module Smithy
         installed = false
 
         force = options.try(:[],:force)
+        force = Smithy::Config.global.try(:[], :"force")
         options.reject!{|k,v| k==:force}
 
         if File.exists?(dest) && !force

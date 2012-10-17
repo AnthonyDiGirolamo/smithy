@@ -62,6 +62,11 @@ Disable group writable file creation
 
 
 
+=== -f|--force
+Always overwrite existing files
+
+
+
 === --help
 Show this message
 

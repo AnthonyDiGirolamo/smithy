@@ -95,6 +95,9 @@ desc "Alternate config file, also set by $SMITHY_CONFIG"
 arg_name "FILE"
 flag [:"config-file"]
 
+desc "Always overwrite existing files"
+switch [:f, :force], :negatable => false
+
 desc "Search currently installed software"
 arg_name "PATTERN"
 command ['search'] do |c|
