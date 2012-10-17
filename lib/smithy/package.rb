@@ -288,6 +288,32 @@ module Smithy
       end
     end
 
+    def download(url)
+      curl = '/usr/bin/curl'
+      curl = `which curl` unless File.exist? curl
+      raise "curl cannot be located, without it files cannot be downloaded" if curl.blank?
+
+      downloaded_tarball = "#{prefix}/#{File.basename(URI(url).path)}"
+      if File.exist?(downloaded_tarball)
+        puts "downloaded ".rjust(12).bright + downloaded_tarball
+        return downloaded_tarball
+      else
+        puts "download ".rjust(12).bright + url
+      end
+
+      args = ['-qf#L']
+      args << "--silent" unless $stdout.tty?
+      args << '-o'
+      args << downloaded_tarball
+      args << url
+
+      if system(curl, *args)
+        return downloaded_tarball
+      else
+        return false
+      end
+    end
+
     def extract(args = {})
       archive = args[:archive]
       temp_dir = File.join(prefix,"tmp")

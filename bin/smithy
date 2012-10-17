@@ -45,6 +45,7 @@ require 'rainbow'
 require 'readline'
 require 'terminal-table'
 require 'erb'
+require 'uri'
 require 'kramdown'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
@@ -270,14 +271,21 @@ command ['new'] do |c|
     p = Package.new :path => args.first
 
     p.valid?
-    if options[:tarball]
+
+    if options[:tarball] =~ URI::ABS_URI
+      url = options[:tarball]
+    elsif options[:tarball]
       archive = File.absolute_path options[:tarball]
       raise "The archive #{archive} does not exist" unless File.exists? archive
     end
     p.create :dry_run => options[:"dry-run"],
                  :web => options[:"web-description"]
 
-    p.extract :archive => archive, :dry_run => options[:"dry-run"] if options[:tarball]
+    if options[:tarball]
+      downloaded = p.download(url) if url
+      archive = downloaded if downloaded
+      p.extract :archive => archive, :dry_run => options[:"dry-run"]
+    end
 
     unless options[:"skip-modulefile"]
       m = ModuleFile.new :package => p
