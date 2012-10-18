@@ -144,7 +144,7 @@ module Smithy
         rc_file = File.join(ENV['HOME'], '.smithyrc')
         if File.exists?(rc_file)
           h = YAML.load_file(rc_file).stringify_keys rescue nil
-          return h[:last]
+          return h["last"]
         else
           return nil
         end
