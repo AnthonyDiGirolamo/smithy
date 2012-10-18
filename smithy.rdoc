@@ -137,7 +137,7 @@ List commands one per line, to assist with shell completion
 
 
 
-==== Command: <tt>module|modulefile  create|use|deploy NAME</tt>
+==== Command: <tt>module  create|use|deploy NAME</tt>
 Manage modulefiles for a package
 
 smithy module create NAME/VERSION/BUILD
