@@ -471,7 +471,7 @@ smithy module edit NAME/VERSION/BUILD
 - alias for 'smithy edit modulefile'
 EOS
 arg_name "create|use|deploy NAME"
-command ['module', 'modulefile'] do |c|
+command ['module'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"], :negatable => false
   c.action do |global_options,options,args|
