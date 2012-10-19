@@ -137,28 +137,31 @@ List commands one per line, to assist with shell completion
 
 
 
-==== Command: <tt>module  create|use|deploy NAME</tt>
+==== Command: <tt>module  NAME</tt>
 Manage modulefiles for a package
 
-smithy module create NAME/VERSION/BUILD
 
-- Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
-
-smithy module use NAME/VERSION/BUILD
-
-- Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
-
-smithy module deploy NAME/VERSION/BUILD
-
-- Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
-
-smithy module edit NAME/VERSION/BUILD
-
-- alias for 'smithy edit modulefile'
 ===== Options
 ===== -n|--dry-run
 See what files will be created without creating them
 
+
+
+===== Commands
+====== Command: <tt>create </tt>
+Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages.
+
+
+====== Command: <tt>deploy </tt>
+Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
+
+
+====== Command: <tt>edit </tt>
+alias for 'smithy edit modulefile'
+
+
+====== Command: <tt>use </tt>
+Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
 
 
 ==== Command: <tt>new  NAME</tt>
@@ -231,16 +234,19 @@ Format of the output
 [Default Value] path
 
 
-==== Command: <tt>show  last|arch</tt>
+==== Command: <tt>show </tt>
 Display internal smithy values
 
-smithy show last
 
-- Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file.
+===== Commands
+====== Command: <tt>arch </tt>
+List all architectures know to smithy.
 
-smithy show arch
 
-- List all architectures know to smithy.
+====== Command: <tt>last </tt>
+Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file.
+
+
 ==== Command: <tt>test </tt>
 Test software
 
