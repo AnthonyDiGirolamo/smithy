@@ -517,37 +517,18 @@ command ['module'] do |c|
 end
 
 desc "Display internal smithy values"
-arg_name "last|arch"
-long_desc <<-EOS
-smithy show last
-
-- Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file.
-
-smithy show arch
-
-- List all architectures know to smithy.
-EOS
 command ['show'] do |c|
-  c.action do |global_options,options,args|
-    sub_commands = [:last, :arch]
-
-    arguments = args.dup
-    sub_command = nil
-    sub_commands.each do |o|
-      if arguments.include? o.to_s
-        sub_command = o
-        arguments.delete o.to_s
-        break
-      end
-    end
-
-    case sub_command
-    when :last
+  c.desc "Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file."
+  c.command :last do |last|
+    last.action do
       puts Smithy::Config.last_prefix
-    when :arch
+    end
+  end
+
+  c.desc "List all architectures know to smithy."
+  c.command :arch do |arch|
+    arch.action do
       Smithy::Config.architectures
-    else
-      raise "Please specify a subcommand (#{sub_commands.join(', ')})"
     end
   end
 end
