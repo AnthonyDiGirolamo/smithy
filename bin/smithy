@@ -452,68 +452,69 @@ command ['publish'] do |c|
   end
 end
 
+
 desc "Manage modulefiles for a package"
-long_desc <<-EOS
-smithy module create NAME/VERSION/BUILD
-
-- Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages
-
-smithy module use NAME/VERSION/BUILD
-
-- Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would.
-
-smithy module deploy NAME/VERSION/BUILD
-
-- Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
-
-smithy module edit NAME/VERSION/BUILD
-
-- alias for 'smithy edit modulefile'
-EOS
-arg_name "create|use|deploy NAME"
+arg_name "NAME"
 command ['module'] do |c|
   c.desc "See what files will be created without creating them"
   c.switch [:n, "dry-run"], :negatable => false
-  c.action do |global_options,options,args|
-    raise "You must supply a package name" if args.empty?
 
-    operations = [:use, :create, :deploy, :edit]
+  c.desc "Run the proper module command to add a package's modulefile to the MODULEPATH. This allows you to edit and test a modulefile in isolation. By adding the correct directory to MODULEPATH you may run module commands as you normally would."
+  c.command :use do |use|
+    use.action do |global_options,options,args|
+      raise "You must supply a package name" if args.empty?
+      p = Package.new :path => args.first
+      p.valid?
+      m = ModuleFile.new :package => p
 
-    arguments = args.dup
-    operation = nil
-    operations.each do |o|
-      if arguments.include? o.to_s
-        operation = o
-        arguments.delete o.to_s
-        break
-      end
-    end
-
-    raise "Missing module command, run 'smithy module #{operations.join("|")} NAME/VERSION/BUILD'" if operation.nil?
-
-    p = Package.new :path => arguments.first
-    p.valid?
-    m = ModuleFile.new :package => p
-    case operation
-    when :use
       mp = m.module_path
       if Dir.exist?(mp)
         puts "module use #{mp}"
       else
         raise "No modulefiles found in #{mp}"
       end
-    when :create
+    end
+  end
+
+  c.desc "Generate a modulefile for a given package. This operation normally happens after creating a new package. It is provided separately here for use with existing packages."
+  c.command :create do |create|
+    create.action do |global_options,options,args|
+      raise "You must supply a package name" if args.empty?
+      p = Package.new :path => args.first
+      p.valid?
+      m = ModuleFile.new :package => p
+
       m.create :dry_run => options[:"dry-run"]
       notice "Next Steps"
       notice_command " smithy edit modulefile last" , "Edit generated modulefile"
       notice_command " smithy module deploy last"   , "Install modulefile"
-    when :deploy
-      m.deploy :dry_run => options[:"dry-run"]
-    when :edit
+    end
+  end
+
+  c.desc "Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation."
+  c.command :deploy do |deploy|
+    deploy.action do |global_options,options,args|
+      raise "You must supply a package name" if args.empty?
+      p = Package.new :path => args.first
+      p.valid?
       m = ModuleFile.new :package => p
+
+      m.deploy :dry_run => options[:"dry-run"]
+    end
+  end
+
+  c.desc "alias for 'smithy edit modulefile'"
+  c.command :edit do |edit|
+    edit.action do |global_options,options,args|
+      raise "You must supply a package name" if args.empty?
+      p = Package.new :path => args.first
+      p.valid?
+      m = ModuleFile.new :package => p
+
       launch_editor :files => [m.module_file]
     end
   end
+
 end
 
 desc "Display internal smithy values"
@@ -521,6 +522,7 @@ command ['show'] do |c|
   c.desc "Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file."
   c.command :last do |last|
     last.action do
+      debugger
       puts Smithy::Config.last_prefix
     end
   end
