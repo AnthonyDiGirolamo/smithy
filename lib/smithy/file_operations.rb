@@ -31,6 +31,29 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. }}}
 
 module Smithy
+  FILE_NOTICE_COLUMNS = 12
+  def notice_create(file)
+    puts "create ".rjust(12).color(:green).bright + file
+  end
+  def notice_exist(file)
+    puts "exists ".rjust(12).color(:blue).bright + file
+  end
+  def notice_link(file1, file2)
+    puts "link ".rjust(12).bright + file1 + " -> " + file2
+  end
+  def notice_identical(file)
+    puts "identical ".rjust(12).color(:blue).bright + file
+  end
+  def notice_conflict(file)
+    puts "conflict ".rjust(12).color(:red).bright + file
+  end
+  def notice_force(file)
+    puts "force ".rjust(12).color(:yellow).bright + file
+  end
+  def notice_skip(file)
+    puts "skip ".rjust(12).bright + file
+  end
+
   class FileOperations
 
     class << self
@@ -83,20 +106,20 @@ module Smithy
 
       def make_directory(d, options = {})
         if File.directory?(d)
-          puts "exist ".rjust(12).bright + d
+          notice_exist d
         else
           FileUtils.mkdir_p d, options
-          puts "create ".rjust(12).bright + d
+          notice_create d
         end
       end
 
       def make_symlink(old, new, options = {})
         if File.symlink?(new)
-          puts "exist ".rjust(12).bright + new
+          notice_exist new
         else
           FileUtils.rm_f(new, options)
           FileUtils.ln_sf(old, new, options)
-          puts "link ".rjust(12).bright + old + " -> " + new
+          notice_link old, new
         end
       end
 
@@ -111,13 +134,13 @@ module Smithy
 
         if File.exists?(dest) && !force
           if FileUtils.identical?(source, dest)
-            puts "identical ".rjust(12).bright + dest
+            notice_identical dest
             installed = true
           else
-            puts "conflict ".rjust(12).color(:red) + dest
+            notice_conflict dest
             overwrite = nil
             while overwrite.nil? do
-              prompt = Readline.readline("Overwrite? (enter \"h\" for help) [ynsdh] ")
+              prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynsdh] ")
               case prompt.downcase
               when "y"
                 overwrite = true
@@ -129,11 +152,12 @@ module Smithy
               when "d"
                 puts `diff -uw #{dest} #{source}`
               when "h"
-                puts %{y - yes, overwrite
-n - no, do not overwrite
-s - save to a separate file (#{duplicate_dest})
-d - diff, show the differences between the old and the new
-h - help, show this help}
+                indent = " "*FILE_NOTICE_COLUMNS
+                puts indent+"y - yes, overwrite"
+                puts indent+"n - no, do not overwrite"
+                puts indent+"s - save to a separate file"
+                puts indent+"d - diff, show the differences between the old and the new"
+                puts indent+"h - help, show this help}"
               #when "q"
                 #raise "Abort new package"
               #else
@@ -142,21 +166,21 @@ h - help, show this help}
             end
 
             if overwrite
-              puts "force ".rjust(12).bright + dest
+              notice_force dest
               FileUtils.install source, dest, options
               installed = true
             else
               if duplicate
                 FileUtils.install source, duplicate_dest, options
-                puts "create ".rjust(12).bright + duplicate_dest
+                notice_create duplicate_dest
               else
-                puts "skip ".rjust(12).bright + dest
+                notice_skip dest
               end
             end
           end
         else
           FileUtils.install source, dest, options
-          puts "create ".rjust(12).bright + dest
+          notice_create dest
           installed = true
         end
 

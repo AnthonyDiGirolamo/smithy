@@ -295,10 +295,10 @@ module Smithy
 
       downloaded_tarball = "#{prefix}/#{File.basename(URI(url).path)}"
       if File.exist?(downloaded_tarball)
-        puts "downloaded ".rjust(12).bright + downloaded_tarball
+        puts "downloaded ".rjust(12).color(:green).bright + downloaded_tarball
         return downloaded_tarball
       else
-        puts "download ".rjust(12).bright + url
+        puts "download ".rjust(12).color(:green).bright + url
       end
 
       args = ['-qf#L']
@@ -329,16 +329,17 @@ module Smithy
       overwrite = Smithy::Config.global.try(:[], :force)
       if File.exists?(source_dir) &&
         while overwrite.nil? do
-          prompt = Readline.readline("Overwrite #{source_dir}? (enter \"h\" for help) [ynh] ")
+          prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
           when "y"
             overwrite = true
           when "n"
             overwrite = false
           when "h"
-            puts %{y - yes, delete existing folder and re-extract
-n - no, do not overwrite
-h - help, show this help}
+            indent = " "*FILE_NOTICE_COLUMNS
+            puts indent+"y - yes, delete existing folder and re-extract"
+            puts indent+"n - no, do not overwrite"
+            puts indent+"h - help, show this help"
           when "q"
             raise "Abort new package"
           end

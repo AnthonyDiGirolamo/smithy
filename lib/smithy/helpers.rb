@@ -56,7 +56,7 @@ end
 
 module Smithy
   def notice(message)
-    STDOUT.puts ("==> "+message).bright if STDOUT.tty?
+    STDOUT.puts "==> ".color(:blue).bright+message.bright if STDOUT.tty?
   end
 
   def notice_warn(message)

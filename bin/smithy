@@ -336,23 +336,23 @@ command ['edit'] do |c|
 
       # if no file, prompt
       if operation.nil?
-        puts "Edit which file? (default is 1)"
+        puts "Edit which file? (default is build)"
         width = 25
-        notice_command "1. build", p.rebuild_script, width
-        notice_command "2. environment", p.remodule_script, width
-        notice_command "3. modulefile", ModuleFile.new(:package => p).module_file, width
-        notice_command "4. test", p.retest_script, width
+        notice_command "(b)uild", p.rebuild_script, width
+        notice_command "(e)nvironment", p.remodule_script, width
+        notice_command "(m)odulefile", ModuleFile.new(:package => p).module_file, width
+        notice_command "(t)est", p.retest_script, width
 
         while operation.nil? do
           prompt = Readline.readline("> ")
           case prompt.downcase
-          when "1"
+          when "1" || "b" || "build"
             operation = :build
-          when "2"
+          when "2" || "e" || "environment"
             operation = :environment
-          when "3"
+          when "3" || "m" || "modulefile"
             operation = :modulefile
-          when "4"
+          when "4" || "t" || "test"
             operation = :test
           else
             operation = :build
