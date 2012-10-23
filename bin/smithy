@@ -522,7 +522,6 @@ command ['show'] do |c|
   c.desc "Display the package name used in the last smithy command. This is stored in the '~/.smithyrc' file."
   c.command :last do |last|
     last.action do
-      debugger
       puts Smithy::Config.last_prefix
     end
   end
