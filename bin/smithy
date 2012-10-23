@@ -345,14 +345,15 @@ command ['edit'] do |c|
 
         while operation.nil? do
           prompt = Readline.readline("> ")
-          case prompt.downcase
-          when "1" || "b" || "build"
+          prompt.downcase!
+
+          if prompt =~ /(1|b|build)/
             operation = :build
-          when "2" || "e" || "environment"
+          elsif prompt =~ /(2|e|environment)/
             operation = :environment
-          when "3" || "m" || "modulefile"
+          elsif prompt =~ /(3|m|modulefile)/
             operation = :modulefile
-          when "4" || "t" || "test"
+          elsif prompt =~ /(4|t|test)/
             operation = :test
           else
             operation = :build
