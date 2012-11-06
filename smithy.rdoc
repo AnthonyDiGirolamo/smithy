@@ -1,4 +1,4 @@
-== smithy - Smithy will help you build, test, and distribute software with ease.
+== smithy - Smithy will help you build, test, and install software with ease.
 
 v1.0
 

@@ -65,7 +65,7 @@ include Smithy
 
 version Smithy::VERSION
 
-program_desc "Smithy will help you build, test, and distribute software with ease."
+program_desc "Smithy will help you build, test, and install software with ease."
 
 desc "Machine architecure to operate on"
 arg_name "NAME"
