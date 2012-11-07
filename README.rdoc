@@ -45,7 +45,7 @@ This file should be saved to <tt>$MODULEPATH/ruby/1.9.3</tt>
 
 == Installing smithy
 
-=== smithy install location
+=== Choosting an install location
 
 There are two ways to install smithy. The simplest is by simply installing the
 <tt>software_smithy</tt> gem. This will install smithy and it's required gems in
@@ -57,19 +57,22 @@ If you are installing in production for all users you will want to install
 smithy somewhere everyone can access. There are two places you might want to do
 this:
 
-1. Ruby's default GEM_PATH. If you installed manually using the examples above,
-this will be something like <tt>PREFIX/lib/ruby/gems/1.9.1</tt> This will give
-access to smithy whenever ruby is loaded into a users environment using the
-modulefile above. To install to ruby's default GEM_PATH (following the above
-example):
+==== Ruby's default GEM_PATH
+
+If you installed manually using the examples above, this will be something like
+<tt>PREFIX/lib/ruby/gems/1.9.1</tt> This will give access to smithy whenever
+ruby is loaded into a users environment using the modulefile above. To install
+to ruby's default GEM_PATH (following the above example):
 
     export GEM_HOME=/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4/lib/ruby/gems/1.9.1
     gem install software_smithy --no-rdoc --no-ri
 
-2. A different location of your choosing. This is useful if you want a single
-smithy install location for more than one install of ruby (typically on separate
-machines). This method is a bit more complicated and requires users to load
-smithy into their environment manually in addition to ruby.
+==== A different location of your choosing.
+
+This is useful if you want a single smithy install location for more than one
+install of ruby (typically on separate machines). This method is a bit more
+complicated and requires users to load smithy into their environment manually in
+addition to ruby.
 
 Assuming you use environment modules you can install smithy to a separate
 directory e.g. <tt>/sw/tools/smithy</tt> with the install_smithy script. This
