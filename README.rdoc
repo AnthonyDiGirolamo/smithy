@@ -77,7 +77,10 @@ addition to ruby.
 Assuming you use environment modules you can install smithy to a separate
 directory e.g. <tt>/sw/tools/smithy</tt> with the install_smithy script. This
 will setup a folder containing the smithy gem, a modulefile and a script that
-sets up shell completion.
+sets up shell completion. Users can load smithy into their environment by
+running:
+
+    source /sw/tools/smithy/environment.sh
 
 === Loading smithy into your environment
 
@@ -85,10 +88,26 @@ Smithy depends on a config file to define it's behavior. For an example see
 {etc/smithyrc}[https://github.com/AnthonyDiGirolamo/smithy/blob/master/etc/smithyrc]
 This can be set via the <tt>$SMITHY_CONFIG</tt> environment variable.
 
+You may wish to set this using a modulefile or a shell script. Examples are
+provided in
+{modulefiles/smithy/1.0}[https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.0]
+and
+{environment.sh}[https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh]
+
 = License
 
 Smithy is based on the ideas created in SWTools and uses a BSD license. See
 LICENSE for the exact text.
+
+= Contributing and Support
+
+The smithy {github repo}[https://github.com/AnthonyDiGirolamo/smithy] contains
+all development files. Please fork and send me a pull request with any additions
+or changes.
+
+If you encounter any issues please {open an
+issue}[https://github.com/AnthonyDiGirolamo/smithy/issues] on github. Or send me
+an email.
 
 = smithy command line usage
 
