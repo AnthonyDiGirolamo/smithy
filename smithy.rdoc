@@ -1,6 +1,6 @@
 == smithy - Smithy will help you build, test, and install software with ease.
 
-v1.0
+v1.1
 
 === Global Options
 === --arch NAME
