@@ -12,7 +12,7 @@ Smithy's goals are:
 
 Smithy requires ruby 1.9.2 or later. Most distrubutions only ship version 1.8.7
 and you may need build your own copy. The simplest way is using the excellent
-[ruby-build](https://github.com/sstephenson/ruby-build) script. As an example,
+{ruby-build}[https://github.com/sstephenson/ruby-build] script. As an example,
 this will install ruby with a prefix of <tt>/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4</tt>
 
     curl -L https://github.com/sstephenson/ruby-build/archive/master.zip -o ruby-build.zip
@@ -22,7 +22,7 @@ this will install ruby with a prefix of <tt>/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu
     ./bin/ruby-build --definitions
     ./bin/ruby-build 1.9.3-p286 /sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4
 
-Many sites use [Environment Modules](http://modules.sourceforge.net/) to allow
+Many sites use {Environment Modules}[http://modules.sourceforge.net/] to allow
 users to load and unload software into their environment. Here is sample
 modulefile for ruby installed in the previous example.
 
