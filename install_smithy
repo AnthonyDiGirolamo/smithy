@@ -1,29 +1,27 @@
-echo "==> Installing Smithy"
-rm -rf smithy
-tar xf smithy.tar
-cd smithy
-
-for f in "environment.sh" "modulefiles/smithy/1.0"
-do
-  sed -i "s#/sw/tools/smithy#$SMITHY_DIR#g" $f
-done
-
+#!/bin/bash
 SMITHY_DIR=/sw/tools/smithy
+
+echo "==> Installing Smithy"
 
 mkdir -p $SMITHY_DIR
 
 cp -rv modulefiles $SMITHY_DIR
 cp -rv environment.sh $SMITHY_DIR
-cp -rv smithyrc $SMITHY_DIR
+cp -rv etc/smithyrc $SMITHY_DIR
 
 source ${MODULESHOME}/init/bash
 module use $SMITHY_DIR/modulefiles
 module load smithy
 
+cd $SMITHY_DIR
+for f in "environment.sh" "modulefiles/smithy/1.0"
+do
+  sed -i "s#/sw/tools/smithy#$SMITHY_DIR#g" $f
+done
+
 export GEM_HOME=$SMITHY_DIR
-cd gems
 gem uninstall software_smithy --all --executables
-gem install gli-1.6.0.gem kramdown-0.13.7.gem open4-1.3.0.gem rainbow-1.1.4.gem terminal-table-1.4.4.gem software_smithy-1.0.gem
+gem install software_smithy --no-rdoc --no-ri
 sed -i 's/#!\/.*/#!\/usr\/bin\/env ruby/g' $SMITHY_DIR/bin/*
 
 export GEM_HOME=$HOME/.gem/ruby/1.9.1

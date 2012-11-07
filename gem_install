@@ -1,6 +1,5 @@
 #!/bin/sh
-SW_ROOT=/sw
-SMITHY_DIR=$SW_ROOT/tools/smithy
+SMITHY_DIR=/sw/tools/smithy
 
 cp -rv modulefiles $SMITHY_DIR/
 cp -rv environment.sh $SMITHY_DIR/
