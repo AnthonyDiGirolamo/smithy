@@ -111,7 +111,5 @@ The smithy [github repo](https://github.com/AnthonyDiGirolamo/smithy) contains
 all development files. Please fork and send me a pull request with any additions
 or changes.
 
-If you encounter any issues please {open an
-issue}[https://github.com/AnthonyDiGirolamo/smithy/issues] on github. Or send me
-an email.
+If you encounter any issues please [open an issue](https://github.com/AnthonyDiGirolamo/smithy/issues) on github. Or send me an email.
 
