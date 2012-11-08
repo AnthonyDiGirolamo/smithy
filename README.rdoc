@@ -75,10 +75,11 @@ complicated and requires users to load smithy into their environment manually in
 addition to ruby.
 
 Assuming you use environment modules you can install smithy to a separate
-directory e.g. <tt>/sw/tools/smithy</tt> with the install_smithy script. This
-will setup a folder containing the smithy gem, a modulefile and a script that
-sets up shell completion. Users can load smithy into their environment by
-running:
+directory e.g. <tt>/sw/tools/smithy</tt> with the
+{install_smithy}[https://github.com/AnthonyDiGirolamo/smithy/blob/master/install_smithy]
+script. This will setup a folder containing the smithy gem, a modulefile and a
+script that sets up shell completion. Users can load smithy into their
+environment by running:
 
     source /sw/tools/smithy/environment.sh
 
