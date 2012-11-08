@@ -4,7 +4,13 @@ Smithy is a tool that aims to replicate and improve upon functionality of
 Smithy's goals are:
 
 * Provide a simplified and intuitive command line interface for installing software.
-* Reduce the number of steps necessary for each function
+* Reduce the number of steps necessary for each function.
+
+Overview
+========
+
+The best introduction to smithy is to read through the
+[manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
 
 Installation
 ============
