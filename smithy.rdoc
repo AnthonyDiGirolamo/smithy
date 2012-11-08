@@ -180,7 +180,7 @@ EXAMPLES:
 silo/4.8/sles11.1_gnu4.5.3
 fftw/3.2.2/cle4.0_pgi11.10.0
 ===== Options
-===== -t|--tarball FILE|URL
+===== -t|--tarball|--tarfile FILE|URL
 
 Provide a tarball to unpack, either a file or URL (optional)
 

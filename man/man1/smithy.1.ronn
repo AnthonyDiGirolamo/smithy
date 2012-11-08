@@ -10,16 +10,19 @@ smithy(1) -- build, test, and install software with ease.
 ## DESCRIPTION
 
 `smithy` will help you get software installed quickly and painlessly. This tool
-follows all the same conventions as swtools. That is, directory structures,
-support files, and scripts are all in the same locations.  Smithy's goal is to
-make using those conventions easier.
+follows all the same conventions as
+[SWTools](http://www.olcf.ornl.gov/center-projects/swtools/). That is, directory
+structures, support files, and scripts are all in the same locations.  Smithy's
+goal is to make using those conventions easier.
 
 This is still a work in progress. If you have any questions, suggestions, or
-encounter any errors please send me an email: anthonyd@ornl.gov
+encounter any errors please open an issue on github at
+[https://github.com/AnthonyDiGirolamo/smithy/issues](https://github.com/AnthonyDiGirolamo/smithy/issues).
 
 ## COMMANDS
 
-For help on all options and commands run `smithy help`
+For help on all options and commands run `smithy help`. For help on a specific
+command run `smithy help COMMAND`.
 
 ## EXAMPLES
 
@@ -35,13 +38,18 @@ All software builds have the following name format: **APPLICATION/VERSION/BUILD*
 That is three different parts separated by forward slashes `/` Each part consists of:
 
   * **APPLICATION**:
+
     The name using lowercase characters
+
   * **VERSION**:
+
     Numbers with periods. I recommend that whatever you choose as a version
     allows it to be lexigraphically sorted from oldest to newest.
+
   * **BUILD**:
+
     Build is somewhat different, it consists of the intended operating system
-    and compiler separated by underscores (`_`). It is important to use compiler
+    and compiler separated by underscores `_`. It is important to use compiler
     version numbers that correspond to module versions. This will allow smithy
     to auto-generate modulefiles for software with multiple builds. As an
     example:
@@ -56,17 +64,29 @@ This can be accomplished by running:
 
     smithy new petsc/3.2/cle4.0_cray8.0.1
 
-You can save yourself some extra time by telling smithy where the tar file for
+You can save yourself some extra time by telling smithy where the source tar file for
 petsc is:
 
-    smithy new -t /sw/sources/petsc/3.2/petsc-lite-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
+    smithy new -t petsc-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
 
 When using the `-t`, `--tarfile=` option smithy will extract the given archive
 to the `source` directory. For the petsc example above this would be
 `/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source`
 
-If this is a brand new piece of software add the `--web-description` switch. This will
-create the application description files too.
+The `-t` option can also download an archive from a given URL. The archive is
+saved along side the source directory. As an example:
+
+    smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz \
+      petsc/3.2/cle4.0_cray8.0.1
+
+This command will download petsc-3.2-p7.tar.gz, save it to
+`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/petsc-3.2-p7.tar.gz` and extract it to
+`/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source`. This feature requires the `curl`
+command to work properly.
+
+Additionally, if this is a brand new piece of software add the
+`--web-description` switch. This will create the application description files
+too.
 
 ### 2. Editing and Building the Software:
 
@@ -142,7 +162,7 @@ If this is a new application you will need to add some information to the
 description file. For petsc this lives in: `/sw/xk6/petsc/description` This is
 an html formatted file.  Alternatively, it can live in
 `/sw/xk6/petsc/description.markdown` this file is in markdown format and is a
-bit simpler to write than html. See http://kramdown.rubyforge.org/quickref.html
+bit simpler to write than html. See [http://kramdown.rubyforge.org/quickref.html](http://kramdown.rubyforge.org/quickref.html)
 for more information on markdown syntax. If both files exist, the markdown file
 takes precedence.
 
@@ -160,8 +180,12 @@ Smithy is freely available under the terms of the BSD license given below.
 
 Copyright (c) 2012. UT-BATTELLE, LLC. All rights reserved.
 
-Produced at the National Center for Computational Sciences in
-Oak Ridge National Laboratory.
+Produced by the National Center for Computational Sciences at Oak Ridge National
+Laboratory. Smithy is a based on SWTools, more information on SWTools can be
+found at: [http://www.olcf.ornl.gov/center-projects/swtools/](http://www.olcf.ornl.gov/center-projects/swtools/)
+
+This product includes software produced by UT-Battelle, LLC under Contract No.
+DE-AC05-00OR22725 with the Department of Energy.
 
 Redistribution and use in source and binary forms, with or without modification,
 are permitted provided that the following conditions are met:

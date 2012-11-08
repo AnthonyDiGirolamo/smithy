@@ -18,13 +18,13 @@
 .br
 .
 .SH "DESCRIPTION"
-\fBsmithy\fR will help you get software installed quickly and painlessly\. This tool follows all the same conventions as swtools\. That is, directory structures, support files, and scripts are all in the same locations\. Smithy\'s goal is to make using those conventions easier\.
+\fBsmithy\fR will help you get software installed quickly and painlessly\. This tool follows all the same conventions as SWTools \fIhttp://www\.olcf\.ornl\.gov/center\-projects/swtools/\fR\. That is, directory structures, support files, and scripts are all in the same locations\. Smithy\'s goal is to make using those conventions easier\.
 .
 .P
-This is still a work in progress\. If you have any questions, suggestions, or encounter any errors please send me an email: anthonyd@ornl\.gov
+This is still a work in progress\. If you have any questions, suggestions, or encounter any errors please open an issue on github at \fIhttps://github\.com/AnthonyDiGirolamo/smithy/issues\fR\.
 .
 .SH "COMMANDS"
-For help on all options and commands run \fBsmithy help\fR
+For help on all options and commands run \fBsmithy help\fR\. For help on a specific command run \fBsmithy help COMMAND\fR\.
 .
 .SH "EXAMPLES"
 This section shows the typical work\-flow for adding a new software build\. Let\'s imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
@@ -36,16 +36,22 @@ Note: all commands, options, and arguments have tab\-completion when using bash 
 All software builds have the following name format: \fBAPPLICATION/VERSION/BUILD\fR That is three different parts separated by forward slashes \fB/\fR Each part consists of:
 .
 .TP
-\fBAPPLICATION\fR
+\fBAPPLICATION\fR:
+.
+.IP
 The name using lowercase characters
 .
 .TP
-\fBVERSION\fR
+\fBVERSION\fR:
+.
+.IP
 Numbers with periods\. I recommend that whatever you choose as a version allows it to be lexigraphically sorted from oldest to newest\.
 .
 .TP
-\fBBUILD\fR
-Build is somewhat different, it consists of the intended operating system and compiler separated by underscores (\fB_\fR)\. It is important to use compiler version numbers that correspond to module versions\. This will allow smithy to auto\-generate modulefiles for software with multiple builds\. As an example:
+\fBBUILD\fR:
+.
+.IP
+Build is somewhat different, it consists of the intended operating system and compiler separated by underscores \fB_\fR\. It is important to use compiler version numbers that correspond to module versions\. This will allow smithy to auto\-generate modulefiles for software with multiple builds\. As an example:
 .
 .IP
 \fBsles11\.1_gnu4\.6\.2\fR corresponds to SuSE Linux Enterprise Server 11\.1 and the GNU gcc compiler 4\.6\.2
@@ -67,13 +73,13 @@ smithy new petsc/3\.2/cle4\.0_cray8\.0\.1
 .IP "" 0
 .
 .P
-You can save yourself some extra time by telling smithy where the tar file for petsc is:
+You can save yourself some extra time by telling smithy where the source tar file for petsc is:
 .
 .IP "" 4
 .
 .nf
 
-smithy new \-t /sw/sources/petsc/3\.2/petsc\-lite\-3\.2\-p7\.tar\.gz petsc/3\.2/cle4\.0_cray8\.0\.1
+smithy new \-t petsc\-3\.2\-p7\.tar\.gz petsc/3\.2/cle4\.0_cray8\.0\.1
 .
 .fi
 .
@@ -83,7 +89,24 @@ smithy new \-t /sw/sources/petsc/3\.2/petsc\-lite\-3\.2\-p7\.tar\.gz petsc/3\.2/
 When using the \fB\-t\fR, \fB\-\-tarfile=\fR option smithy will extract the given archive to the \fBsource\fR directory\. For the petsc example above this would be \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1/source\fR
 .
 .P
-If this is a brand new piece of software add the \fB\-\-web\-description\fR switch\. This will create the application description files too\.
+The \fB\-t\fR option can also download an archive from a given URL\. The archive is saved along side the source directory\. As an example:
+.
+.IP "" 4
+.
+.nf
+
+smithy new \-t http://ftp\.mcs\.anl\.gov/pub/petsc/release\-snapshots/petsc\-3\.2\-p7\.tar\.gz \e
+  petsc/3\.2/cle4\.0_cray8\.0\.1
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This command will download petsc\-3\.2\-p7\.tar\.gz, save it to \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1/petsc\-3\.2\-p7\.tar\.gz\fR and extract it to \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1/source\fR\. This feature requires the \fBcurl\fR command to work properly\.
+.
+.P
+Additionally, if this is a brand new piece of software add the \fB\-\-web\-description\fR switch\. This will create the application description files too\.
 .
 .SS "2\. Editing and Building the Software:"
 Once you have created the build you may need to update the build (\fBrebuild\fR) and environment (\fBremodule\fR) scripts before building the software\. Both files live within the software prefix\. For our example it is located in \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1\fR\. You can edit this and other related files using the \fBedit\fR command:
@@ -207,7 +230,7 @@ smithy module deploy last
 For out petsc example, this command will copy \fB/sw/xk6/petsc/3\.2/modulefile/petsc/3\.2\fR to \fB/sw/xk6/modulefiles/petsc/3\.2\fR
 .
 .SS "4\. Website Description"
-If this is a new application you will need to add some information to the description file\. For petsc this lives in: \fB/sw/xk6/petsc/description\fR This is an html formatted file\. Alternatively, it can live in \fB/sw/xk6/petsc/description\.markdown\fR this file is in markdown format and is a bit simpler to write than html\. See http://kramdown\.rubyforge\.org/quickref\.html for more information on markdown syntax\. If both files exist, the markdown file takes precedence\.
+If this is a new application you will need to add some information to the description file\. For petsc this lives in: \fB/sw/xk6/petsc/description\fR This is an html formatted file\. Alternatively, it can live in \fB/sw/xk6/petsc/description\.markdown\fR this file is in markdown format and is a bit simpler to write than html\. See \fIhttp://kramdown\.rubyforge\.org/quickref\.html\fR for more information on markdown syntax\. If both files exist, the markdown file takes precedence\.
 .
 .P
 If the description file is missing you can generate one by running:
@@ -242,7 +265,10 @@ Smithy is freely available under the terms of the BSD license given below\.
 Copyright (c) 2012\. UT\-BATTELLE, LLC\. All rights reserved\.
 .
 .P
-Produced at the National Center for Computational Sciences in Oak Ridge National Laboratory\.
+Produced by the National Center for Computational Sciences at Oak Ridge National Laboratory\. Smithy is a based on SWTools, more information on SWTools can be found at: \fIhttp://www\.olcf\.ornl\.gov/center\-projects/swtools/\fR
+.
+.P
+This product includes software produced by UT\-Battelle, LLC under Contract No\. DE\-AC05\-00OR22725 with the Department of Energy\.
 .
 .P
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

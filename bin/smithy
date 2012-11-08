@@ -269,7 +269,7 @@ command ['new'] do |c|
 
   c.desc "Provide a tarball to unpack, either a file or URL (optional)"
   c.arg_name "FILE|URL"
-  c.flag [:t, :tarball]
+  c.flag [:t, :tarball, :tarfile]
   c.action do |global_options,options,args|
     raise "You must supply a name to create new packages" if args.empty?
 
