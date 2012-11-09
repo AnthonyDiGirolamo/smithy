@@ -1,16 +1,26 @@
 Smithy is a tool that aims to replicate and improve upon functionality of
 [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
 
-Smithy's goals are:
-
-* Provide a simplified and intuitive command line interface for installing software.
-* Reduce the number of steps necessary for each function.
-
 Overview
 ========
 
-The best introduction to smithy is to read through the
-[manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
+More information and a tutorial can be found on the [manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
+
+Features
+========
+
+Smithys goal is to make following the SWTools conventions easier and less error
+prone. Improvements include:
+
+- Simpler command line interface. You can compile a new piece of software with
+  two commands.
+- Simpler rebuild scripts (8 lines instead of 49).
+- Automatic generation of modulefiles.
+- Automatic generation of build scripts depending on the environment or
+  compiler.
+- Write software descriptions without html.
+- Search for software, report who built it, and when.
+- Cleaner, shorter, and more maintainable code.
 
 Installation
 ============
