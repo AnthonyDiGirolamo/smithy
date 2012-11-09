@@ -123,8 +123,10 @@ module Smithy
 
     def module_build_list(package, builds, args = {})
       output = ""
-      notice "Multiple Builds Found"
-      notice_info "Build Name".rjust(25)+"   Required Modules"
+
+
+      notice "Multiple Builds Found" if Smithy::Config.global[:verbose]
+      notice_info "Build Name".rjust(25)+"   Required Modules" if Smithy::Config.global[:verbose]
       Environments.each_with_index do |e,i|
         if i == 0
           output << "if "
@@ -146,14 +148,14 @@ module Smithy
               end
               output << "[ is-loaded #{name}/#{version} ] {\n"
               output << "    set BUILD #{b}\n"
-              notice_info b.rjust(25) + "   #{e[:prg_env]} + #{name}/#{version}"
+              notice_info b.rjust(25) + "   #{e[:prg_env]} + #{name}/#{version}" if Smithy::Config.global[:verbose]
             end
             output << "  } else {\n"
             output << "    set BUILD #{sub_builds.last}\n"
             output << "  }\n"
           else
             output << "  set BUILD #{builds[j]}\n"
-            notice_info builds[j].rjust(25) + "   #{e[:prg_env]}"
+            notice_info builds[j].rjust(25) + "   #{e[:prg_env]}" if Smithy::Config.global[:verbose]
           end
         else
           output << "  puts stderr \"Not implemented for the #{e[:human_name]} compiler\"\n"

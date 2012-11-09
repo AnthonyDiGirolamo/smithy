@@ -104,6 +104,9 @@ flag [:"config-file"]
 desc "Always overwrite existing files"
 switch [:f, :force], :negatable => false
 
+desc "Be more verbose"
+switch [:v, :verbose], :negatable => false
+
 desc "Search currently installed software"
 arg_name "PATTERN"
 command ['search'] do |c|
@@ -297,12 +300,14 @@ command ['new'] do |c|
       m.create :dry_run => options[:"dry-run"]
     end
 
-    notice "Next Steps"
-    notice_command " smithy edit last"            , "Edit build scripts or modulefile"
-    notice_command " smithy build last"           , "Run build script"
-    notice_command " smithy module create"        , "Generate a modulefile" if options[:"skip-modulefile"]
-    notice_command " smithy module deploy last"   , "Install modulefile"
-    notice_command " smithy publish last"         , "Publish web description"
+    if global_options[:verbose]
+      notice "Next Steps"
+      notice_command " smithy edit last"            , "Edit build scripts or modulefile"
+      notice_command " smithy build last"           , "Run build script"
+      notice_command " smithy module create"        , "Generate a modulefile" if options[:"skip-modulefile"]
+      notice_command " smithy module deploy last"   , "Install modulefile"
+      notice_command " smithy publish last"         , "Publish web description"
+    end
   end
 end
 
@@ -491,9 +496,11 @@ command ['module'] do |c|
       m = ModuleFile.new :package => p
 
       m.create :dry_run => options[:"dry-run"]
-      notice "Next Steps"
-      notice_command " smithy edit modulefile last" , "Edit generated modulefile"
-      notice_command " smithy module deploy last"   , "Install modulefile"
+      if global_options[:verbose]
+        notice "Next Steps"
+        notice_command " smithy edit modulefile last" , "Edit generated modulefile"
+        notice_command " smithy module deploy last"   , "Install modulefile"
+      end
     end
   end
 
