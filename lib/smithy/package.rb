@@ -332,7 +332,7 @@ module Smithy
 
       overwrite = nil
       overwrite = Smithy::Config.global.try(:[], :force)
-      if File.exists?(source_dir) &&
+      if File.exists?(source_dir)
         while overwrite.nil? do
           prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
