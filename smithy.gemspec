@@ -48,8 +48,10 @@ man/man1/smithy.1
   )
   s.require_paths << 'lib'
   s.has_rdoc = true
-  s.extra_rdoc_files = ['README.rdoc','smithy.rdoc']
-  s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
+  # s.extra_rdoc_files = ['README.rdoc','smithy.rdoc']
+  # s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
+  s.extra_rdoc_files = ['smithy.rdoc']
+  s.rdoc_options << '--title' << 'smithy' << '--main' << 'smithy.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'smithy'
   s.add_development_dependency('awesome_print')

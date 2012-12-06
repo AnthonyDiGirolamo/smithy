@@ -21,8 +21,8 @@ end
 
 # RDoc Generation
 Rake::RDocTask.new do |rd|
-  rd.main = "README.rdoc"
-  rd.rdoc_files.include("README.rdoc","lib/**/*.rb","bin/**/*")
+  rd.main = "smithy.rdoc"
+  rd.rdoc_files.include("smithy.rdoc","lib/**/*.rb","bin/**/*")
   rd.title = 'Smithy'
 end
 

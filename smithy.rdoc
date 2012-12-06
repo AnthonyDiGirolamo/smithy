@@ -72,6 +72,11 @@ Show this message
 
 
 
+=== -v|--verbose
+Be more verbose
+
+
+
 === --version
 
 
@@ -180,6 +185,13 @@ EXAMPLES:
 silo/4.8/sles11.1_gnu4.5.3
 fftw/3.2.2/cle4.0_pgi11.10.0
 ===== Options
+===== -e|--existing-scripts PATH
+
+Use an existing software's build scripts
+
+[Default Value] None
+
+
 ===== -t|--tarball|--tarfile FILE|URL
 
 Provide a tarball to unpack, either a file or URL (optional)
