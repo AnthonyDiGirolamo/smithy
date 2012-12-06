@@ -12,7 +12,6 @@ spec = Gem::Specification.new do |s|
 bin/smithy
 etc/completion/smithy-completion.bash
 etc/completion/zsh/_smithy
-etc/smithyrc
 etc/templates/modulefile.erb
 etc/templates/build/.owners
 etc/templates/build/build-notes

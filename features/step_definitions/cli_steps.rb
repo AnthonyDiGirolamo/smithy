@@ -14,11 +14,12 @@ Given /^an architecture folder named "([^"]*)" exists$/ do |arch|
 end
 
 Given /^my config file contains:$/ do |string|
-  config = "etc/smithyrc"
-  @config_backup = true
+  config = "tmp/smithyrc"
+  @config_backup = ENV['SMITHY_CONFIG']
   File.open(config, "w+") do |file|
     file.puts string
   end
+  ENV['SMITHY_CONFIG'] = File.join(Dir.pwd, config)
 end
 
 Then /^a file named "([^"]*)" should be group writable$/ do |file|

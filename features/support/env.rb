@@ -32,7 +32,7 @@ After do
   end
 
   if @config_backup
-    FileUtils.cp "etc/smithyrc.original", "etc/smithyrc"
+    ENV['SMITHY_CONFIG'] = @config_backup
   end
 
   if @original_config_file
