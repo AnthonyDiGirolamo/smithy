@@ -88,9 +88,14 @@ module Smithy
 
       FileUtils.mkdir_p(File.join(module_path, package.name), options)
 
-      FileOperations.render_erb :destination => module_file,
-        :erb => File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb"),
-        :binding => get_binding, :options => options
+      if args[:existing]
+        existing_modulefile = File.join(args[:existing], "../modulefile", package.name, package.version)
+        FileOperations.install_file(existing_modulefile, module_file, options) if File.exists?(existing_modulefile)
+      else
+        FileOperations.render_erb :destination => module_file,
+          :erb => File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb"),
+          :binding => get_binding, :options => options
+      end
 
       FileOperations.make_group_writable(module_path, options.merge(:recursive => true))
       FileOperations.set_group(module_path, package.group, options.merge(:recursive => true))
@@ -216,8 +221,8 @@ module Smithy
         system_module_defaults += module_files_defaults
       end
 
-			# desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
-			# stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
+      # desired_modules = %w{ ^cce ^pgi ^intel ^gcc ^hdf5 ^netcdf ^fftw ^petsc ^trilinos ^chapel ^java ^ntk ^papi ^stat ^gdb ^perftools ^tpsl ^ga\/ ^libsci_acc ^acml }
+      # stub_packages = system_module_names.select{|m| m =~ /(#{desired_modules.join('|')})/}
 
       return system_module_names, system_module_defaults
     end

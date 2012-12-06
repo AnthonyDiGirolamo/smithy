@@ -50,8 +50,8 @@ module Smithy
         root = args[:root]
         arch = args[:arch]
       end
-      p.gsub! /\/?#{root}\/?/, ''
-      p.gsub! /\/?#{arch}\/?/, ''
+      p.gsub! /^\/?#{root}\/?/, ''
+      p.gsub! /^\/?#{arch}\/?/, ''
       return p
     end
 
@@ -108,11 +108,17 @@ module Smithy
     BuildFileERBs = [
       BuildFileNames[:env] ]
 
-    def build_support_files
+    def build_support_files(alternate_source)
       file_list = []
       BuildFileNames.each do |name, file|
         src = File.join(@@smithy_bin_root, "etc/templates/build", file)
         src += ".erb" if BuildFileERBs.include?(file)
+
+        if alternate_source && Dir.exists?(alternate_source)
+          alt_src = File.join(alternate_source, file)
+          src     = alt_src if File.exists? alt_src
+        end
+
         file_list << { :name => name, :src => src, :dest => File.join(prefix, file) }
       end
       return file_list
@@ -131,7 +137,7 @@ module Smithy
 
       # If good, save as last prefix
       Smithy::Config.save_last_prefix(qualified_name)
-			return true
+      return true
     end
 
     def qualified_name
@@ -415,7 +421,7 @@ module Smithy
           #end
         end
 
-        all_files = build_support_files
+        all_files = build_support_files(args[:existing])
         all_files = package_support_files + all_files if args[:web] || args[:stub]
 
         all_files.each do |file|
@@ -582,7 +588,7 @@ module Smithy
       software.reject! do |s|
         ! Description.publishable?(s)
       end
-			software.sort!
+      software.sort!
       return software
     end
 

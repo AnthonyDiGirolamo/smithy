@@ -270,6 +270,10 @@ command ['new'] do |c|
   c.desc "Skip modulefile generation"
   c.switch ["skip-modulefile"], :negatable => false
 
+  c.desc "Use an existing software's build scripts"
+  c.arg_name "PATH"
+  c.flag [:e, "existing-scripts"]
+
   c.desc "Provide a tarball to unpack, either a file or URL (optional)"
   c.arg_name "FILE|URL"
   c.flag [:t, :tarball, :tarfile]
@@ -287,7 +291,9 @@ command ['new'] do |c|
       raise "The archive #{archive} does not exist" unless File.exists? archive
     end
     p.create :dry_run => options[:"dry-run"],
+            :existing => options[:"existing-scripts"],
                  :web => options[:"web-description"]
+
 
     if options[:tarball]
       downloaded = p.download(url) if url
@@ -297,7 +303,7 @@ command ['new'] do |c|
 
     unless options[:"skip-modulefile"]
       m = ModuleFile.new :package => p
-      m.create :dry_run => options[:"dry-run"]
+      m.create :dry_run => options[:"dry-run"], :existing => options[:"existing-scripts"]
     end
 
     if global_options[:verbose]
@@ -564,7 +570,6 @@ end
 # end
 
 pre do |global,command,options,args|
-  # ap global #XXX
   Sickill::Rainbow.enabled = false if global[:"colors"] == false
 
   Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
