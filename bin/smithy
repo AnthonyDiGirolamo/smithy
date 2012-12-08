@@ -553,6 +553,21 @@ command ['show'] do |c|
   end
 end
 
+desc "Install software from predefined formulas"
+command ['formula'] do |c|
+  c.desc "List known formulas"
+  c.command :list do |subcommand|
+    subcommand.action do
+    end
+  end
+
+  c.desc "Install a package using a formula"
+  c.command :install do |subcommand|
+    subcommand.action do
+    end
+  end
+end
+
 # command ['publish_cray'] do |c|
 #   c.desc "See what files will be created without creating them"
 #   c.switch [:n, "dry-run"], :negatable => false
