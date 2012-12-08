@@ -556,24 +556,17 @@ end
 
 desc "Install software from predefined formulas"
 command ['formula'] do |c|
-  formula_files = Dir.glob(File.join(@@smithy_bin_root, "lib/formulas/*.rb"))
-  formula_names = formula_files.collect{|f| File.basename(f,".rb")}.collect{|f| f.gsub("_formula","")}
-
   c.desc "List known formulas"
   c.command :list do |subcommand|
     subcommand.action do
-      puts formula_names
+      FormulaCommand.list
     end
   end
 
   c.desc "Install a package using a formula"
   c.command :install do |subcommand|
     subcommand.action do |global_options,options,args|
-      p = args.first
-      raise "unknown formula #{p}" unless formula_names.include?(p)
-      required_formula = formula_files.select{|f| f =~ /#{p}/}.first
-      require required_formula
-      puts "#{p.camelize}_formula".constantize.url
+      FormulaCommand.install(options,args)
     end
   end
 end

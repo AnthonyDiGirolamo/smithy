@@ -1,8 +1,11 @@
 module Smithy
-
   class Formula
+    def initialize(args = {})
+      @package = args[:package]
+      @version = @package.version
+    end
 
-    %w{url homepage md5}.each do |attr|
+    %w{url homepage md5 version}.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           if block_given?
