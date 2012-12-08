@@ -2,6 +2,9 @@ module Smithy
 
   class FormulaCommand
     class << self
+
+      # helpers
+
       def formula_files
         @formula_files = Dir.glob(File.join(@@smithy_bin_root, "lib/formulas/*.rb")) if @formula_files.nil?
         @formula_files
@@ -10,10 +13,6 @@ module Smithy
       def formula_names
         @formula_names = formula_files.collect{|f| File.basename(f,".rb")}.collect{|f| f.gsub("_formula","")} if @formula_names.nil?
         @formula_names
-      end
-
-      def list
-        puts formula_names
       end
 
       def construct_formula(package)
@@ -25,6 +24,12 @@ module Smithy
         required_formula = formula_files.select{|f| f =~ /#{p.name}/}.first
         require required_formula
         return "#{p.name.camelize}_formula".constantize.new(:package => p)
+      end
+
+      # formula subcommands
+
+      def list
+        puts formula_names
       end
 
       def install(options,args)
