@@ -54,8 +54,8 @@ require 'uri'
 require 'kramdown'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
-# require 'debugger'      #XXX
-# require 'awesome_print' #XXX
+require 'debugger'      #XXX
+require 'awesome_print' #XXX
 
 require 'gli'
 include GLI::App
@@ -555,15 +555,22 @@ end
 
 desc "Install software from predefined formulas"
 command ['formula'] do |c|
+  formula_files = Dir.glob(File.join(@@smithy_bin_root, "lib/formulas/*.rb"))
+  formula_names = formula_files.collect{|f| File.basename(f,".rb")}.collect{|f| f.gsub("_formula","")}
+
   c.desc "List known formulas"
   c.command :list do |subcommand|
     subcommand.action do
+      puts formula_names
     end
   end
 
   c.desc "Install a package using a formula"
   c.command :install do |subcommand|
-    subcommand.action do
+    subcommand.action do |global_options,options,args|
+      raise "unknown formula #{args.first}" unless formula_names.include?(args.first)
+      required_formula = formula_files.select{|f| f =~ /#{args.first}/}.first
+      require required_formula
     end
   end
 end
