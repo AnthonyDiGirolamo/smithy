@@ -96,8 +96,8 @@ module Smithy
           @config_file_name = config_path
           @config_file_hash = YAML.load_file(config_path).stringify_keys
         else
-          raise """warning: Cannot read config file: #{@config_file_name}
-          Please update the file or set SMITHY_CONFIG """
+          raise """Cannot read config file: #{@config_file_name}
+       Please set the $SMITHY_CONFIG variable to a config file location"""
         end
       end
 

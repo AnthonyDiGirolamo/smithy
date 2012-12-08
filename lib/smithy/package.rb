@@ -50,6 +50,7 @@ module Smithy
         root = args[:root]
         arch = args[:arch]
       end
+      p = Dir.pwd if p =~ /^\.$/
       p.gsub! /^\/?#{root}\/?/, ''
       p.gsub! /^\/?#{arch}\/?/, ''
       return p
