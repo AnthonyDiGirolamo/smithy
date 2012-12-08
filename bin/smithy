@@ -54,6 +54,7 @@ require 'uri'
 require 'kramdown'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
+require 'active_support/inflector'
 require 'debugger'      #XXX
 require 'awesome_print' #XXX
 
@@ -568,9 +569,11 @@ command ['formula'] do |c|
   c.desc "Install a package using a formula"
   c.command :install do |subcommand|
     subcommand.action do |global_options,options,args|
-      raise "unknown formula #{args.first}" unless formula_names.include?(args.first)
-      required_formula = formula_files.select{|f| f =~ /#{args.first}/}.first
+      p = args.first
+      raise "unknown formula #{p}" unless formula_names.include?(p)
+      required_formula = formula_files.select{|f| f =~ /#{p}/}.first
       require required_formula
+      puts "#{p.camelize}_formula".constantize.url
     end
   end
 end
