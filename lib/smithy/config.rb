@@ -94,7 +94,12 @@ module Smithy
 
         if File.exists? config_path
           @config_file_name = config_path
-          @config_file_hash = YAML.load_file(config_path).stringify_keys
+          begin
+            @config_file_hash = YAML.load_file(config_path).stringify_keys
+          rescue
+            raise """Cannot interpret smithy config file. This is probably caused by malformed YAML.
+       #{config_path}"""
+          end
         else
           raise """Cannot read config file: #{@config_file_name}
        Please set the $SMITHY_CONFIG variable to a config file location"""
@@ -136,8 +141,8 @@ module Smithy
       def get_software_root
         if @root.blank? || @arch.blank?
           raise """Cannot determine which architecture we are using.
-           Please specify using --arch or add a '#{@hostname}' hostname entry to:
-           #{@config_file_name}"""
+       Please specify using --arch or add a '#{@hostname}' hostname entry to:
+       #{@config_file_name}"""
         end
 
         s = File.join(@root, @arch)
