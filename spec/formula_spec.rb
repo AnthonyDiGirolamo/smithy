@@ -30,3 +30,18 @@ describe Formula do
 		it { subject.should_not respond_to(:install) }
 	end
 end
+
+describe FormulaCommand do
+  describe '#list' do
+    it { FormulaCommand.formula_names.should include('zlib') }
+  end
+
+  describe '#construct_formula' do
+    subject { FormulaCommand.construct_formula('zlib/1.2.7/gnu4.2') }
+    it 'should detect name, version, and prefix' do
+      subject.name.should == 'zlib'
+      subject.version.should == '1.2.7'
+      subject.prefix.should include('zlib/1.2.7/gnu4.2')
+    end
+  end
+end

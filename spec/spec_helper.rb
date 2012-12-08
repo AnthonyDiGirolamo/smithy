@@ -6,10 +6,16 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'rubygems'
+require 'debugger'
 require 'bundler/setup'
 
+require 'active_support/core_ext/hash'
+require 'active_support/core_ext/string'
 require 'smithy'
 include Smithy
+
+@@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+Smithy::Config.load_configuration
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true
