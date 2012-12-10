@@ -42,7 +42,13 @@ module Smithy
 
     def self.normalize_name(name)
       name = Dir.pwd if name == "."
-      return File.join(name.split('/')[-3..-1])
+      name_split = name.split('/')
+      name_version_build = []
+      name_version_build << name_split[-3]
+      name_version_build << name_split[-2]
+      name_version_build << name_split[-1]
+      name_version_build.compact!
+      return File.join(name_version_build)
     end
 
     def initialize(args = {})
