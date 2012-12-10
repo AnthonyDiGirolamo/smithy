@@ -387,6 +387,16 @@ module Smithy
       end
     end
 
+    def update_version_table_file(options)
+      version_table_file = File.join(application_directory, ".versions")
+      version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
+      version_table.merge!({version.encode('UTF-8') => build_name.encode('UTF-8')})
+
+      FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
+      FileOperations.set_group version_table_file, group, options
+      FileOperations.make_group_writable version_table_file, options if group_writeable?
+    end
+
     def create(args = {})
       notice "New #{args[:stub] ? "stub " : ""}#{prefix}"
       notice_warn "Dry Run! (no files will be created or changed)" if args[:dry_run]
@@ -400,13 +410,7 @@ module Smithy
           FileOperations.make_group_writable dir, options if group_writeable?
         end
 
-        version_table_file = File.join(application_directory, ".versions")
-        version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
-        version_table.merge!({version => build_name})
-
-        FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
-        FileOperations.set_group version_table_file, group, options
-        FileOperations.make_group_writable version_table_file, options if group_writeable?
+        update_version_table_file(options)
       else
 
         directories.each do |dir|
