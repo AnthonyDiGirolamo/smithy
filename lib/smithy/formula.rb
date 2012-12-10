@@ -1,5 +1,7 @@
 module Smithy
   class Formula
+    attr_accessor :package
+
     def initialize(args = {})
       if args[:package]
         @package = args[:package]
@@ -8,6 +10,8 @@ module Smithy
         @prefix  = @package.prefix
       end
     end
+
+    # DSL and instance methods
 
     %w{url homepage md5 version name prefix}.each do |attr|
       class_eval %Q{
@@ -35,28 +39,5 @@ module Smithy
       }
     end
 
-    # def self.url(value = nil, &block)
-    #   if block_given?
-    #     @url = block
-    #   elsif value
-    #     @url = value
-    #   end
-
-    #   @url
-    # end
-
-    # def url
-    #   unless @url
-    #     if self.class.url.is_a?(Proc)
-    #       @url = instance_eval(&self.class.url)
-    #     else
-    #       @url = self.class.url
-    #     end
-    #   end
-
-    #   @url
-    # end
-
-  end
-
-end
+  end #class Formula
+end #module Smithy

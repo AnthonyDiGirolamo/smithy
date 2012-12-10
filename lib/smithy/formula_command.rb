@@ -15,7 +15,7 @@ module Smithy
         @formula_names
       end
 
-      def construct_formula(package)
+      def build_formula(package)
         p = Package.new :path => package
 
         p.valid?
@@ -24,6 +24,17 @@ module Smithy
         required_formula = formula_files.select{|f| f =~ /#{p.name}/}.first
         require required_formula
         return "#{p.name.camelize}_formula".constantize.new(:package => p)
+      end
+
+      def checksum_download(file, checksum)
+        md5sum = `md5sum #{file}`.split[0].strip.chomp
+        if checksum != md5sum
+          raise <<-EOF.strip_heredoc
+            file does not match expected MD5 checksum
+                   expected: #{checksum}
+                   got:      #{md5sum}
+          EOF
+        end
       end
 
       # formula subcommands
@@ -41,12 +52,16 @@ module Smithy
         raise "You must supply at least one package to install" if packages.empty?
 
         packages.each do |package|
-          f = construct_formula(package)
+          f = build_formula(package)
+          f.package.create(:formula => true)
+          downloaded_file = f.package.download(f.url)
+          checksum_download(downloaded_file, f.md5) if f.md5
+          f.package.extract(:archive => downloaded_file)
           f.install
         end
       end
 
-    end
+    end #class << self
   end #FormulaCommand
 
 end

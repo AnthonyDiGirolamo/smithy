@@ -55,8 +55,8 @@ require 'kramdown'
 require 'active_support/core_ext/hash'
 require 'active_support/core_ext/string'
 require 'active_support/inflector'
-require 'debugger'      #XXX
-require 'awesome_print' #XXX
+# require 'debugger'      #XXX
+# require 'awesome_print' #XXX
 
 require 'gli'
 include GLI::App

@@ -16,7 +16,7 @@ class Testzlibempty < Formula
 end
 
 describe Formula do
-	context 'defines values' do
+	context 'with defined values' do
 		subject { Testzlib.new }
 		it { subject.url.should == 'http://zlib.net/zlib-1.2.7.tar.gz' }
 		it { subject.homepage.should == 'http://zlib.net' }
@@ -24,7 +24,7 @@ describe Formula do
 		it { subject.should respond_to(:install) }
 	end
 
-	context 'excludes values' do
+	context 'with excluded values' do
 		subject { Testzlibempty.new }
 		it { subject.url.should be_nil }
 		it { subject.should_not respond_to(:install) }
@@ -36,8 +36,8 @@ describe FormulaCommand do
     it { FormulaCommand.formula_names.should include('zlib') }
   end
 
-  describe '#construct_formula' do
-    subject { FormulaCommand.construct_formula('zlib/1.2.7/gnu4.2') }
+  describe '#build_formula' do
+    subject { FormulaCommand.build_formula('zlib/1.2.7/gnu4.2') }
     it 'should detect name, version, and prefix' do
       subject.name.should == 'zlib'
       subject.version.should == '1.2.7'

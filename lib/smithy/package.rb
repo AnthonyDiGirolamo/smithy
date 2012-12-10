@@ -421,6 +421,11 @@ module Smithy
           #end
         end
 
+        if args[:formula]
+          update_version_table_file(options)
+          return
+        end
+
         all_files = build_support_files(args[:existing])
         all_files = package_support_files + all_files if args[:web] || args[:stub]
 
