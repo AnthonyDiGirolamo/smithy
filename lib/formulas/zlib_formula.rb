@@ -4,6 +4,8 @@ class Zlib_formula < Formula
   md5      '60df6a37c56e7c1366cca812414f7b85'
 
   def install
-    puts "called install: "+version
+    system "./configure", "--prefix=#{prefix}"
+    system "make"
+    system "make install"
   end
 end
