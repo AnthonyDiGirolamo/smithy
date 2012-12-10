@@ -62,7 +62,7 @@ module Smithy
           if @package == 'last'
             @name = last_prefix.split('/').try(:first)
           else
-            @name = Package.normalize_name :name => args[:package], :root => @root, :arch => @arch
+            @name = Package.normalize_name(args[:package])
           end
           @path = File.join @root, @arch, @name
         end
@@ -254,7 +254,7 @@ module Smithy
         if Smithy::Config.descriptions_root
           File.basename(p)
         else
-          Package.normalize_name(:name => p, :root => root, :arch => arch)
+          Package.normalize_name(p)
         end
       end
       @packages.sort!
