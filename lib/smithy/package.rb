@@ -41,7 +41,8 @@ module Smithy
     attr_accessor :group
 
     def self.normalize_name(name)
-      File.join(name.split('/')[-3..-1])
+      name = Dir.pwd if name == "."
+      return File.join(name.split('/')[-3..-1])
     end
 
     def initialize(args = {})
