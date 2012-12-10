@@ -40,20 +40,8 @@ module Smithy
     attr_accessor :arch, :root, :name, :version, :build_name
     attr_accessor :group
 
-    # Remove root and arch from the path if necessary
-    def self.normalize_name(args = {})
-      p = args[:name].dup
-      if args[:swroot]
-        root = File.dirname args[:swroot]
-        arch = File.basename args[:swroot]
-      else
-        root = args[:root]
-        arch = args[:arch]
-      end
-      p = Dir.pwd if p =~ /^\.$/
-      p.gsub! /^\/?#{root}\/?/, ''
-      p.gsub! /^\/?#{arch}\/?/, ''
-      return p
+    def self.normalize_name(name)
+      File.join(name.split('/')[-3..-1])
     end
 
     def initialize(args = {})
@@ -63,7 +51,7 @@ module Smithy
       if args[:path].try(:downcase) == 'last'
         @path = Smithy::Config.last_prefix
       else
-        @path = Package.normalize_name(:name => args[:path], :root => @root, :arch => @arch)
+        @path = Package.normalize_name(args[:path])
       end
       @path =~ /(.*)\/(.*)\/(.*)$/
       @name = $1
