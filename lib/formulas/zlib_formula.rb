@@ -7,8 +7,8 @@ class Zlib_formula < Formula
   def install
     ENV['CC'] = 'gcc'
     module_list
-    system "which pgcc"
-    system "./configure", "--prefix=#{prefix}"
+    system "which gcc"
+    system "./configure --prefix=#{prefix}"
     system "make"
     system "make install"
   end

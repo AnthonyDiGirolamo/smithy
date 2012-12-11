@@ -150,6 +150,10 @@ module Smithy
       raise "The package #{prefix} does not exist!" unless prefix_exists?
     end
 
+    def source_directory
+      File.join(prefix,"source")
+    end
+
     def rebuild_script
       File.join(prefix, BuildFileNames[:build])
     end
@@ -214,6 +218,23 @@ module Smithy
 
     def delete_lock_file
       FileUtils.rm_f(lock_file)
+    end
+
+    def valid_build_file
+      File.join(prefix, ".valid")
+    end
+
+    def create_valid_build_file
+      unless File.exists? valid_build_file
+        FileUtils.touch(valid_build_file)
+        FileOperations.set_group(valid_build_file, group)
+        FileOperations.make_group_writable(valid_build_file) if group_writeable?
+        return true
+      end
+    end
+
+    def delete_valid_build_file
+      FileUtils.rm_f(valid_build_file)
     end
 
     def run_script(args ={})
@@ -283,16 +304,18 @@ module Smithy
 
         case args[:script]
         when :build
-          if exit_status == 0
-            notice "Setting permissions on installed files"
-            FileOperations.set_group prefix, @group, :recursive => true
-            FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
-          end
+          set_file_permissions_recursive if exit_status == 0
         when :test
         end
 
         delete_lock_file
       end
+    end
+
+    def set_file_permissions_recursive
+      notice "Setting permissions on installed files"
+      FileOperations.set_group prefix, @group, :recursive => true
+      FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
     end
 
     def download(url)
@@ -326,16 +349,15 @@ module Smithy
     def extract(args = {})
       archive = args[:archive]
       temp_dir = File.join(prefix,"tmp")
-      source_dir = File.join(prefix,"source")
 
-      notice "Extracting #{archive} to #{source_dir}"
+      notice "Extracting to #{source_directory}"
 
       return if args[:dry_run]
 
       overwrite = nil
       overwrite = Smithy::Config.global.try(:[], :force)
       overwrite = true if args[:overwrite]
-      if File.exists?(source_dir)
+      if File.exists?(source_directory)
         while overwrite.nil? do
           prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
@@ -358,7 +380,7 @@ module Smithy
 
       if overwrite
         FileUtils.rm_rf temp_dir
-        FileUtils.rm_rf source_dir
+        FileUtils.rm_rf source_directory
         FileUtils.mkdir temp_dir
         FileUtils.cd temp_dir
 
@@ -375,16 +397,16 @@ module Smithy
 
         extracted_files = Dir.glob('*')
         if extracted_files.count == 1
-          FileUtils.mv extracted_files.first, source_dir
+          FileUtils.mv extracted_files.first, source_directory
         else
           FileUtils.cd prefix
-          FileUtils.mv temp_dir, source_dir
+          FileUtils.mv temp_dir, source_directory
         end
 
         FileUtils.rm_rf temp_dir
 
-        FileOperations.set_group source_dir, @group, :recursive => true
-        FileOperations.make_group_writable source_dir, :recursive => true if group_writeable?
+        FileOperations.set_group source_directory, @group, :recursive => true
+        FileOperations.make_group_writable source_directory, :recursive => true if group_writeable?
       end
     end
 
@@ -575,9 +597,9 @@ module Smithy
     def self.all(args = {})
       # Array of full paths to rebuild scripts
       software = Dir.glob(Smithy::Config.full_root+"/*/*/*/#{BuildFileNames[:build]}")
+      software += Dir.glob(Smithy::Config.full_root+"/*/*/*/.valid")
       # Remove rebuild from each path
-      software.collect!{|s| s.gsub(/\/#{BuildFileNames[:build]}$/, '')}
-      #TODO allow sorting?
+      software.collect!{|s| s.gsub(/\/(#{BuildFileNames[:build]}|\.valid)$/, '')}
       software.sort!
     end
 

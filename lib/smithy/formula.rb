@@ -23,11 +23,26 @@ module Smithy
     end
 
     def system(*args)
+      notice args.join(' ')
       Kernel.system @module_setup + args.join(' ')
+      if $?.exitstatus != 0
+        raise <<-EOF.strip_heredoc
+          The last command exited with status: #{$?.exitstatus}
+            Formula: #{__FILE__}
+            Build Directory: #{@package.source_directory}
+        EOF
+      end
+    end
+
+    def run_install
+      install
+      notice_success "SUCCESS #{@package.prefix}"
+      return true
     end
 
     def module_list
       if ENV['MODULESHOME']
+        notice "module list"
         Kernel.system @module_setup + "#{ENV['MODULESHOME']}/bin/modulecmd sh list 2>&1"
       end
     end

@@ -62,7 +62,11 @@ module Smithy
           f.package.extract(:archive => downloaded_file)
 
           Dir.chdir File.join(f.package.prefix, "source")
-          f.install
+          if f.run_install
+            f.package.create_valid_build_file
+            f.package.set_file_permissions_recursive
+          end
+
         end
       end
 
