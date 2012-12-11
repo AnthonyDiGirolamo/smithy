@@ -594,6 +594,10 @@ module Smithy
       Description.publishable?(application_directory)
     end
 
+    def self.search(query)
+      Package.all.select.select{|s| s =~ /#{query}/}
+    end
+
     def self.all(args = {})
       # Array of full paths to rebuild scripts
       software = Dir.glob(Smithy::Config.full_root+"/*/*/*/#{BuildFileNames[:build]}")
