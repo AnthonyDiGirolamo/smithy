@@ -606,9 +606,10 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
+  notice_exception exception.message unless exception.message.blank?
   # Error logic here
   # return false to skip default error handling
-  true
+  false
 end
 
 exit run(ARGV)

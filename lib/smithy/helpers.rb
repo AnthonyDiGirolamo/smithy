@@ -78,7 +78,7 @@ module Smithy
 
   def notice_success(message)
     if STDOUT.tty?
-      STDOUT.puts ("==> "+message).color(:green)
+      STDOUT.puts "==> ".color(:green).bright + message.color(:green)
     else
       STDOUT.puts message
     end
@@ -90,6 +90,10 @@ module Smithy
     else
       STDOUT.puts message
     end
+  end
+
+  def notice_exception(message)
+    STDERR.puts "==> ERROR: ".color(:red).bright + message
   end
 
   def process_ouput(stdout, stderr, suppress_stdout = false, log_file = nil)
