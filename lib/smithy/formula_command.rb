@@ -58,7 +58,8 @@ module Smithy
           f.package.create(:formula => true)
           downloaded_file = f.package.download(f.url)
           checksum_download(downloaded_file, f.md5) if f.md5
-          f.package.extract(:archive => downloaded_file, :overwrite => true)
+          # f.package.extract(:archive => downloaded_file, :overwrite => true)
+          f.package.extract(:archive => downloaded_file)
 
           Dir.chdir File.join(f.package.prefix, "source")
           f.install
