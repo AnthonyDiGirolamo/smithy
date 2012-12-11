@@ -139,7 +139,7 @@ command ['search'] do |c|
 
     notice "Searching in #{swroot}" unless formatter.class == Format::Doku
 
-    software = Package.all :root => swroot
+    software = Package.all
 
     count = 0
     formatter.before

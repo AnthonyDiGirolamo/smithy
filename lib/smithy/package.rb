@@ -568,7 +568,7 @@ module Smithy
 
     def self.all(args = {})
       # Array of full paths to rebuild scripts
-      software = Dir.glob(args[:root]+"/*/*/*/#{BuildFileNames[:build]}")
+      software = Dir.glob(Smithy::Config.full_root+"/*/*/*/#{BuildFileNames[:build]}")
       # Remove rebuild from each path
       software.collect!{|s| s.gsub(/\/#{BuildFileNames[:build]}$/, '')}
       #TODO allow sorting?
