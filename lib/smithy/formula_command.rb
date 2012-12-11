@@ -27,8 +27,10 @@ module Smithy
       end
 
       def checksum_download(file, checksum)
-        md5sum = `md5sum #{file}`.split[0].strip.chomp
-        if checksum != md5sum
+        # md5sum = `md5sum #{file}`.split[0].strip.chomp
+        require 'digest/md5'
+        digest = Digest::MD5.hexdigest(File.read(file))
+        if checksum != digest
           raise <<-EOF.strip_heredoc
             file does not match expected MD5 checksum
                    expected: #{checksum}
