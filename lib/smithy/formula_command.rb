@@ -26,19 +26,6 @@ module Smithy
         return "#{p.name.camelize}_formula".constantize.new(:package => p)
       end
 
-      def checksum_download(file, checksum)
-        # md5sum = `md5sum #{file}`.split[0].strip.chomp
-        require 'digest/md5'
-        digest = Digest::MD5.hexdigest(File.read(file))
-        if checksum != digest
-          raise <<-EOF.strip_heredoc
-            file does not match expected MD5 checksum
-                   expected: #{checksum}
-                   got:      #{md5sum}
-          EOF
-        end
-      end
-
       # formula subcommands
 
       def list
@@ -56,8 +43,6 @@ module Smithy
         packages.each do |package|
           f = build_formula(package)
           f.package.create(:formula => true)
-          # downloaded_file = f.package.download(f.url)
-          # checksum_download(downloaded_file, f.md5) if f.md5
           d = DownloadCache.new(f)
           d.get
           # f.package.extract(:archive => downloaded_file, :overwrite => true)

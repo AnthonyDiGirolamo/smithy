@@ -297,9 +297,11 @@ command ['new'] do |c|
 
 
     if options[:tarball]
-      downloaded = p.download(url) if url
-      archive = downloaded if downloaded
-      p.extract :archive => archive, :dry_run => options[:"dry-run"]
+      if url
+        d = DownloadCache.new(p)
+        d.get(url)
+      end
+      p.extract :archive => d.downloaded_file_path, :dry_run => options[:"dry-run"]
     end
 
     unless options[:"skip-modulefile"]

@@ -3,16 +3,24 @@ module Smithy
     attr_accessor :url, :name, :version, :checksums
 
     def initialize(p)
+      @url = ''
+      @checksums = {}
       if p.is_a? Formula
         @url = p.try(:url)
-        @checksums = {}
         @checksums.merge!(:md5 => p.md5) if p.try(:md5)
         @checksums.merge!(:sha1 => p.sha1) if p.try(:sha1)
         @name = p.try(:package).try(:name)
         @version = p.try(:package).try(:version)
-      else
-        return nil
+      elsif p.is_a? Package
+        @name = p.name
+        @version = p.version
       end
+    end
+
+    def download_cache_dir
+      dir = Smithy::Config.global[:"download-cache"]
+      dir = File.join(ENV['HOME'], '.smithy/cache') if dir.blank?
+      dir
     end
 
     def downloaded_file_name
@@ -20,9 +28,7 @@ module Smithy
     end
 
     def downloaded_file_dir
-      dir = Smithy::Config.global[:"download-cache"]
-      dir = File.join(ENV['HOME'], '.smithy/cache') if dir.blank?
-      File.join(dir, name, version)
+      File.join(download_cache_dir, name, version)
     end
 
     def downloaded_file_path
@@ -34,6 +40,7 @@ module Smithy
     end
 
     def checksum_download
+      return true if checksums.empty?
       return false unless downloaded?
 
       checksums.keys.each do |type|
@@ -51,9 +58,11 @@ module Smithy
         if checksum != digest
           raise <<-EOF.strip_heredoc
             file does not match expected #{type.to_s.upcase} checksum
-                   expected: #{checksum}
-                   got:      #{digest}
+              expected: #{checksum}
+              got:      #{digest}
           EOF
+        else
+          return true
         end
       end
     end
@@ -91,9 +100,12 @@ module Smithy
       end
     end
 
-    def get
-      if download
-        checksum_download
+    def get(passed_url= nil)
+      @url = passed_url if passed_url
+      if download && checksum_download
+        return downloaded_file_path
+      else
+        return false
       end
     end
 
