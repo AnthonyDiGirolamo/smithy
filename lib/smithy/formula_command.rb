@@ -56,10 +56,12 @@ module Smithy
         packages.each do |package|
           f = build_formula(package)
           f.package.create(:formula => true)
-          downloaded_file = f.package.download(f.url)
-          checksum_download(downloaded_file, f.md5) if f.md5
+          # downloaded_file = f.package.download(f.url)
+          # checksum_download(downloaded_file, f.md5) if f.md5
+          d = DownloadCache.new(f)
+          d.get
           # f.package.extract(:archive => downloaded_file, :overwrite => true)
-          f.package.extract(:archive => downloaded_file)
+          f.package.extract(:archive => d.downloaded_file_path)
 
           Dir.chdir File.join(f.package.prefix, "source")
           if f.run_install
