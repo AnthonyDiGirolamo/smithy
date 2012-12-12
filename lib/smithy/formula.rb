@@ -14,6 +14,8 @@ module Smithy
       @module_setup = ''
 
       if ENV['MODULESHOME']
+        @modulecmd = "modulecmd sh"
+        @modulecmd = "#{ENV['MODULESHOME']}/bin/modulecmd sh" if File.exists?("#{ENV['MODULESHOME']}/bin/modulecmd")
         @module_setup << `#{@module_setup} #{ENV['MODULESHOME']}/bin/modulecmd sh purge`
         @module_setup << ' '
         if modules
