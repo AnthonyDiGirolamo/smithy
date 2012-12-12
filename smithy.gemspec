@@ -37,12 +37,19 @@ etc/templates/web/all.html.erb
 lib/smithy.rb
 lib/smithy/config.rb
 lib/smithy/description.rb
-lib/smithy/format.rb
-lib/smithy/helpers.rb
-lib/smithy/package.rb
-lib/smithy/module_file.rb
+lib/smithy/download_cache.rb
 lib/smithy/file_operations.rb
+lib/smithy/format.rb
+lib/smithy/formula.rb
+lib/smithy/formula_command.rb
+lib/smithy/helpers.rb
+lib/smithy/module_file.rb
+lib/smithy/package.rb
 lib/smithy_version.rb
+lib/formulas/curl_formula.rb
+lib/formulas/git_formula.rb
+lib/formulas/openmpi_formula.rb
+lib/formulas/zlib_formula.rb
 man/man1/smithy.1
   )
   s.require_paths << 'lib'

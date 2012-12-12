@@ -16,10 +16,10 @@ module Smithy
       if ENV['MODULESHOME']
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV['MODULESHOME']}/bin/modulecmd sh" if File.exists?("#{ENV['MODULESHOME']}/bin/modulecmd")
-        @module_setup << `#{@module_setup} #{ENV['MODULESHOME']}/bin/modulecmd sh purge`
+        @module_setup << `#{@module_setup} #{@modulecmd} purge`
         @module_setup << ' '
         if modules
-          @module_setup << `#{@module_setup} #{ENV['MODULESHOME']}/bin/modulecmd sh load #{@modules.join(' ')}`
+          @module_setup << `#{@module_setup} #{@modulecmd} load #{@modules.join(' ')}`
           @module_setup << ' '
         end
       end
@@ -65,7 +65,7 @@ module Smithy
     def module_list
       if ENV['MODULESHOME']
         notice "module list"
-        Kernel.system @module_setup + "#{ENV['MODULESHOME']}/bin/modulecmd sh list 2>&1"
+        Kernel.system @module_setup + "#{@modulecmd} list 2>&1"
       end
     end
 
