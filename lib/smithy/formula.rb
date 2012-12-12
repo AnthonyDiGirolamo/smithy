@@ -4,10 +4,11 @@ module Smithy
 
     def initialize(args = {})
       if args[:package]
-        @package = args[:package]
-        @version = @package.version
-        @name    = @package.name
-        @prefix  = @package.prefix
+        @package    = args[:package]
+        @name       = @package.name
+        @version    = @package.version
+        @build_name = @package.build_name
+        @prefix     = @package.prefix
       end
 
       @module_setup = ''
@@ -68,7 +69,7 @@ module Smithy
 
     # DSL and instance methods
 
-    %w{depends_on url homepage md5 sha1 sha2 version name prefix modules}.each do |attr|
+    %w{depends_on url homepage md5 sha1 sha2 version name build_name prefix modules}.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           if block_given?
