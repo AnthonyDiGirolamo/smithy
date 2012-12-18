@@ -2,7 +2,7 @@ module Smithy
   class DownloadCache
     attr_accessor :url, :name, :version, :checksums
 
-    def initialize(p)
+    def initialize(p, fname = nil)
       @url = ''
       @checksums = {}
       if p.is_a? Formula
@@ -15,6 +15,8 @@ module Smithy
         @name = p.name
         @version = p.version
       end
+
+      @name = fname unless fname.blank?
     end
 
     def download_cache_dir

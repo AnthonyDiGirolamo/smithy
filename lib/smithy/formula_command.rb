@@ -47,7 +47,7 @@ module Smithy
         packages.each do |package|
           f = build_formula(package, options[:"formula-name"])
           f.package.create(:formula => true)
-          d = DownloadCache.new(f).get
+          d = DownloadCache.new(f, options[:"formula-name"]).get
           # f.package.extract(:archive => d, :overwrite => true)
           f.package.extract(:archive => d)
 
