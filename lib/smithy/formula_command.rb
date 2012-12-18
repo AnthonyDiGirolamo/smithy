@@ -2,11 +2,16 @@ module Smithy
 
   class FormulaCommand
     class << self
+      attr_accessor :formula_directories
 
       # helpers
 
       def formula_files
-        @formula_files = Dir.glob(File.join(@@smithy_bin_root, "formulas/*.rb")) if @formula_files.nil?
+        if @formula_files.nil?
+          @formula_directories << File.join(@@smithy_bin_root, "formulas")
+          @formula_files = []
+          @formula_directories.each {|dir| @formula_files += Dir.glob(File.join(File.expand_path(dir),"*.rb")) }
+        end
         @formula_files
       end
 
@@ -32,11 +37,16 @@ module Smithy
 
       # formula subcommands
 
-      def list
+      def list(options,args)
+        debugger
+        @formula_directories = options[:directories] || []
+
         puts formula_names
       end
 
       def install(options,args)
+        @formula_directories = options[:directories] || []
+
         packages = args.dup
         if args.empty?
           notice "Reading package names from STDIN..."

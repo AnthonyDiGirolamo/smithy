@@ -558,10 +558,13 @@ end
 
 desc "Install software from predefined formulas"
 command ['formula'] do |c|
+  c.desc "Specify one or more additional formula directories separated with commas"
+  c.flag [:d, :directories], :type => Array
+
   c.desc "List known formulas"
   c.command :list do |subcommand|
-    subcommand.action do
-      FormulaCommand.list
+    subcommand.action do |global_options,options,args|
+      FormulaCommand.list(options,args)
     end
   end
 
