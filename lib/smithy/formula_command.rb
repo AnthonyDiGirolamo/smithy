@@ -6,7 +6,7 @@ module Smithy
       # helpers
 
       def formula_files
-        @formula_files = Dir.glob(File.join(@@smithy_bin_root, "lib/formulas/*.rb")) if @formula_files.nil?
+        @formula_files = Dir.glob(File.join(@@smithy_bin_root, "formulas/*.rb")) if @formula_files.nil?
         @formula_files
       end
 

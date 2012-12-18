@@ -46,10 +46,10 @@ lib/smithy/helpers.rb
 lib/smithy/module_file.rb
 lib/smithy/package.rb
 lib/smithy_version.rb
-lib/formulas/curl_formula.rb
-lib/formulas/git_formula.rb
-lib/formulas/openmpi_formula.rb
-lib/formulas/zlib_formula.rb
+formulas/curl_formula.rb
+formulas/git_formula.rb
+formulas/openmpi_formula.rb
+formulas/zlib_formula.rb
 man/man1/smithy.1
   )
   s.require_paths << 'lib'
