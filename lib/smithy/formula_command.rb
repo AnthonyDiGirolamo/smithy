@@ -15,15 +15,19 @@ module Smithy
         @formula_names
       end
 
-      def build_formula(package)
+      # construct a new fomula object given a package
+      def build_formula(package, fname = nil)
         p = Package.new :path => package
-
         p.valid?
-        raise "unknown formula #{p.name}" unless formula_names.include?(p.name)
 
-        required_formula = formula_files.select{|f| f =~ /#{p.name}/}.first
+        fname = p.name if fname.blank?
+        raise "unknown formula #{fname}" unless formula_names.include?(fname)
+
+        required_formula = formula_files.select{|f| f =~ /#{fname}/}.first
         require required_formula
-        return "#{p.name.camelize}_formula".constantize.new(:package => p)
+        f = "#{fname.camelize}_formula".constantize.new(:package => p)
+        f.formula_file_path = required_formula
+        return f
       end
 
       # formula subcommands
@@ -41,19 +45,19 @@ module Smithy
         raise "You must supply at least one package to install" if packages.empty?
 
         packages.each do |package|
-          f = build_formula(package)
+          f = build_formula(package, options[:"formula-name"])
           f.package.create(:formula => true)
-          d = DownloadCache.new(f)
-          d.get
-          # f.package.extract(:archive => downloaded_file, :overwrite => true)
-          f.package.extract(:archive => d.downloaded_file_path)
+          d = DownloadCache.new(f).get
+          # f.package.extract(:archive => d, :overwrite => true)
+          f.package.extract(:archive => d)
+
+          ModuleFile.new(:package => f.package).create if options[:"modulefile"]
 
           Dir.chdir File.join(f.package.prefix, "source")
           if f.run_install
             f.package.create_valid_build_file
             f.package.set_file_permissions_recursive
           end
-
         end
       end
 

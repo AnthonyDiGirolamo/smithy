@@ -1,6 +1,6 @@
 module Smithy
   class Formula
-    attr_accessor :package, :module_setup
+    attr_accessor :package, :module_setup, :formula_file_path
 
     def initialize(args = {})
       if args[:package]
@@ -50,7 +50,7 @@ module Smithy
       if $?.exitstatus != 0
         raise <<-EOF.strip_heredoc
           The last command exited with status: #{$?.exitstatus}
-            Formula: #{__FILE__}
+            Formula: #{formula_file_path}
             Build Directory: #{@package.source_directory}
         EOF
       end

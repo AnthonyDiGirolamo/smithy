@@ -567,6 +567,12 @@ command ['formula'] do |c|
 
   c.desc "Install a package using a formula"
   c.command :install do |subcommand|
+    subcommand.desc "Formula name"
+    subcommand.flag [:f, "formula-name"]
+
+    subcommand.desc "Create modulefiles as well"
+    subcommand.switch [:m, "modulefile"], :negatable => false
+
     subcommand.action do |global_options,options,args|
       FormulaCommand.install(options,args)
     end
