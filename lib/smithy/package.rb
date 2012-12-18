@@ -385,7 +385,13 @@ module Smithy
     def update_version_table_file(options)
       version_table_file = File.join(application_directory, ".versions")
       version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
-      version_table.merge!({version.encode('UTF-8') => build_name.encode('UTF-8')})
+      if version_table[version].is_a? String
+        version_table[version] = [ build_name.encode('UTF-8') ]
+      elsif version_table[version].is_a? Array
+        version_table[version] << build_name.encode('UTF-8') unless version_table[version].include?(build_name.encode('UTF-8'))
+      else
+        version_table.merge!({version.encode('UTF-8') => build_name.encode('UTF-8')})
+      end
 
       FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
       FileOperations.set_group version_table_file, group, options
@@ -533,7 +539,7 @@ module Smithy
 
       stubbed_builds = YAML.load_file(File.join(File.dirname(version_directory), ".versions")).stringify_keys rescue {}
       if stubbed_builds[version]
-        if stubbed_builds[version].class == String
+        if stubbed_builds[version].is_a? String
           builds += [ stubbed_builds[version] ]
         else
           builds += stubbed_builds[version]
