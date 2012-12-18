@@ -132,6 +132,32 @@ Split editing window with requested file and the environment (remodule) file
 
 
 
+==== Command: <tt>formula </tt>
+Install software from predefined formulas
+
+
+===== Commands
+====== Command: <tt>install </tt>
+Install a package using a formula
+
+
+======= Options
+======= -f|--formula-name arg
+
+Formula name
+
+[Default Value] None
+
+
+======= -m|--modulefile
+Create modulefiles as well
+
+
+
+====== Command: <tt>list </tt>
+List known formulas
+
+
 ==== Command: <tt>help  command</tt>
 Shows a list of commands or help for one command
 
