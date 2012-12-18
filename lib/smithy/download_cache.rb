@@ -54,7 +54,7 @@ module Smithy
           digest = Digest::MD5.hexdigest(File.read(downloaded_file_path))
         when :sha1
           require 'digest/sha1'
-          digest = Digest::SHA1.hexdigest(File.read(downloaded_file))
+          digest = Digest::SHA1.hexdigest(File.read(downloaded_file_path))
         end
 
         if checksum != digest
