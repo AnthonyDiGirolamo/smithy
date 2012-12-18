@@ -572,14 +572,21 @@ module Smithy
       Description.publishable?(application_directory)
     end
 
-    def self.search(query)
-      Package.all.select.select{|s| s =~ /#{query}/}
+    def self.search(query = '')
+      Package.all.select{|s| s =~ /#{query}/}
+    end
+
+    def self.search_by_name(name)
+      Package.all(:name => name)
     end
 
     def self.all(args = {})
+      name    = args[:name]    || '*'
+      version = args[:version] || '*'
+      build   = args[:build]   || '*'
       # Array of full paths to rebuild scripts
-      software = Dir.glob(Smithy::Config.full_root+"/*/*/*/#{BuildFileNames[:build]}")
-      software += Dir.glob(Smithy::Config.full_root+"/*/*/*/.valid")
+      software =  Dir.glob(Smithy::Config.full_root+"/#{name}/#{version}/#{build}/#{BuildFileNames[:build]}")
+      software += Dir.glob(Smithy::Config.full_root+"/#{name}/#{version}/#{build}/.valid")
       # Remove rebuild from each path
       software.collect!{|s| s.gsub(/\/(#{BuildFileNames[:build]}|\.valid)$/, '')}
       software.sort!
