@@ -58,6 +58,7 @@ module Smithy
           f = build_formula(package, options[:"formula-name"])
           f.package.create(:formula => true)
           d = DownloadCache.new(f, options[:"formula-name"]).get
+          raise "Download failure" unless d
           # f.package.extract(:archive => d, :overwrite => true)
           f.package.extract(:archive => d)
 
