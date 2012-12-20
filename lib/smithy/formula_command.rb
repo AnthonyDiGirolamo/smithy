@@ -8,6 +8,7 @@ module Smithy
 
       def formula_files
         if @formula_files.nil?
+          @formula_directories = [] if @formula_directories.nil?
           @formula_directories << File.join(@@smithy_bin_root, "formulas")
           @formula_files = []
           @formula_directories.each {|dir| @formula_files += Dir.glob(File.join(File.expand_path(dir),"*.rb")) }
@@ -38,7 +39,6 @@ module Smithy
       # formula subcommands
 
       def list(options,args)
-        debugger
         @formula_directories = options[:directories] || []
 
         puts formula_names
