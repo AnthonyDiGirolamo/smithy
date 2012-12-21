@@ -285,26 +285,20 @@ command ['new'] do |c|
     raise "You must supply a name to create new packages" if args.empty?
 
     p = Package.new :path => args.first
-
     p.valid?
-
-    if options[:tarball] =~ URI::ABS_URI
-      url = options[:tarball]
-    elsif options[:tarball]
-      archive = File.absolute_path options[:tarball]
-      raise "The archive #{archive} does not exist" unless File.exists? archive
-    end
     p.create :dry_run => options[:"dry-run"],
             :existing => options[:"existing-scripts"],
                  :web => options[:"web-description"]
 
-
     if options[:tarball]
-      if url
+      if options[:tarball] =~ URI::ABS_URI
         d = DownloadCache.new(p)
-        d.get(url)
+        archive = d.get(options[:tarball])
+      else
+        archive = File.absolute_path options[:tarball]
+        raise "The archive #{archive} does not exist" unless File.exists? archive
       end
-      p.extract :archive => d.downloaded_file_path, :dry_run => options[:"dry-run"]
+      p.extract :archive => archive, :dry_run => options[:"dry-run"]
     end
 
     unless options[:"skip-modulefile"]
