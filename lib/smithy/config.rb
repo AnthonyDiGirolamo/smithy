@@ -163,7 +163,7 @@ module Smithy
 
       def save_last_prefix(prefix)
         rc_file = File.join(ENV['HOME'], '.smithyrc')
-        h = {:last => prefix}
+        h = {:last => prefix.encode('UTF-8')}
         File.open(rc_file, "w+") do |f|
           f.write(h.to_yaml)
         end
