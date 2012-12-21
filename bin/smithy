@@ -354,7 +354,6 @@ command ['edit'] do |c|
       p = Package.new :path => arguments.first
       p.valid?
       p.prefix_exists!
-      p.rebuild_script_exists!
 
       # if no file, prompt
       if operation.nil?
