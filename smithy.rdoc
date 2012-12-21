@@ -136,6 +136,14 @@ Split editing window with requested file and the environment (remodule) file
 Install software from predefined formulas
 
 
+===== Options
+===== -d|--directories arg
+
+Specify one or more additional formula directories separated with commas
+
+[Default Value] None
+
+
 ===== Commands
 ====== Command: <tt>install </tt>
 Install a package using a formula

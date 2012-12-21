@@ -1,17 +1,21 @@
 module Smithy
 
+  # This class acts as a controller for formula subcommands
   class FormulaCommand
     class << self
       attr_accessor :formula_directories
 
       # helpers
 
+      # Collect known formula names in the following order
+      # 1. formula directories specified on the command line
+      # 2. smithy's built in formulas
       def formula_files
         if @formula_files.nil?
           @formula_directories = [] if @formula_directories.nil?
           @formula_directories << File.join(@@smithy_bin_root, "formulas")
           @formula_files = []
-          @formula_directories.each {|dir| @formula_files += Dir.glob(File.join(File.expand_path(dir),"*.rb")) }
+          @formula_directories.each {|dir| @formula_files += Dir.glob(File.join(File.expand_path(dir),"*.rb")).sort }
         end
         @formula_files
       end

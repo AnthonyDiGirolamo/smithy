@@ -24,22 +24,25 @@ module Smithy
         end
       end
 
-      if depends_on
-        @depends_on = [depends_on] if depends_on.is_a? String
-        depends_on.each do |package|
-          path = Package.search(package).first
-          if path
-            p = Package.new(:path => path)
-            class_eval %Q{
-              def #{p.name}
-                @#{p.name} = Package.new(:path => "#{path}") if @#{p.name}.nil?
-                @#{p.name}
-              end
-            }
-          else
-            raise "Formula #{name} depends on #{package}"
-            #TODO build package instead?
-          end
+      check_dependencies if depends_on
+    end
+
+    def check_dependencies
+      @depends_on = [depends_on] if depends_on.is_a? String
+      depends_on.each do |package|
+        name_version_build = package.split('/')
+        path = Package.all(:name => name_version_build[0], :version => name_version_build[1], :build => name_version_build[2]).first
+        if path
+          p = Package.new(:path => path)
+          class_eval %Q{
+            def #{p.name}
+              @#{p.name} = Package.new(:path => "#{path}") if @#{p.name}.nil?
+              @#{p.name}
+            end
+          }
+        else
+          raise "Formula #{name} depends on #{package}"
+          #TODO build package instead?
         end
       end
     end
