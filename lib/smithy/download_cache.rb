@@ -9,6 +9,7 @@ module Smithy
         @url = p.try(:url)
         @checksums.merge!(:md5 => p.md5) if p.try(:md5)
         @checksums.merge!(:sha1 => p.sha1) if p.try(:sha1)
+        @checksums.merge!(:sha256 => p.sha256) if p.try(:sha256)
         @name = p.try(:package).try(:name)
         @version = p.try(:package).try(:version)
       elsif p.is_a? Package
@@ -55,6 +56,9 @@ module Smithy
         when :sha1
           require 'digest/sha1'
           digest = Digest::SHA1.hexdigest(File.read(downloaded_file_path))
+        when :sha256
+          require 'digest/sha2'
+          digest = Digest::SHA256.hexdigest(File.read(downloaded_file_path))
         end
 
         if checksum != digest

@@ -74,7 +74,7 @@ module Smithy
 
     # DSL and instance methods
 
-    %w{depends_on url homepage md5 sha1 sha2 version name build_name prefix modules}.each do |attr|
+    %w{depends_on url homepage md5 sha1 sha2 sha256 version name build_name prefix modules}.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           if block_given?
