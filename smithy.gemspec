@@ -62,6 +62,8 @@ man/man1/smithy.1
   s.executables << 'smithy'
   s.add_development_dependency('awesome_print')
   s.add_development_dependency('debugger')
+  s.add_development_dependency('pry')
+  s.add_development_dependency('pry-doc')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
