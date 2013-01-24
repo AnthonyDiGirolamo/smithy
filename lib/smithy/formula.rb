@@ -11,6 +11,8 @@ module Smithy
         @prefix     = @package.prefix
       end
 
+      @formula_file_path = args[:path] if args[:path]
+
       @module_setup = ''
 
       if ENV['MODULESHOME']

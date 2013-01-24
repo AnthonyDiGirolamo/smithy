@@ -25,6 +25,10 @@ module Smithy
         @formula_names
       end
 
+      def formula_file_path(formula_name)
+        formula_files.select{|f| f =~ /#{formula_name}/}.first
+      end
+
       # construct a new fomula object given a package
       def build_formula(package, fname = nil)
         p = Package.new :path => package
@@ -33,10 +37,9 @@ module Smithy
         fname = p.name if fname.blank?
         raise "unknown formula #{fname}" unless formula_names.include?(fname)
 
-        required_formula = formula_files.select{|f| f =~ /#{fname}/}.first
+        required_formula = formula_file_path(fname)
         require required_formula
-        f = "#{fname.camelize}_formula".constantize.new(:package => p)
-        f.formula_file_path = required_formula
+        f = "#{fname.camelize}Formula".constantize.new(:package => p, :path => required_formula)
         return f
       end
 
@@ -46,6 +49,12 @@ module Smithy
         @formula_directories = options[:directories] || []
 
         puts formula_names
+      end
+
+      def display(options,args)
+        @formula_directories = options[:directories] || []
+
+        puts File.read(formula_file_path(args.first))
       end
 
       def install(options,args)
