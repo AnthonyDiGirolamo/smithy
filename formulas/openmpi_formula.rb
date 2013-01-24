@@ -1,8 +1,8 @@
-class Openmpi_formula < Formula
-  homepage 'http://www.open-mpi.org'
-  url      'http://www.open-mpi.org/software/ompi/v1.6/downloads/openmpi-1.6.3.tar.bz2'
-  md5      'eedb73155a7a40b0b07718494298fb25'
-  sha1     'a61aa2dee4c47d93d88e49ebed36de25df4f6492'
+class OpenmpiFormula < Formula
+  homepage "http://www.open-mpi.org"
+  url      "http://www.open-mpi.org/software/ompi/v1.6/downloads/openmpi-1.6.3.tar.bz2"
+  md5      "eedb73155a7a40b0b07718494298fb25"
+  sha1     "a61aa2dee4c47d93d88e49ebed36de25df4f6492"
 
   modules do
     if build_name =~ /gnu/

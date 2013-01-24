@@ -1,7 +1,7 @@
-class Mxml_formula < Formula
-  homepage 'http://www.minixml.org/'
-  url 'http://ftp.easysw.com/pub/mxml/2.7/mxml-2.7.tar.gz'
-  sha1 'a3bdcab48307794c297e790435bcce7becb9edae'
+class MxmlFormula < Formula
+  homepage "http://www.minixml.org/"
+  url      "http://ftp.easysw.com/pub/mxml/2.7/mxml-2.7.tar.gz"
+  sha1     "a3bdcab48307794c297e790435bcce7becb9edae"
 
   modules do
     if build_name =~ /gnu/
