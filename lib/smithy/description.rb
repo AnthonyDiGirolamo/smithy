@@ -43,7 +43,7 @@ module Smithy
     def initialize(args = {})
       @www_root = Smithy::Config.web_root
       @package = args[:package]
-      @global_description = true if Smithy::Config.descriptions_root
+      @global_description = Smithy::Config.descriptions_root if Smithy::Config.descriptions_root
 
       if @package.class == Package
         @root = @package.root
@@ -57,7 +57,7 @@ module Smithy
 
         if @global_description
           @name = @package.gsub(/#{Smithy::Config.descriptions_root}\/?/, "")
-          @path = @package
+          @path = File.join(Smithy::Config.descriptions_root, @name) if @global_description
         else
           if @package == 'last'
             @name = last_prefix.split('/').try(:first)
