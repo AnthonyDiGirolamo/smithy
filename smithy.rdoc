@@ -145,6 +145,10 @@ Specify one or more additional formula directories separated with commas
 
 
 ===== Commands
+====== Command: <tt>display </tt>
+Display a formula
+
+
 ====== Command: <tt>install </tt>
 Install a package using a formula
 

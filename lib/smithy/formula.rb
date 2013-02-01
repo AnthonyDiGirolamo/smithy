@@ -51,7 +51,12 @@ module Smithy
 
     def system(*args)
       notice args.join(' ')
-      Kernel.system @module_setup + args.join(' ')
+      if args.first == :nomodules
+        args.shift
+        Kernel.system args.join(' ')
+      else
+        Kernel.system @module_setup + args.join(' ')
+      end
       if $?.exitstatus != 0
         raise <<-EOF.strip_heredoc
           The last command exited with status: #{$?.exitstatus}
