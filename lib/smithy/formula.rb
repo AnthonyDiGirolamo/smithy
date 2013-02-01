@@ -18,7 +18,7 @@ module Smithy
       if ENV['MODULESHOME']
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV['MODULESHOME']}/bin/modulecmd sh" if File.exists?("#{ENV['MODULESHOME']}/bin/modulecmd")
-        @module_setup << `#{@module_setup} #{@modulecmd} purge`
+        @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null`
         @module_setup << ' '
         if modules
           @module_setup << `#{@module_setup} #{@modulecmd} load #{@modules.join(' ')}`
@@ -47,6 +47,14 @@ module Smithy
           #TODO build package instead?
         end
       end
+    end
+
+    def patch(content)
+      patch_file_name = "patch.diff"
+      File.open(patch_file_name, "w+") do |f|
+        f.write(content)
+      end
+      `patch -p1 <#{patch_file_name}`
     end
 
     def system(*args)
