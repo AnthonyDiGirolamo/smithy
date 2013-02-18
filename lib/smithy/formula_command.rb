@@ -39,7 +39,7 @@ module Smithy
 
         required_formula = formula_file_path(fname)
         require required_formula
-        f = "#{fname.camelize}Formula".constantize.new(:package => p, :path => required_formula)
+        f = "#{fname.underscore.camelize}Formula".constantize.new(:package => p, :path => required_formula)
         return f
       end
 
@@ -93,8 +93,10 @@ module Smithy
               end
             end
 
-            formula_prefix_contents.each do |f|
-              FileUtils.rm_rf(f)
+            if overwrite
+              formula_prefix_contents.each do |f|
+                FileUtils.rm_rf(f)
+              end
             end
           end
 

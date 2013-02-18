@@ -2,6 +2,8 @@ module Smithy
   class Formula
     attr_accessor :package, :module_setup, :formula_file_path
 
+    def package(p)
+
     def initialize(args = {})
       if args[:package]
         @package    = args[:package]
@@ -36,10 +38,11 @@ module Smithy
         path = Package.all(:name => name_version_build[0], :version => name_version_build[1], :build => name_version_build[2]).first
         if path
           p = Package.new(:path => path)
+          new_name = p.name.underscore
           class_eval %Q{
-            def #{p.name}
-              @#{p.name} = Package.new(:path => "#{path}") if @#{p.name}.nil?
-              @#{p.name}
+            def #{new_name}
+              @#{new_name} = Package.new(:path => "#{path}") if @#{new_name}.nil?
+              @#{new_name}
             end
           }
         else
@@ -89,7 +92,7 @@ module Smithy
 
     # DSL and instance methods
 
-    %w{depends_on url homepage md5 sha1 sha2 sha256 version name build_name prefix modules}.each do |attr|
+    %w{depends_on url homepage md5 sha1 sha2 sha256 version name build_name prefix modules modulefile}.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           if block_given?
