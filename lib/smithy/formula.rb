@@ -1,17 +1,22 @@
 module Smithy
   class Formula
-    attr_accessor :package, :module_setup, :formula_file_path
+    attr_accessor :module_setup, :formula_file_path
 
-    def package(p)
+    def package
+      @package
+    end
+
+    def package=(p)
+      @package    = p
+      @name       = @package.name
+      @version    = @package.version
+      @build_name = @package.build_name
+      @prefix     = @package.prefix
+      return @package
+    end
 
     def initialize(args = {})
-      if args[:package]
-        @package    = args[:package]
-        @name       = @package.name
-        @version    = @package.version
-        @build_name = @package.build_name
-        @prefix     = @package.prefix
-      end
+      self.package = args[:package] if args[:package]
 
       @formula_file_path = args[:path] if args[:path]
 
