@@ -31,11 +31,11 @@ class NoseFormula < Formula
 
     EOF
 
-    python_binary_name = "python"
-    python_binary_name = "python3.3" if build_name.include?("python3.3.0")
+    python_binary = "python"
+    python_binary = "python3.3" if build_name.include?("python3.3.0")
 
-    system "which #{python_binary_name}"
+    system "which #{python_binary}"
 
-    system "PYTHONPATH=$PYTHONPATH:#{prefix}/lib/python3.3/site-packages #{python_binary_name} setup.py install --prefix=#{prefix} --compile"
+    system "PYTHONPATH=$PYTHONPATH:#{prefix}/lib/python3.3/site-packages #{python_binary} setup.py install --prefix=#{prefix} --compile"
   end
 end
