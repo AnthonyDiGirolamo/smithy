@@ -6,11 +6,15 @@ class OpenmpiFormula < Formula
 
   modules do
     if build_name =~ /gnu/
-      %w{gcc}
+      if build_name =~ /gnu4.6.2/
+        ["gcc/4.6.2"]
+      else
+        ["gcc"]
+      end
     elsif build_name =~ /intel/
-      %w{intel}
+      ["intel"]
     elsif build_name =~ /pgi/
-      %w{pgi}
+      ["pgi"]
     end
   end
 
