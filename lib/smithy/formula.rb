@@ -38,9 +38,10 @@ module Smithy
 
     def check_dependencies
       @depends_on = [depends_on] if depends_on.is_a? String
+      missing_packages = []
       depends_on.each do |package|
-        name_version_build = package.split('/')
-        path = Package.all(:name => name_version_build[0], :version => name_version_build[1], :build => name_version_build[2]).first
+        name, version, build = package.split('/')
+        path = Package.all(:name => name, :version => version, :build => build).first
         if path
           p = Package.new(:path => path)
           new_name = p.name.underscore
@@ -51,9 +52,13 @@ module Smithy
             end
           }
         else
-          raise "Formula #{name} depends on #{package}"
+          missing_packages << package
           #TODO build package instead?
         end
+      end
+
+      unless missing_packages.empty?
+        raise "#{self.class} depends on: #{missing_packages.join(" ")}"
       end
     end
 
