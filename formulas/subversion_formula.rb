@@ -12,7 +12,7 @@ class SubversionFormula < Formula
 
     system "./configure",
       "--prefix=#{prefix}",
-      "--disable-mod-activation",
+      "--without-apxs",
       "--with-ssl",
       "--with-zlib=/usr",
       "--with-sqlite",
