@@ -160,4 +160,30 @@ module Smithy
     # end
   end
 
+  def operating_system
+    b = "build"
+    redhat = "/etc/redhat-release"
+    suse = "/etc/SuSE-release"
+    if File.exists? redhat
+      # Red Hat Enterprise Linux Server release 6.3 (Santiago)
+      # CentOS release 5.9 (Final)
+      content = File.read(redhat)
+      content =~ /([\d\.]+)/
+      version = $1
+      b = "rhel" if content =~ /Red Hat/
+      b = "centos" if content =~ /CentOS/
+      b += version
+    elsif File.exists? suse
+      # SUSE Linux Enterprise Server 11 (x86_64)
+      # VERSION = 11
+      # PATCHLEVEL = 1
+      content = File.read(suse)
+      content =~ /VERSION = (\d+)/
+      version = $1
+      content =~ /PATCHLEVEL = (\d+)/
+      patch = $1
+      b = "sles#{version}.#{patch}"
+    end
+    return b
+  end
 end

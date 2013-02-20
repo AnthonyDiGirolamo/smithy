@@ -564,6 +564,13 @@ command ['formula'] do |c|
     end
   end
 
+  c.desc "Display a formula location"
+  c.command :which do |subcommand|
+    subcommand.action do |global_options,options,args|
+      FormulaCommand.which(options,args)
+    end
+  end
+
   c.desc "Display a formula"
   c.command :display do |subcommand|
     subcommand.action do |global_options,options,args|

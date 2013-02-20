@@ -6,7 +6,6 @@ module Smithy
       attr_accessor :formula_directories
 
       # helpers
-
       # Collect known formula names in the following order
       # 1. formula directories specified on the command line
       # 2. smithy's built in formulas
@@ -31,15 +30,25 @@ module Smithy
 
       # construct a new fomula object given a package
       def build_formula(package, fname = nil)
-        p = Package.new :path => package
-        p.valid?
 
-        fname = p.name if fname.blank?
+        fname, version, build = package.split("/") if fname.blank?
+
         raise "unknown formula #{fname}" unless formula_names.include?(fname)
 
         required_formula = formula_file_path(fname)
         require required_formula
-        f = "#{fname.underscore.camelize}Formula".constantize.new(:package => p, :path => required_formula)
+        f = "#{fname.underscore.camelize}Formula".constantize.new(:path => required_formula)
+
+        version = f.version if version.blank?
+        build = operating_system if build.blank?
+
+        package = [fname, version, build].join("/")
+
+        p = Package.new :path => package
+        p.valid?
+
+        f.package = p
+
         return f
       end
 
@@ -54,7 +63,25 @@ module Smithy
       def display(options,args)
         @formula_directories = options[:directories] || []
 
-        puts File.read(formula_file_path(args.first))
+        formula_name = args.first.split("/").first
+
+        if File.exists? formula_file_path(formula_name)
+          puts File.read(formula_file_path(formula_name))
+        else
+          raise "unkown formula '#{formula_name}'"
+        end
+      end
+
+      def which(options,args)
+        @formula_directories = options[:directories] || []
+
+        formula_name = args.first.split("/").first
+
+        if File.exists? formula_file_path(formula_name)
+          puts formula_file_path(formula_name)
+        else
+          raise "unkown formula '#{formula_name}'"
+        end
       end
 
       def install(options,args)
