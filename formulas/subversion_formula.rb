@@ -12,6 +12,7 @@ class SubversionFormula < Formula
 
     system "./configure",
       "--prefix=#{prefix}",
+      "--disable-mod-activation",
       "--with-ssl",
       "--with-zlib=/usr",
       "--with-sqlite",
@@ -20,6 +21,7 @@ class SubversionFormula < Formula
       "--with-apr-util=#{apr_util.prefix}",
       "--with-sqlite=#{sqlite.prefix}"
 
+    system "make"
     system "make install"
   end
 end

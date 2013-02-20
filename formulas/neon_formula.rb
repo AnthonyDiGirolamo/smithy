@@ -8,6 +8,7 @@ class NeonFormula < Formula
   def install
     module_list
     system "./configure --prefix=#{prefix} --enable-shared --disable-static --with-ssl --disable-debug"
+    system "make"
     system "make install"
   end
 end

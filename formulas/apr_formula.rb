@@ -8,6 +8,7 @@ class AprFormula < Formula
   def install
     module_list
     system "./configure --prefix=#{prefix} --enable-shared --disable-static --disable-debug"
+    system "make"
     system "make install"
   end
 end

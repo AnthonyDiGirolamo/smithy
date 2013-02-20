@@ -7,6 +7,7 @@ class SqliteFormula < Formula
   def install
     module_list
     system "./configure --prefix=#{prefix}", "--disable-dependency-tracking", "--enable-dynamic-extensions"
+    system "make"
     system "make install"
   end
 end
