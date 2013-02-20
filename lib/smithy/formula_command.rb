@@ -25,7 +25,7 @@ module Smithy
       end
 
       def formula_file_path(formula_name)
-        formula_files.select{|f| f =~ /#{formula_name}/}.first
+        formula_files.select{|f| f =~ /#{formula_name}_formula.rb/}.first
       end
 
       # construct a new fomula object given a package
