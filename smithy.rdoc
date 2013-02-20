@@ -170,6 +170,10 @@ Create modulefiles as well
 List known formulas
 
 
+====== Command: <tt>which </tt>
+Display a formula location
+
+
 ==== Command: <tt>help  command</tt>
 Shows a list of commands or help for one command
 
