@@ -18,7 +18,7 @@ class SubversionFormula < Formula
       "--with-neon=#{neon.prefix}",
       "--with-apr=#{apr.prefix}",
       "--with-apr-util=#{apr_util.prefix}",
-		  "--with-sqlite=#{sqlite.prefix}"
+      "--with-sqlite=#{sqlite.prefix}"
 
     system "make install"
   end
