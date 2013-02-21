@@ -47,7 +47,9 @@ module Smithy
         p = Package.new :path => package
         p.valid?
 
-        f.package = p
+        # f.package = p
+        # reinit formula with correct package - ugly
+        f = "#{fname.underscore.camelize}Formula".constantize.new(:package => p, :path => required_formula)
 
         return f
       end
