@@ -51,20 +51,18 @@ man/man1/smithy.1
   s.files += Dir["formulas/*"]
   s.require_paths << 'lib'
   s.has_rdoc = true
-  # s.extra_rdoc_files = ['README.rdoc','smithy.rdoc']
-  # s.rdoc_options << '--title' << 'smithy' << '--main' << 'README.rdoc' << '-ri'
   s.extra_rdoc_files = ['smithy.rdoc']
   s.rdoc_options << '--title' << 'smithy' << '--main' << 'smithy.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'smithy'
   s.add_development_dependency('awesome_print')
+  s.add_development_dependency('cucumber')
   s.add_development_dependency('debugger')
-  s.add_development_dependency('pry')
-  s.add_development_dependency('pry-doc')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
   s.add_development_dependency('ronn')
+  s.add_development_dependency('rspec')
   s.add_dependency('gli', '>= 2.3.0')
   s.add_dependency('kramdown', '>= 0.14.0')
   s.add_dependency('open4')
