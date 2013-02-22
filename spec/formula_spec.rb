@@ -4,61 +4,92 @@ require 'smithy'
 include Smithy
 
 describe Formula do
-  it "knows it's name" do
-    class TestFormula < Formula
-    end
-    TestFormula.formula_name.should == "test"
-  end
+	context "valid formulas" do
+		it "knows it's name" do
+			module SmithyFormulaExamples
+				class TestFormula < Formula
+				end
+			end
+			SmithyFormulaExamples::TestFormula.formula_name.should == "test"
+		end
 
-  it "can run a defined install method" do
-    class TestFormulaWithInstall < Formula
-      def install
-      end
-    end
-    TestFormulaWithInstall.new.should respond_to :install
-  end
+		it "can run a defined install method" do
+			module SmithyFormulaExamples
+				class TestFormulaWithInstall < Formula
+					def install
+					end
+				end
+			end
+			SmithyFormulaExamples::TestFormulaWithInstall.new.should respond_to :install
+		end
 
-  it "raises an error if the install method is not implemented" do
-    class EmptyTestFormula < Formula
-    end
+		it "has a homepage" do
+			module SmithyFormulaExamples
+				class HomepageTestFormula < Formula
+					homepage "http://rspec.info/"
+				end
+			end
+			Formula.homepage.should be_nil
+			SmithyFormulaExamples::HomepageTestFormula.homepage.should == "http://rspec.info/"
+		end
 
-    expect { EmptyTestFormula.new.install }.to raise_error
-  end
+		it "has a url" do
+			module SmithyFormulaExamples
+				class UrlTestFormula < Formula
+					url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+				end
+			end
+			Formula.url.should be_nil
+			SmithyFormulaExamples::UrlTestFormula.url.should == "https://rubygems.org/downloads/rspec-2.12.0.gem"
+		end
 
-  it "has a homepage" do
-    class HomepageTestFormula < Formula
-      homepage "http://rspec.info/"
-    end
+		it "can use homepage value" do
+			module SmithyFormulaExamples
+				class HomepageUrlTestFormula < Formula
+					homepage "http://rspec.info/"
+					url homepage
+				end
+			end
+			SmithyFormulaExamples::HomepageUrlTestFormula.inspect
+			SmithyFormulaExamples::HomepageUrlTestFormula.url.should == "http://rspec.info/"
+		end
 
-    Formula.homepage.should be_nil
-    HomepageTestFormula.homepage.should == "http://rspec.info/"
-  end
+		it "passes values to instances" do
+			module SmithyFormulaExamples
+				class HomepageUrlTestFormula < Formula
+					homepage "http://rspec.info/"
+					url homepage
+				end
+			end
+			SmithyFormulaExamples::HomepageUrlTestFormula.url.should == "http://rspec.info/"
+			SmithyFormulaExamples::HomepageUrlTestFormula.new.url.should == "http://rspec.info/"
+		end
 
-  it "has a url" do
-    class UrlTestFormula < Formula
-      url "https://rubygems.org/downloads/rspec-2.12.0.gem"
-    end
+		it "has a hash" do
+			module SmithyFormulaExamples
+				class HashTestFormula < Formula
+					homepage "http://rspec.info/"
+					url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+					hash "1234567890"
+				end
+			end
+			SmithyFormulaExamples::HashTestFormula.hash.should == "1234567890"
+		end
 
-    Formula.url.should be_nil
-    UrlTestFormula.url.should == "https://rubygems.org/downloads/rspec-2.12.0.gem"
-  end
+		it "sets a version"
+	end
 
-  it "can use homepage value" do
-    class HomepageUrlTestFormula < Formula
-      homepage "http://rspec.info/"
-      url homepage
-    end
+	context "invalid formulas" do
+		it "raises an error if the install method is not implemented" do
+			module SmithyFormulaExamples
+				class EmptyTestFormula < Formula
+				end
+			end
+			expect { EmptyTestFormula.new.install }.to raise_error
+		end
 
-    HomepageUrlTestFormula.inspect
-    HomepageUrlTestFormula.url.should == "http://rspec.info/"
-  end
-
-  it "passes values to instances" do
-    HomepageUrlTestFormula.url.should == "http://rspec.info/"
-    HomepageUrlTestFormula.new.url.should == "http://rspec.info/"
-  end
-  it "has a hash"
-  it "sets a version"
+		it "raises and error if a homepage or url are unspecified"
+	end
 end
 
 # require 'spec_helper'

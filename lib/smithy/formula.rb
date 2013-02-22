@@ -1,7 +1,7 @@
 module Smithy
   class Formula
     def self.formula_name
-      self.to_s.underscore.gsub /_formula$/, ""
+      self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
     def self.install
@@ -18,7 +18,7 @@ module Smithy
     #   @url
     # end
 
-    %w{ url homepage }.each do |attr|
+    %w{ homepage url hash }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil)
           @#{attr} = value unless @#{attr}
@@ -30,6 +30,11 @@ module Smithy
         end
       }
     end
+
+    # def self.method_missing(*args)
+    #   debugger
+    #   puts self
+    # end
   end
 
 #   class Formula
