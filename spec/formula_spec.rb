@@ -82,8 +82,6 @@ describe Formula do
     SmithyFormulaExamples::HashTestFormula.md5.should == "1234567890"
   end
 
-  it "sets a version"
-
   it "raises an error if the install method is not implemented" do
     module SmithyFormulaExamples
       class InvalidFormulaNoInstall < Formula
@@ -114,6 +112,31 @@ describe Formula do
       end
     end
     SmithyFormulaExamples::FormulaFilePath.new.formula_file.should =~ /formula.rb$/
+  end
+
+  it "sets a version explicitly" do
+    module SmithyFormulaExamples
+      class FormulaWithManualVersion < Formula
+        homepage "http://rspec.info/"
+        url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+        version "2.12.0"
+        def install
+        end
+      end
+    end
+    SmithyFormulaExamples::FormulaWithManualVersion.new.version.should == "2.12.0"
+  end
+
+  it "guesses version number based on the url" do
+    module SmithyFormulaExamples
+      class FormulaWithUrlVersion < Formula
+        homepage "http://rspec.info/"
+        url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+        def install
+        end
+      end
+    end
+    SmithyFormulaExamples::FormulaWithUrlVersion.new.version.should == "2.12.0"
   end
 end
 

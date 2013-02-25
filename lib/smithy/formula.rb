@@ -1,14 +1,13 @@
 module Smithy
   class Formula
+    attr_accessor :formula_file
+
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
-    def formula_file
-      __FILE__
-    end
-
     def initialize
+      @formula_file = __FILE__
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
@@ -25,6 +24,22 @@ module Smithy
           @#{attr}
         end
       }
+    end
+
+    def self.version(value = nil)
+      unless @version
+        if value
+          @version = value
+        else
+          @version = File.basename(URI(self.url).path)
+          @version = $1 if @version =~ /([\d\.]+[\d])/
+        end
+      end
+      @version
+    end
+    def version
+      @version = self.class.version unless @version
+      @version
     end
 
     # def self.method_missing(*args)
