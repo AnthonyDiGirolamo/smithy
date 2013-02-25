@@ -1,19 +1,26 @@
 module Smithy
   class Formula
-    attr_accessor :formula_file
+    attr_accessor :formula_file, :name, :build_name, :prefix
 
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
-    def initialize
+    def initialize(package = nil)
       @formula_file = __FILE__
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
+      if package
+        @name       = package.name
+        @version    = package.version
+        @build_name = package.build_name
+        @prefix     = package.prefix
+      end
     end
 
-    %w{ homepage url md5 }.each do |attr|
+    # DSL Value Methods
+    %w{ homepage url md5 sha1 sha2 sha256 }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil)
           @#{attr} = value unless @#{attr}
@@ -26,6 +33,7 @@ module Smithy
       }
     end
 
+    # DLS Version Method, can set a version or guess based on the filename
     def self.version(value = nil)
       unless @version
         if value
@@ -37,6 +45,7 @@ module Smithy
       end
       @version
     end
+
     def version
       @version = self.class.version unless @version
       @version

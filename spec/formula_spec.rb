@@ -61,7 +61,6 @@ describe Formula do
     module SmithyFormulaExamples
       class HomepageUrlTestFormulaInstance < Formula
         homepage "http://rspec.info/"
-        # url "https://rubygems.org/downloads/rspec-2.12.0.gem"
         url homepage
         def install
         end
@@ -71,15 +70,21 @@ describe Formula do
     SmithyFormulaExamples::HomepageUrlTestFormulaInstance.new.url.should == "http://rspec.info/"
   end
 
-  it "has an md5" do
+  it "has a md5, sha1, sha2, or sha256 " do
     module SmithyFormulaExamples
       class HashTestFormula < Formula
         homepage "http://rspec.info/"
         url "https://rubygems.org/downloads/rspec-2.12.0.gem"
-        md5 "1234567890"
+        md5 "1"
+        sha1 "2"
+        sha2 "3"
+        sha256 "4"
       end
     end
-    SmithyFormulaExamples::HashTestFormula.md5.should == "1234567890"
+    SmithyFormulaExamples::HashTestFormula.md5.should == "1"
+    SmithyFormulaExamples::HashTestFormula.sha1.should == "2"
+    SmithyFormulaExamples::HashTestFormula.sha2.should == "3"
+    SmithyFormulaExamples::HashTestFormula.sha256.should == "4"
   end
 
   it "raises an error if the install method is not implemented" do
@@ -137,6 +142,30 @@ describe Formula do
       end
     end
     SmithyFormulaExamples::FormulaWithUrlVersion.new.version.should == "2.12.0"
+  end
+
+  describe "zlib test formula" do
+    before do
+      class ZlibFormula < Formula
+        homepage "http://zlib.net"
+        url      "http://zlib.net/zlib-1.2.7.tar.gz"
+        md5      "60df6a37c56e7c1366cca812414f7b85"
+        def install
+        end
+      end
+    end
+
+    it "takes a package" do
+      p = stub :name => "zlib",
+            :version => "1.2",
+         :build_name => "macos10.8_gnu4.2",
+             :prefix => "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"
+      z = ZlibFormula.new(p)
+      z.name.should       == "zlib"
+      z.version.should    == "1.2"
+      z.build_name.should == "macos10.8_gnu4.2"
+      z.prefix.should     == "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"
+    end
   end
 end
 
