@@ -4,29 +4,22 @@ module Smithy
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
+    def formula_file
+      __FILE__
+    end
+
     def initialize
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
     end
 
-    # def self.homepage(value = nil)
-    #   @homepage = value unless @homepage
-    #   @homepage
-    # end
-
-    # def self.url(value = nil)
-    #   @url = value unless @url
-    #   @url
-    # end
-
-    %w{ homepage url hash }.each do |attr|
+    %w{ homepage url md5 }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil)
           @#{attr} = value unless @#{attr}
           @#{attr}
         end
-
         def #{attr}
           @#{attr} = self.class.#{attr} unless @#{attr}
           @#{attr}
