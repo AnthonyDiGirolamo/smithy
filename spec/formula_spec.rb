@@ -16,6 +16,8 @@ describe Formula do
 		it "can run a defined install method" do
 			module SmithyFormulaExamples
 				class TestFormulaWithInstall < Formula
+          homepage "homepage"
+          url "url"
 					def install
 					end
 				end
@@ -48,6 +50,8 @@ describe Formula do
 				class HomepageUrlTestFormula < Formula
 					homepage "http://rspec.info/"
 					url homepage
+          def install
+          end
 				end
 			end
 			SmithyFormulaExamples::HomepageUrlTestFormula.inspect
@@ -56,13 +60,16 @@ describe Formula do
 
 		it "passes values to instances" do
 			module SmithyFormulaExamples
-				class HomepageUrlTestFormula < Formula
+				class HomepageUrlTestFormulaInstance < Formula
 					homepage "http://rspec.info/"
+					# url "https://rubygems.org/downloads/rspec-2.12.0.gem"
 					url homepage
+          def install
+          end
 				end
 			end
-			SmithyFormulaExamples::HomepageUrlTestFormula.url.should == "http://rspec.info/"
-			SmithyFormulaExamples::HomepageUrlTestFormula.new.url.should == "http://rspec.info/"
+			SmithyFormulaExamples::HomepageUrlTestFormulaInstance.url.should == "http://rspec.info/"
+			SmithyFormulaExamples::HomepageUrlTestFormulaInstance.new.url.should == "http://rspec.info/"
 		end
 
 		it "has a hash" do
@@ -82,13 +89,23 @@ describe Formula do
 	context "invalid formulas" do
 		it "raises an error if the install method is not implemented" do
 			module SmithyFormulaExamples
-				class EmptyTestFormula < Formula
+				class InvalidFormulaNoInstall < Formula
+					homepage "http://rspec.info/"
+					url "https://rubygems.org/downloads/rspec-2.12.0.gem"
 				end
 			end
-			expect { EmptyTestFormula.new.install }.to raise_error
+			expect { SmithyFormulaExamples::InvalidFormulaNoInstall.new }.to raise_error
 		end
 
-		it "raises and error if a homepage or url are unspecified"
+		it "raises an error if a homepage or url are unspecified" do
+      module SmithyFormulaExamples
+        class InvalidFormulaNoHomepageUrl < Formula
+          def install
+          end
+        end
+      end
+      expect { SmithyFormulaExamples::InvalidFormulaNoHomepageUrl.new }.to raise_error
+    end
 	end
 end
 

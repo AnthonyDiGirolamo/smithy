@@ -4,8 +4,10 @@ module Smithy
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
-    def self.install
-      raise "no install method implemented"
+    def initialize
+      raise "no install method implemented" unless self.respond_to?(:install)
+      raise "homepage must be specified" if homepage.blank?
+      raise "url must be specified" if url.blank?
     end
 
     # def self.homepage(value = nil)
@@ -27,6 +29,7 @@ module Smithy
 
         def #{attr}
           @#{attr} = self.class.#{attr} unless @#{attr}
+          @#{attr}
         end
       }
     end
