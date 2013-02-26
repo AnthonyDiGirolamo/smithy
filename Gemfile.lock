@@ -42,9 +42,6 @@ GEM
       rspec (~> 2.0)
       rspec-instafail (~> 0.2.0)
       ruby-progressbar (~> 1.0.0)
-    fuubar-cucumber (0.0.18)
-      cucumber (~> 1.2.0)
-      ruby-progressbar (~> 1.0.0)
     gherkin (2.11.6)
       json (>= 1.7.6)
     gli (2.5.4)
@@ -85,7 +82,6 @@ DEPENDENCIES
   cucumber
   debugger
   fuubar
-  fuubar-cucumber
   rake
   rdoc
   ronn
