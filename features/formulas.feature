@@ -24,9 +24,13 @@ Feature: Interact with formulas
     When I successfully run `smithy formula which zlib`
     Then the stdout should contain "/zlib_formula.rb"
 
+  @wip
   Scenario: Install a formula with full name
     When I successfully run `smithy formula install zlib/1.2/fullpath`
     Then show me the files
+    Then the stdout should contain "==> ./configure --prefix=/tmp/swsmithy/x86/zlib/1.2/fullpath"
+    Then the stdout should contain "==> make"
+    Then the stdout should contain "==> make install"
     Then the stdout should contain "SUCCESS /tmp/swsmithy/x86/zlib/1.2/fullpath"
     And a directory named "/tmp/swsmithy/x86/zlib/1.2/fullpath" should exist
     And a directory named "/tmp/swsmithy/x86/zlib/1.2/fullpath/source" should exist

@@ -89,8 +89,6 @@ module Smithy
         return f
       end
 
-      # # formula subcommands
-
       def install_command(options,args)
         initialize_directories(options)
 
@@ -101,7 +99,7 @@ module Smithy
           f = build_formula(package, options[:"formula-name"])
           f.package.create(:formula => true)
 
-      #     formula_prefix_contents = Dir["#{f.package.prefix}/*"]
+          formula_prefix_contents = Dir["#{f.prefix}/*"]
       #     unless formula_prefix_contents.empty?
       #       overwrite = nil
       #       while overwrite.nil? do
