@@ -1,22 +1,25 @@
 module Smithy
   class Formula
-    attr_accessor :formula_file, :name, :build_name, :prefix
+    attr_accessor :formula_file, :name, :build_name, :prefix, :package
 
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
 
-    def initialize(package = nil)
+    def initialize(passed_package = nil)
       @formula_file = __FILE__
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
-      if package
-        @name       = package.name
-        @version    = package.version
-        @build_name = package.build_name
-        @prefix     = package.prefix
-      end
+      set_package(passed_package) if passed_package
+    end
+
+    def set_package(p)
+      @package    = p
+      @name       = p.name
+      @version    = p.version
+      @build_name = p.build_name
+      @prefix     = p.prefix
     end
 
     # DSL Value Methods
@@ -59,19 +62,6 @@ module Smithy
 
 #   class Formula
 #     attr_accessor :module_setup, :formula_file_path
-
-#     def package
-#       @package
-#     end
-
-#     def package=(p)
-#       @package    = p
-#       @name       = @package.name
-#       @version    = @package.version
-#       @build_name = @package.build_name
-#       @prefix     = @package.prefix
-#       return @package
-#     end
 
 #     def initialize(args = {})
 #       self.package = args[:package] if args[:package]

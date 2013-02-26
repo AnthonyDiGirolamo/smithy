@@ -169,6 +169,16 @@ describe Formula do
       z.prefix.should     == "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"
       z.install.should == ["macos10.8_gnu4.2","/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"]
     end
+
+    it "can set the package" do
+      z = ZlibFormula.new
+      z.set_package(p)
+      z.name.should       == "zlib"
+      z.version.should    == "1.2"
+      z.build_name.should == "macos10.8_gnu4.2"
+      z.prefix.should     == "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"
+      z.install.should == ["macos10.8_gnu4.2","/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"]
+    end
   end
 end
 

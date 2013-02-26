@@ -22,10 +22,11 @@ Feature: Interact with formulas
 
   Scenario: Get file path of a formula
     When I successfully run `smithy formula which zlib`
-    Then the stdout should contain "formulas/zlib_formula.rb"
+    Then the stdout should contain "/zlib_formula.rb"
 
   Scenario: Install a formula with full name
     When I successfully run `smithy formula install zlib/1.2/fullpath`
+    Then show me the files
     Then the stdout should contain "SUCCESS /tmp/swsmithy/x86/zlib/1.2/fullpath"
     And a directory named "/tmp/swsmithy/x86/zlib/1.2/fullpath" should exist
     And a directory named "/tmp/swsmithy/x86/zlib/1.2/fullpath/source" should exist

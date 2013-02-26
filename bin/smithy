@@ -560,21 +560,21 @@ command ['formula'] do |c|
   c.desc "List known formulas"
   c.command :list do |subcommand|
     subcommand.action do |global_options,options,args|
-      FormulaCommand.list(options,args)
+      FormulaCommand.list_command(options,args)
     end
   end
 
   c.desc "Display a formula location"
   c.command :which do |subcommand|
     subcommand.action do |global_options,options,args|
-      FormulaCommand.which(options,args)
+      FormulaCommand.which_command(options,args)
     end
   end
 
   c.desc "Display a formula"
   c.command :display do |subcommand|
     subcommand.action do |global_options,options,args|
-      FormulaCommand.display(options,args)
+      FormulaCommand.display_command(options,args)
     end
   end
 
@@ -587,7 +587,7 @@ command ['formula'] do |c|
     subcommand.switch [:m, "modulefile"], :negatable => false
 
     subcommand.action do |global_options,options,args|
-      FormulaCommand.install(options,args)
+      FormulaCommand.install_command(options,args)
     end
   end
 end
