@@ -1,0 +1,41 @@
+---
+software-root: /sw
+file-group-name: ccsstaff
+hostname-architectures:
+  titan-ext: xk6
+  titan-login: xk6
+  arthur-login: xk6
+  chester-login: xk6
+  eugene: bgp
+  everest: redhat6
+  everest-login: redhat6
+  ewok: sith
+  fatman: scibox
+  frost: frost
+  jaguar-ext: xt5
+  jaguar: xk6
+  jaguarpf-login: xk6
+  jaguarpf-ext: xk6
+  lens-login: analysis-x64
+  lens: analysis-x64
+  rizzo: xt5
+  sith: redhat6
+  sith-login: redhat6
+  smoky-login: smoky
+  smoky: smoky
+  smokylogin: smoky
+  yona-login: yona
+  yona: yona
+programming-environment-prefix:
+  default: PrgEnv-
+  smoky: PE-
+  sith: PE-
+web-root: /ccs/proj/ccsstaff/swdesc/data
+descriptions-root: /sw/descriptions
+web-architecture-names:
+  xk6: titan
+  xk7: titan
+  analysis-x64: lens
+  smoky: smoky
+download-cache: /sw/sources
+
