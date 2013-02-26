@@ -144,6 +144,34 @@ describe Formula do
     SmithyFormulaExamples::FormulaWithUrlVersion.new.version.should == "2.12.0"
   end
 
+  it "can specify modules to load" do
+    module SmithyFormulaExamples
+      class FormulaWithModules < Formula
+        homepage "http://rspec.info/"
+        url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+        modules ["ruby"]
+        def install
+        end
+      end
+    end
+    SmithyFormulaExamples::FormulaWithModules.new.modules.should == ["ruby"]
+  end
+
+  it "can take a block for modules" do
+    module SmithyFormulaExamples
+      class FormulaWithModulesBlock < Formula
+        homepage "http://rspec.info/"
+        url "https://rubygems.org/downloads/rspec-2.12.0.gem"
+        modules do
+          ["ruby"] if version == "2.12.0"
+        end
+        def install
+        end
+      end
+    end
+    SmithyFormulaExamples::FormulaWithModulesBlock.new.modules.should == ["ruby"]
+  end
+
   describe "zlib test formula" do
     before(:all) do
       class ZlibFormula < Formula

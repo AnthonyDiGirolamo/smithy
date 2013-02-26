@@ -22,15 +22,15 @@ module Smithy
       @prefix     = p.prefix
     end
 
-    # DSL Value Methods
-    %w{ homepage url md5 sha1 sha2 sha256 }.each do |attr|
+    # DSL Methods
+    %w{ homepage url md5 sha1 sha2 sha256 modules }.each do |attr|
       class_eval %Q{
-        def self.#{attr}(value = nil)
-          @#{attr} = value unless @#{attr}
+        def self.#{attr}(value = nil, &block)
+          @#{attr} = block_given? ? block : value unless @#{attr}
           @#{attr}
         end
         def #{attr}
-          @#{attr} = self.class.#{attr} unless @#{attr}
+          @#{attr} = self.class.#{attr}.is_a?(Proc) ? instance_eval(&self.class.#{attr}) : self.class.#{attr} unless @#{attr}
           @#{attr}
         end
       }
