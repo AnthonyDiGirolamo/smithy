@@ -53,7 +53,7 @@ The root level directory for published web files
 
 
 === --[no-]colors
-Disable or enable color output (default: enabled)
+Disable or enable color output
 
 
 
