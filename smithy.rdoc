@@ -137,7 +137,7 @@ Install software from predefined formulas
 
 
 ===== Options
-===== -d|--directories arg
+===== -d|--directories PATH
 
 Specify one or more additional formula directories separated with commas
 
@@ -145,16 +145,16 @@ Specify one or more additional formula directories separated with commas
 
 
 ===== Commands
-====== Command: <tt>display </tt>
+====== Command: <tt>display  FORMULA</tt>
 Display a formula
 
 
-====== Command: <tt>install </tt>
+====== Command: <tt>install  FORMULA|NAME/VERSION/BUILD|NAME/VERSION...</tt>
 Install a package using a formula
 
 
 ======= Options
-======= -f|--formula-name arg
+======= -f|--formula-name NAME
 
 Formula name
 
@@ -170,7 +170,26 @@ Create modulefiles as well
 List known formulas
 
 
-====== Command: <tt>which </tt>
+====== Command: <tt>new  URL</tt>
+Create a new formula
+
+
+======= Options
+======= -h|--homepage URL
+
+Formula homepage
+
+[Default Value] None
+
+
+======= -n|--name NAME
+
+Formula name
+
+[Default Value] None
+
+
+====== Command: <tt>which  FORMULA</tt>
 Display a formula location
 
 
