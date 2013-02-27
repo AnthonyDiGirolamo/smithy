@@ -94,9 +94,11 @@ module Smithy
         Kernel.system @module_setup + args.join(' ')
       end
       if $?.exitstatus != 0
+        $stdout.flush
+        $stderr.flush
         raise <<-EOF.strip_heredoc
           The last command exited with status: #{$?.exitstatus}
-            Formula: #{formula_file_path}
+            Formula: #{formula_file}
             Build Directory: #{@package.source_directory}
         EOF
       end
