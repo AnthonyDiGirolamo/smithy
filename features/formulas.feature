@@ -50,14 +50,16 @@ Feature: Interact with formulas
     And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/lib" should exist
     And a file named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/lib/libz.a" should exist
 
-  # @wip
-  # Scenario: Install a formula using only the formula
-  #   When I successfully run `smithy formula install zlib`
-  #   Then show me the files
-  #   Then the stdout should contain "SUCCESS /tmp/swsmithy/x86/zlib/1.2.7/build"
-  #   And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/build" should exist
-  #   And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/build/source" should exist
-  #   And a file named "/tmp/swsmithy/x86/zlib/1.2.7/build/source/configure" should exist
-  #   And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/build/lib" should exist
-  #   And a file named "/tmp/swsmithy/x86/zlib/1.2.7/build/lib/libz.a" should exist
+  Scenario: Install a formula using the formula name only
+    When I successfully run `smithy formula install zlib`
+    # Then show me the files
+    Then the stdout should contain "==> ./configure --prefix=/tmp/swsmithy/x86/zlib/1.2.7/sles11.1"
+    Then the stdout should contain "==> make"
+    Then the stdout should contain "==> make install"
+    Then the stdout should contain "==> SUCCESS /tmp/swsmithy/x86/zlib/1.2.7/sles11.1"
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1" should exist
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/source" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/source/configure" should exist
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/lib" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1/lib/libz.a" should exist
 
