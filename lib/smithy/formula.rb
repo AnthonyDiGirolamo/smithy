@@ -1,6 +1,6 @@
 module Smithy
   class Formula
-    attr_accessor :formula_file, :name, :build_name, :prefix, :package
+    attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup
 
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
@@ -12,6 +12,20 @@ module Smithy
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
       set_package(passed_package) if passed_package
+
+      @module_setup = ''
+
+#       if ENV['MODULESHOME']
+#         @modulecmd = "modulecmd sh"
+#         @modulecmd = "#{ENV['MODULESHOME']}/bin/modulecmd sh" if File.exists?("#{ENV['MODULESHOME']}/bin/modulecmd")
+#         @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null`
+#         @module_setup << ' '
+#         if modules
+#           @module_setup << `#{@module_setup} #{@modulecmd} load #{@modules.join(' ')}`
+#           @module_setup << ' '
+#         end
+#       end
+
     end
 
     def set_package(p)
@@ -52,6 +66,19 @@ module Smithy
     def version
       @version = self.class.version unless @version
       @version
+    end
+
+    def run_install
+      install
+      notice_success "SUCCESS #{@prefix}"
+      return true
+    end
+
+    def module_list
+      if ENV['MODULESHOME']
+        notice "module list"
+        Kernel.system @module_setup + "#{@modulecmd} list 2>&1"
+      end
     end
 
     # def self.method_missing(*args)
@@ -135,18 +162,6 @@ module Smithy
 #       end
 #     end
 
-#     def run_install
-#       install
-#       notice_success "SUCCESS #{@package.prefix}"
-#       return true
-#     end
-
-#     def module_list
-#       if ENV['MODULESHOME']
-#         notice "module list"
-#         Kernel.system @module_setup + "#{@modulecmd} list 2>&1"
-#       end
-#     end
 
 #     # DSL and instance methods
 

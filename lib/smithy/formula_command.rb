@@ -72,7 +72,7 @@ module Smithy
         puts formula_names
       end
 
-      # construct a new fomula object given a package
+      # construct a new fomula object given a formula name or full name/version/build
       def build_formula(package, formula_name = nil)
         name, version, build = package.split("/")
         formula_name = name if formula_name.blank?
@@ -128,18 +128,18 @@ module Smithy
       #       end
           # end
 
-      #     d = DownloadCache.new(f, options[:"formula-name"]).get
-      #     raise "Download failure" unless d
-      #     # f.package.extract(:archive => d, :overwrite => true)
-      #     f.package.extract(:archive => d)
+          d = DownloadCache.new(f, options[:"formula-name"]).get
+          raise "Download failure" unless d
+          # f.package.extract(:archive => d, :overwrite => true)
+          f.package.extract(:archive => d)
 
-      #     ModuleFile.new(:package => f.package).create if options[:"modulefile"]
+          ModuleFile.new(:package => f.package).create if options[:"modulefile"]
 
-      #     Dir.chdir File.join(f.package.prefix, "source")
-      #     if f.run_install
-      #       f.package.create_valid_build_file
-      #       f.package.set_file_permissions_recursive
-      #     end
+          Dir.chdir File.join(f.package.prefix, "source")
+          if f.run_install
+            f.package.create_valid_build_file
+            f.package.set_file_permissions_recursive
+          end
         end #packages.each
       end
 
