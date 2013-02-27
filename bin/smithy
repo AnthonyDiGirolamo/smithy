@@ -556,6 +556,7 @@ end
 desc "Install software from predefined formulas"
 command ['formula'] do |c|
   c.desc "Specify one or more additional formula directories separated with commas"
+  c.arg_name "PATH"
   c.flag [:d, :directories], :type => Array
 
   c.desc "List known formulas"
@@ -566,6 +567,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Display a formula location"
+  c.arg_name "FORMULA"
   c.command :which do |subcommand|
     subcommand.action do |global_options,options,args|
       FormulaCommand.which_command(options,args)
@@ -573,15 +575,34 @@ command ['formula'] do |c|
   end
 
   c.desc "Display a formula"
+  c.arg_name "FORMULA"
   c.command :display do |subcommand|
     subcommand.action do |global_options,options,args|
       FormulaCommand.display_command(options,args)
     end
   end
 
+  c.desc "Create a new formula"
+  c.arg_name "URL"
+  c.command :new do |subcommand|
+    subcommand.desc "Formula name"
+    subcommand.arg_name "NAME"
+    subcommand.flag [:n, "name"]
+
+    subcommand.desc "Formula homepage"
+    subcommand.arg_name "URL"
+    subcommand.flag [:h, "homepage"]
+
+    subcommand.action do |global_options,options,args|
+      FormulaCommand.new_command(options,args)
+    end
+  end
+
   c.desc "Install a package using a formula"
+  c.arg_name "FORMULA|NAME/VERSION/BUILD|NAME/VERSION..."
   c.command :install do |subcommand|
     subcommand.desc "Formula name"
+    subcommand.arg_name "NAME"
     subcommand.flag [:f, "formula-name"]
 
     subcommand.desc "Create modulefiles as well"

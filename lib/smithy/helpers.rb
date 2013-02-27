@@ -191,4 +191,15 @@ module Smithy
     File.basename(URI(url).path)
   end
 
+  def url_filename_version_number(url)
+    version = url_filename(url)
+    version = $1 if version =~ /([\d\.]+[\d])/
+    version
+  end
+
+  def url_filename_basename(url)
+    name = url_filename(url)
+    name = $1 if name =~ /(.*?)-([\d\.]+[\d])/
+    name
+  end
 end

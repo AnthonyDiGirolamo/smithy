@@ -208,6 +208,7 @@ module Smithy
       end
 
       def render_erb(args = {})
+        args[:options] = {} unless args[:options]
         options = {:noop => false, :verbose => false}
         options.merge!(args[:options])
         erb_filename  = args[:erb]

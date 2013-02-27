@@ -143,6 +143,19 @@ module Smithy
         end #packages.each
       end
 
+      def new_command(options,args)
+        @formula_name     = options[:name]
+        @formula_name     = url_filename_basename(args.first) unless options[:name]
+        @formula_name     = @formula_name.camelize
+        @formula_url      = args.first
+        @formula_homepage = options[:homepage]
+        @formula_homepage = "#{URI(@formula_url).scheme}://#{URI(@formula_url).host}/" unless options[:homepage]
+        FileUtils::mkdir_p(File.join(ENV["HOME"], ".smithy/formulas"))
+        FileOperations.render_erb :binding => binding,
+          :erb         => File.join(@@smithy_bin_root, "etc/templates/formula.rb.erb"),
+          :destination => File.join(ENV["HOME"], ".smithy/formulas", "#{@formula_name.underscore}_formula.rb")
+      end
+
     end #class << self
   end #FormulaCommand
 

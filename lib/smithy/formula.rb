@@ -53,8 +53,7 @@ module Smithy
         if value
           @version = value
         else
-          @version = url_filename(self.url)
-          @version = $1 if @version =~ /([\d\.]+[\d])/
+          @version = url_filename_version_number(self.url)
         end
       end
       @version
