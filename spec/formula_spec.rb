@@ -172,7 +172,7 @@ describe Formula do
     SmithyFormulaExamples::FormulaWithModulesBlock.new.modules.should == ["ruby"]
   end
 
-  describe "zlib test formula" do
+  describe "#initialize" do
     before(:all) do
       class ZlibFormula < Formula
         homepage "http://zlib.net"
@@ -198,7 +198,7 @@ describe Formula do
       z.install.should == ["macos10.8_gnu4.2","/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"]
     end
 
-    it "can set the package" do
+    it "can set the package after initialization" do
       z = ZlibFormula.new
       z.set_package(p)
       z.name.should       == "zlib"
@@ -208,9 +208,10 @@ describe Formula do
       z.install.should == ["macos10.8_gnu4.2","/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"]
     end
 
-    it "stores module purge commands", :if => ENV["MODULESHOME"] do
+    it "saves module purge commands", :if => ENV["MODULESHOME"] do
       z = ZlibFormula.new
-      z.module_setup.should include("blah")
+      z.module_setup.should include("unset")
+      z.module_setup.should include("export")
     end
   end
 end

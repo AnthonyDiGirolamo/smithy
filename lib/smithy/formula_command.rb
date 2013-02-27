@@ -100,33 +100,33 @@ module Smithy
           f.package.create(:formula => true)
 
           formula_prefix_contents = Dir["#{f.prefix}/*"]
-      #     unless formula_prefix_contents.empty?
-      #       overwrite = nil
-      #       while overwrite.nil? do
-      #         notice_conflict f.package.prefix
-      #         prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Is not empty, delete contents? (enter \"h\" for help) [ynhq] ")
-      #         case prompt.downcase
-      #         when "y"
-      #           overwrite = true
-      #         when "n"
-      #           overwrite = false
-      #         when "h"
-      #           indent = " "*FILE_NOTICE_COLUMNS
-      #           puts indent+"y - yes, delete existing install"
-      #           puts indent+"n - no, do not overwrite"
-      #           puts indent+"h - help, show this help"
-      #           puts indent+"q - exit now"
-      #         when "q"
-      #           raise "Abort new formula install"
-      #         end
-      #       end
-
-      #       if overwrite
-      #         formula_prefix_contents.each do |f|
-      #           FileUtils.rm_rf(f)
-      #         end
-      #       end
-          # end
+          unless formula_prefix_contents.empty?
+            # overwrite = nil
+            # while overwrite.nil? do
+            #   notice_conflict f.package.prefix
+            #   prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Is not empty, delete contents? (enter \"h\" for help) [ynhq] ")
+            #   case prompt.downcase
+            #   when "y"
+            #     overwrite = true
+            #   when "n"
+            #     overwrite = false
+            #   when "h"
+            #     indent = " "*FILE_NOTICE_COLUMNS
+            #     puts indent+"y - yes, delete existing install"
+            #     puts indent+"n - no, do not overwrite"
+            #     puts indent+"h - help, show this help"
+            #     puts indent+"q - exit now"
+            #   when "q"
+            #     raise "Abort new formula install"
+            #   end
+            # end
+            # if overwrite
+            notice "cleaning #{f.prefix}"
+              formula_prefix_contents.each do |f|
+                FileUtils.rm_rf(f)
+              end
+            # end
+          end
 
           d = DownloadCache.new(f, options[:"formula-name"]).get
           raise "Download failure" unless d
