@@ -98,7 +98,8 @@ desc "The root level directory global description files"
 arg_name "PATH"
 flag ["descriptions-root"]
 
-desc "Disable or enable color output (default: enabled)"
+desc "Disable or enable color output"
+default_value true
 switch "colors"
 
 desc "Alternate config file, also set by $SMITHY_CONFIG"
