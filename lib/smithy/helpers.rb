@@ -186,4 +186,9 @@ module Smithy
     end
     return b
   end
+
+  def url_filename(url)
+    File.basename(URI(url).path)
+  end
+
 end

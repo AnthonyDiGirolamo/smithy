@@ -27,7 +27,7 @@ module Smithy
     end
 
     def downloaded_file_name
-      File.basename(URI(url).path)
+      url_filename(url)
     end
 
     def downloaded_file_dir
