@@ -61,35 +61,35 @@ end
 
 module Smithy
   def notice(message)
-    STDOUT.puts "==> ".color(:blue).bright+message.bright if STDOUT.tty?
+    STDOUT.puts "==> ".color(:blue).bright+message.bright #if STDOUT.tty?
   end
 
   def notice_warn(message)
-    STDOUT.puts ("==> "+message).color(:yellow) if STDOUT.tty?
+    STDOUT.puts ("==> "+message).color(:yellow) #if STDOUT.tty?
   end
 
   def notice_info(message)
-    STDOUT.puts (message).color(:blue) if STDOUT.tty?
+    STDOUT.puts (message).color(:blue) #if STDOUT.tty?
   end
 
   def notice_command(command, comment, width=40)
-    STDOUT.puts command.bright.ljust(width)+comment.color(:blue) if STDOUT.tty?
+    STDOUT.puts command.bright.ljust(width)+comment.color(:blue) #if STDOUT.tty?
   end
 
   def notice_success(message)
-    if STDOUT.tty?
+    # if STDOUT.tty?
       STDOUT.puts "==> ".color(:green).bright + message.color(:green)
-    else
-      STDOUT.puts message
-    end
+    # else
+    #   STDOUT.puts message
+    # end
   end
 
   def notice_fail(message)
-    if STDOUT.tty?
+    # if STDOUT.tty?
       STDOUT.puts ("==> "+message).color(:red)
-    else
-      STDOUT.puts message
-    end
+    # else
+    #   STDOUT.puts message
+    # end
   end
 
   def notice_exception(message)
