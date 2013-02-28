@@ -161,7 +161,7 @@ module Smithy
   end
 
   def operating_system
-    b = "build"
+    b = `uname -m`.chomp
     redhat = "/etc/redhat-release"
     suse = "/etc/SuSE-release"
     if File.exists? redhat
@@ -183,6 +183,10 @@ module Smithy
       content =~ /PATCHLEVEL = (\d+)/
       patch = $1
       b = "sles#{version}.#{patch}"
+    end
+
+    if `gcc --version` =~ /gcc \((.*)\) ([\d\.]+)/
+      b << "_gnu#{$2}"
     end
     return b
   end

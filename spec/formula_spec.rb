@@ -223,7 +223,8 @@ describe Formula do
     end
 
     it "can take a block for modules and use name, version, build_name" do
-      ZlibFormula.new.modules.should == ["zlib", "1.2.7", "sles11.1"]
+      ZlibFormula.new.modules.should include "zlib"
+      ZlibFormula.new.modules.should include "1.2.7"
       ZlibFormula.new(p).modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
     end
 
