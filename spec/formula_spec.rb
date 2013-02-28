@@ -7,9 +7,14 @@ describe Formula do
   it "knows it's name" do
     module SmithyFormulaExamples
       class TestFormula < Formula
+        homepage "homepage"
+        url "url"
+        def install
+        end
       end
     end
     SmithyFormulaExamples::TestFormula.formula_name.should == "test"
+    SmithyFormulaExamples::TestFormula.new.formula_name.should == "test"
   end
 
   it "can run a defined install method" do
@@ -178,6 +183,9 @@ describe Formula do
         homepage "http://zlib.net"
         url      "http://zlib.net/zlib-1.2.7.tar.gz"
         md5      "60df6a37c56e7c1366cca812414f7b85"
+        modules do
+          [name, version, build_name]
+        end
         def install
           [build_name, prefix]
         end
@@ -213,6 +221,12 @@ describe Formula do
       z.module_setup.should include("unset")
       z.module_setup.should include("export")
     end
+
+    it "can take a block for modules and use name, version, build_name" do
+      ZlibFormula.new.modules.should == ["zlib", "1.2.7", "sles11.1"]
+      ZlibFormula.new(p).modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
+    end
+
   end
 end
 

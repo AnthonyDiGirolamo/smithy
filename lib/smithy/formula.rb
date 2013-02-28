@@ -5,23 +5,39 @@ module Smithy
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub /_formula$/, ""
     end
+    def formula_name
+      self.class.formula_name
+    end
 
     def initialize(passed_package = nil)
       @formula_file = __FILE__
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
-      set_package(passed_package) if passed_package
+      initialize_modules
+      if passed_package
+        set_package(passed_package)
+      else
+        # guess name and build_name
+        @name = self.formula_name
+        @build_name = operating_system
+        set_loaded_modules
+      end
+    end
 
+    def initialize_modules
       @module_setup = ""
       if ENV["MODULESHOME"]
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
         @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null` << " "
-        if modules
-          raise "modules must return a list of strings" unless modules.is_a? Array
-          @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
-        end
+      end
+    end
+
+    def set_loaded_modules
+      if modules
+        raise "modules must return a list of strings" unless modules.is_a? Array
+        @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
       end
     end
 
@@ -31,6 +47,7 @@ module Smithy
       @version    = p.version
       @build_name = p.build_name
       @prefix     = p.prefix
+      set_loaded_modules unless @module_setup.blank?
     end
 
     # DSL Methods
@@ -45,6 +62,24 @@ module Smithy
           @#{attr}
         end
       }
+        # def self.#{attr}(value = nil, &block)
+        #   if block_given?
+        #     @#{attr} = block
+        #   elsif value
+        #     @#{attr} = value
+        #   end
+        #   @#{attr}
+        # end
+        # def #{attr}
+        #   unless @#{attr}
+        #     if self.class.#{attr}.is_a?(Proc)
+        #       @#{attr} = instance_eval(&self.class.#{attr})
+        #     else
+        #       @#{attr} = self.class.#{attr}
+        #     end
+        #   end
+        #   @#{attr}
+        # end
     end
 
     # DLS Version Method, can set a version or guess based on the filename
