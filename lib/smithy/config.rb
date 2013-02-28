@@ -60,6 +60,7 @@ module Smithy
         options_to_merge[:"descriptions-root"] = @config_file_hash.try(:[], "descriptions-root")
         options_to_merge[:"web-architecture-names"] = @config_file_hash.try(:[], "web-architecture-names")
         options_to_merge[:"download-cache"] = @config_file_hash.try(:[], "download-cache")
+        options_to_merge[:"formula-directories"] = @config_file_hash.try(:[], "formula-directories")
 
         set_hostname_and_arch
         options_to_merge[:arch] = @arch

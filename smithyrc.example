@@ -38,4 +38,6 @@ web-architecture-names:
   analysis-x64: lens
   smoky: smoky
 download-cache: /sw/sources
+formula-directories:
+- /sw/tools/smithy/formulas
 

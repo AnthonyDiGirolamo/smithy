@@ -8,10 +8,13 @@ module Smithy
       # 3. smithy's built in formulas
       def formula_directories
         unless @formula_directories
-          @formula_directories = [
-            File.join(ENV["HOME"], ".smithy/formulas"),
-            File.join(@@smithy_bin_root, "formulas")
-          ]
+          @formula_directories = [ File.join(ENV["HOME"], ".smithy/formulas") ]
+          if Smithy::Config.global[:"formula-directories"]
+            Smithy::Config.global[:"formula-directories"].reverse.each do |dir|
+              @formula_directories << dir
+            end
+          end
+          @formula_directories << File.join(@@smithy_bin_root, "formulas")
         end
         @formula_directories
       end
@@ -150,10 +153,19 @@ module Smithy
         @formula_url      = args.first
         @formula_homepage = options[:homepage]
         @formula_homepage = "#{URI(@formula_url).scheme}://#{URI(@formula_url).host}/" unless options[:homepage]
-        FileUtils::mkdir_p(File.join(ENV["HOME"], ".smithy/formulas"))
+
+        destination = File.join(ENV["HOME"], ".smithy/formulas")
+        destination = Smithy::Config.global[:"formula-directories"].first if Smithy::Config.global[:"formula-directories"]
+        FileUtils::mkdir_p(destination)
+
+        destination = File.join(destination, "#{@formula_name.underscore}_formula.rb")
         FileOperations.render_erb :binding => binding,
           :erb         => File.join(@@smithy_bin_root, "etc/templates/formula.rb.erb"),
-          :destination => File.join(ENV["HOME"], ".smithy/formulas", "#{@formula_name.underscore}_formula.rb")
+          :destination => destination
+        if Smithy::Config.global[:"file-group-name"]
+          FileOperations.set_group(destination, Smithy::Config.global[:"file-group-name"])
+          FileOperations.make_group_writable(destination)
+        end
       end
 
     end #class << self
