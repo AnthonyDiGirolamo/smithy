@@ -35,7 +35,7 @@ module Smithy
     end
 
     def set_loaded_modules
-      if modules
+      if ENV["MODULESHOME"] && modules
         raise "modules must return a list of strings" unless modules.is_a? Array
         @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
       end
