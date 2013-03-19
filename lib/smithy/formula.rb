@@ -100,7 +100,7 @@ module Smithy
     end
 
     def run_install
-      check_dependencies
+      check_dependencies if depends_on
       install
       notice_success "SUCCESS #{@prefix}"
       return true
