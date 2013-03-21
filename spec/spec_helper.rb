@@ -9,8 +9,7 @@ require 'rubygems'
 require 'debugger'
 require 'bundler/setup'
 
-require 'active_support/core_ext/hash'
-require 'active_support/core_ext/string'
+require 'active_support/all'
 require 'smithy'
 include Smithy
 
