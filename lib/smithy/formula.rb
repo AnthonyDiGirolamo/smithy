@@ -88,7 +88,7 @@ module Smithy
         if value
           @version = value
         else
-          @version = url_filename_version_number(self.url)
+          @version = url_filename_version_number(url) if url.present?
         end
       end
       @version
