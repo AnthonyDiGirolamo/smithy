@@ -92,9 +92,8 @@ module Smithy
       def load_config_yaml
         config_path = File.expand_path(ENV['SMITHY_CONFIG']) if ENV['SMITHY_CONFIG']
         config_path = File.expand_path(global[:"config-file"]) if global[:"config-file"]
-        config_path = File.expand_path(@config_file_name) if config_path.blank?
 
-        if File.exists? config_path
+        if config_path.present? && File.exists?(config_path)
           @config_file_name = config_path
           begin
             @config_file_hash = YAML.load_file(config_path).stringify_keys
@@ -104,7 +103,8 @@ module Smithy
           end
         else
           raise """Cannot read config file: #{@config_file_name}
-       Please set the $SMITHY_CONFIG variable to a config file location"""
+       Please set the $SMITHY_CONFIG variable to a config file location
+       Or use the --config-file=FILE option"""
         end
       end
 
