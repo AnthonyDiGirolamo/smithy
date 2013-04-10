@@ -124,10 +124,12 @@ module Smithy
             #   end
             # end
             # if overwrite
-            notice "cleaning #{f.prefix}"
+            if options[:clean]
+              notice "cleaning #{f.prefix}"
               formula_prefix_contents.each do |f|
                 FileUtils.rm_rf(f)
               end
+            end
             # end
           end
 
