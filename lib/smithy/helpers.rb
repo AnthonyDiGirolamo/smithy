@@ -35,30 +35,6 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # }}}
 
-# try and blank? methods borrowed from rails
-# See: https://github.com/rails/rails/blob/master/activesupport/lib/active_support/core_ext/object/try.rb
-class Object
-  def try(method, *args, &block)
-    send(method, *args, &block)
-  end
-  remove_method :try
-  alias_method :try, :__send__
-
-  def blank?
-    respond_to?(:empty?) ? empty? : !self
-  end
-end
-
-class NilClass #:nodoc:
-  def try(*args)
-    nil
-  end
-
-  def blank?
-    true
-  end
-end
-
 module Smithy
   def notice(message)
     STDOUT.puts "==> ".color(:blue).bright+message.bright #if STDOUT.tty?
