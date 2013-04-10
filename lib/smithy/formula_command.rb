@@ -104,8 +104,8 @@ module Smithy
 
           formula_prefix_contents = Dir["#{f.prefix}/*"]
           unless formula_prefix_contents.empty?
-            # overwrite = nil
-            # while overwrite.nil? do
+            # overwrite = "unknown"
+            # while overwrite == "unknown" do
             #   notice_conflict f.package.prefix
             #   prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Is not empty, delete contents? (enter \"h\" for help) [ynhq] ")
             #   case prompt.downcase

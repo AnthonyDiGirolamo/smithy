@@ -326,11 +326,10 @@ module Smithy
 
       return if args[:dry_run]
 
-      overwrite = nil
-      overwrite = Smithy::Config.global.try(:[], :force)
+      overwrite = Smithy::Config.global.try(:[], :force) ? true : "unknown"
       overwrite = true if args[:overwrite]
       if File.exists?(source_directory)
-        while overwrite.nil? do
+        while overwrite == "unknown" do
           prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynh] ")
           case prompt.downcase
           when "y"
@@ -612,8 +611,8 @@ module Smithy
     def self.create_stubs_from_modules(stub_packages, system_module_defaults, options = {})
       notice "Generating stubs for the following modules:"
       Format.print_column_list(stub_packages)
-      proceed = nil
-      while proceed.nil? do
+      proceed = "no"
+      while proceed == "no" do
         prompt = Readline.readline("Generate the above packages? [yn] ")
         case prompt.downcase
         when "y"

@@ -83,7 +83,7 @@ module Smithy
         begin
           FileUtils.send method, nil, new_group, f, options
         rescue
-          raise "Could not set group \"#{new_group}\" on \"#{f}\""
+          # raise "Could not set group \"#{new_group}\" on \"#{f}\""
         end
       end
 
@@ -143,8 +143,8 @@ module Smithy
             installed = true
           else
             notice_conflict dest
-            overwrite = nil
-            while overwrite.nil? do
+            overwrite = "unknown"
+            while overwrite == "unknown" do
               prompt = Readline.readline(" "*FILE_NOTICE_COLUMNS+"Overwrite? (enter \"h\" for help) [ynsdh] ")
               case prompt.downcase
               when "y"
