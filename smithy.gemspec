@@ -57,6 +57,7 @@ man/man1/smithy.1
   s.bindir = 'bin'
   s.executables << 'smithy'
   s.add_development_dependency('awesome_print')
+  s.add_development_dependency('interactive_editor')
   s.add_development_dependency('cucumber')
   s.add_development_dependency('debugger')
   s.add_development_dependency('rake')
