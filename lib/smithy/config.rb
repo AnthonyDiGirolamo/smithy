@@ -114,6 +114,10 @@ module Smithy
         notice_command "All Architectures: ", @config_file_hash["hostname-architectures"].values.uniq.sort.join(", "), 30
       end
 
+      def compilers
+        config_file_hash.try(:[], "compilers")
+      end
+
       def get_prgenv_prefix
         default_prefix = "PrgEnv-"
 
@@ -169,6 +173,46 @@ module Smithy
           f.write(h.to_yaml)
         end
       end
+
+      def example_config
+        example = {}
+        example["software-root"]       = "/sw"
+        example["download-cache"]      = "/sw/sources"
+        example["formula-directories"] = [
+          "/sw/tools/smithy/formulas",
+          "/sw/tools/smithy/another_formula_directory"
+        ]
+        example["file-group-name"]        = "ccsstaff"
+        example["descriptions-root"]      = "/sw/descriptions"
+        example["web-root"]               = "/sw/descriptions_in_html"
+        example["web-architecture-names"] = {
+          "xk6"          => "titan",
+          "xk7"          => "titan",
+          "analysis-x64" => "lens",
+          "smoky"        => "smoky"
+        }
+        example["programming-environment-prefix"] = {
+          "default" => "PrgEnv-",
+          "smoky"   => "PE-",
+          "sith"    => "PE-"
+        }
+        example["hostname-architectures"] = {
+          "everest-login" => "redhat6",
+          "everest"       => "redhat6",
+          "lens"          => "analysis-x64",
+          "sith-login"    => "redhat6",
+          "sith"          => "redhat6",
+          "smoky-login"   => "smoky",
+          "titan-login"   => "xk6",
+          "titan-ext"     => "xk6",
+          "yona-login"    => "yona",
+          "yona"          => "yona"
+        }
+        example["compilers"] = ModuleFile::Environments
+
+        return example.to_yaml
+      end
+
     end
   end
 end

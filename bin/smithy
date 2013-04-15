@@ -551,6 +551,13 @@ command ['show'] do |c|
       Smithy::Config.architectures
     end
   end
+
+  c.desc "Display an example config file."
+  c.command :example_config do |example_config|
+    example_config.action do
+      puts Smithy::Config.example_config
+    end
+  end
 end
 
 desc "Install software from predefined formulas"

@@ -6,7 +6,7 @@ Checkmarks indicate a given version is available for the compiler specified in e
   <thead>
     <tr>
       <td style="text-align:center;"><b>Version</b></td>
-      <% ModuleFile::Environments.reject{|e| e[:human_name]=="pathscale"}.each do |e| %>
+      <% ModuleFile::compilers.reject{|e| e[:human_name]=="pathscale"}.each do |e| %>
       <td style="text-align:center;"><b><%= e[:human_name].upcase %></b></td>
       <% end %>
     </tr>
@@ -15,7 +15,7 @@ Checkmarks indicate a given version is available for the compiler specified in e
   <% @version_table.each do |version, builds| %>
   <tr>
     <td style="text-align:center;"><b><%= "#{@name}/#{version}" %></b></td>
-    <% ModuleFile::Environments.reject{|e| e[:human_name]=="pathscale"}.each do |e| %>
+    <% ModuleFile::compilers.reject{|e| e[:human_name]=="pathscale"}.each do |e| %>
     <td style="text-align:center;"><% if builds.select{|b|b=~e[:regex]}.size > 0 %><img width="23" height="18" style="margin:0;" title="checkmark" alt="" src="http://www.olcf.ornl.gov/wp-content/uploads/2011/03/checkmark.png"><% end %></td>
     <% end %>
   </tr>

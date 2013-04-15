@@ -54,6 +54,10 @@ module Smithy
     ]
       #{:prg_env => "PrgEnv-pathscale", :compiler_name => "pathscale", :human_name => "pathscale", :regex => /(pathscale)(.*)/}
 
+    def self.compilers
+      Smithy::Config.compilers || Environments
+    end
+
     def initialize(args = {})
       @package = args[:package]
       @builds = @package.alternate_builds
@@ -132,7 +136,7 @@ module Smithy
 
       notice "Multiple Builds Found" if Smithy::Config.global[:verbose]
       notice_info "Build Name".rjust(25)+"   Required Modules" if Smithy::Config.global[:verbose]
-      Environments.each_with_index do |e,i|
+      compilers.each_with_index do |e,i|
         if i == 0
           output << "if "
         else

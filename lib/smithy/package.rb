@@ -453,7 +453,7 @@ module Smithy
 
     def module_load_prgenv
       output = ""
-      ModuleFile::Environments.each do |e|
+      ModuleFile::compilers.each do |e|
         if build_name =~ e[:regex]
           output = "module load #{e[:prg_env]}"
           break
