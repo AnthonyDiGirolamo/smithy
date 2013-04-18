@@ -35,6 +35,7 @@ module Smithy
     end
 
     def set_loaded_modules
+      @modules = nil # reset modules
       if ENV["MODULESHOME"] && modules
         raise "modules must return a list of strings" unless modules.is_a? Array
         @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
@@ -47,7 +48,10 @@ module Smithy
       @version    = p.version
       @build_name = p.build_name
       @prefix     = p.prefix
-      set_loaded_modules unless @module_setup.blank?
+      # re-setup module environment
+      @modules = nil
+      initialize_modules
+      set_loaded_modules
     end
 
     # DSL Methods
