@@ -161,6 +161,11 @@ Formula name
 [Default Value] None
 
 
+======= -c|--[no-]clean
+Clean exiting install prefix
+
+
+
 ======= -m|--modulefile
 Create modulefiles as well
 
@@ -314,6 +319,10 @@ Display internal smithy values
 ===== Commands
 ====== Command: <tt>arch </tt>
 List all architectures know to smithy.
+
+
+====== Command: <tt>example_config </tt>
+Display an example config file.
 
 
 ====== Command: <tt>last </tt>
