@@ -1,11 +1,11 @@
 class NcoFormula < Formula
   homepage "http://nco.sourceforge.net/"
-  url "http://nco.sourceforge.net/src/nco-4.2.5.tar.gz"
-  md5 "8bb89217ac1dadb62679d1b08ea19025"
+  url "http://nco.sourceforge.net/src/nco-4.3.0.tar.gz"
+  md5 "7dc000805441cc30ff9de837e088df34"
 
-  modules ["PrgEnv-gnu", "netcdf", "hdf5", "gsl"]
+  modules ["PrgEnv-gnu", "netcdf", "hdf5", "gsl", "java"]
 
-  depends_on ["udunits", "gsl", "expat"]
+  depends_on ["udunits", "gsl", "expat", "antlr2"]
 
   def install
     module_list
@@ -27,12 +27,12 @@ class NcoFormula < Formula
            "NETCDF4_ROOT=$NETCDF_DIR",
            "NETCDF_INC=$NETCDF_DIR/include",
            "NETCDF_LIB=$NETCDF_DIR/lib",
+           "ANTLR_ROOT=#{antlr2.prefix}",
            "./configure --prefix=#{prefix}",
            "--disable-shared",
            "--enable-netcdf4",
            "--disable-udunits",
-           "--enable-udunits2",
-           "--disable-ncap2"
+           "--enable-udunits2"
     system "make"
     system "make install"
   end
