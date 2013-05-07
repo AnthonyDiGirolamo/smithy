@@ -61,6 +61,8 @@ require 'active_support/inflector'
 # require 'pry'
 # require 'pry-doc'
 
+@@global_argv = ARGV.dup
+
 require 'gli'
 include GLI::App
 
@@ -647,6 +649,8 @@ pre do |global,command,options,args|
   Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
   Smithy::Config.load_configuration(global)
 
+  @@global_config = global
+
   # Pre logic here
   # Return true to proceed; false to abort and not call the chosen command
   # Use skips_pre before a command to skip this block on that command only
@@ -661,6 +665,8 @@ end
 
 on_error do |exception|
   notice_exception exception.message unless exception.message.blank?
+
+  log_exception(exception, @@global_argv, @@global_config)
   # Error logic here
   # return false to skip default error handling
   false

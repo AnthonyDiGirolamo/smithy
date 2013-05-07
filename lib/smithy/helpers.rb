@@ -182,4 +182,24 @@ module Smithy
     name = $1 if name =~ /(.*?)-([\d\.]+[\d])/
     name
   end
+
+  def log_exception(e, argv, config)
+    logfile = Smithy::Config.global[:"global-error-log"]
+    if logfile.present?
+      exception = {
+       "time"        => DateTime.now,
+       "user"        => `whoami`.chomp,
+       "hostname"    => `hostname`.chomp,
+       "working_dir" => Dir.getwd,
+       "argv"        => argv,
+       "config"      => config,
+       "exception"   => e,
+       "backtrace"   => e.backtrace
+      }
+      File.open(logfile, "a") do |f|
+        f.write(exception.to_yaml)
+      end
+    end
+  end
+
 end

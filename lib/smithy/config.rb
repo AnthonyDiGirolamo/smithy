@@ -61,6 +61,7 @@ module Smithy
         options_to_merge[:"web-architecture-names"] = @config_file_hash.try(:[], "web-architecture-names")
         options_to_merge[:"download-cache"] = @config_file_hash.try(:[], "download-cache")
         options_to_merge[:"formula-directories"] = @config_file_hash.try(:[], "formula-directories")
+        options_to_merge[:"global-error-log"] = @config_file_hash.try(:[], "global-error-log")
 
         set_hostname_and_arch
         options_to_merge[:arch] = @arch
@@ -159,6 +160,7 @@ module Smithy
       def last_prefix
         rc_file = File.join(ENV['HOME'], '.smithyrc')
         if File.exists?(rc_file)
+          rc_file = ""
           h = YAML.load_file(rc_file).stringify_keys rescue nil
           return h["last"]
         else
@@ -182,6 +184,7 @@ module Smithy
           "/sw/tools/smithy/formulas",
           "/sw/tools/smithy/another_formula_directory"
         ]
+        example["global-error-log"]    = "/sw/tools/smithy/exceptions.log"
         example["file-group-name"]        = "ccsstaff"
         example["descriptions-root"]      = "/sw/descriptions"
         example["web-root"]               = "/sw/descriptions_in_html"
