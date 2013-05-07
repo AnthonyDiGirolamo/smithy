@@ -220,7 +220,10 @@ module Smithy
           rendered_file = "#{File.dirname(dest)}/.#{File.basename(dest)}_#{Time.now.to_i}"
         end
 
-        erb = ERB.new(File.read(erb_filename), nil, "<>")
+        erb_string = args[:erb_string]
+        erb_string = File.read(erb_filename) if erb_string.blank?
+
+        erb = ERB.new(erb_string, nil, "<>")
         File.open(rendered_file, "w+") do |f|
           f.write erb.result(args[:binding])
         end

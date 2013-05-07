@@ -55,7 +55,7 @@ module Smithy
     end
 
     # DSL Methods
-    %w{ homepage url md5 sha1 sha2 sha256 modules depends_on }.each do |attr|
+    %w{ homepage url md5 sha1 sha2 sha256 modules depends_on modulefile }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           @#{attr} = block_given? ? block : value unless @#{attr}
@@ -66,24 +66,6 @@ module Smithy
           @#{attr}
         end
       }
-        # def self.#{attr}(value = nil, &block)
-        #   if block_given?
-        #     @#{attr} = block
-        #   elsif value
-        #     @#{attr} = value
-        #   end
-        #   @#{attr}
-        # end
-        # def #{attr}
-        #   unless @#{attr}
-        #     if self.class.#{attr}.is_a?(Proc)
-        #       @#{attr} = instance_eval(&self.class.#{attr})
-        #     else
-        #       @#{attr} = self.class.#{attr}
-        #     end
-        #   end
-        #   @#{attr}
-        # end
     end
 
     # DLS Version Method, can set a version or guess based on the filename
@@ -108,6 +90,16 @@ module Smithy
       install
       notice_success "SUCCESS #{@prefix}"
       return true
+    end
+
+    def create_modulefile
+      return if modulefile.blank?
+      notice "Creating Modulefile for #{package.prefix}"
+      m = ModuleFile.new :package => package
+      FileUtils.mkdir_p(File.dirname(m.module_file))
+      FileOperations.render_erb(:erb_string => modulefile, :binding => m.get_binding, :destination => m.module_file)
+      FileOperations.make_group_writable(m.module_file)
+      FileOperations.set_group(m.module_file, package.group)
     end
 
     def module_list
