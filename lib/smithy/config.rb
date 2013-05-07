@@ -160,7 +160,6 @@ module Smithy
       def last_prefix
         rc_file = File.join(ENV['HOME'], '.smithyrc')
         if File.exists?(rc_file)
-          rc_file = ""
           h = YAML.load_file(rc_file).stringify_keys rescue nil
           return h["last"]
         else
