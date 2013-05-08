@@ -8,6 +8,8 @@ class OpenmpiFormula < Formula
     if build_name =~ /gnu/
       if build_name =~ /gnu4.6.2/
         ["gcc/4.6.2"]
+      elsif build_name =~ /gnu4.1.2/
+        []
       else
         ["gcc"]
       end
@@ -41,3 +43,4 @@ class OpenmpiFormula < Formula
     system "make install"
   end
 end
+

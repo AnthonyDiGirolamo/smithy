@@ -1,12 +1,11 @@
 class GitFormula < Formula
-  homepage "http://git-scm.com/"
-  version  "1.8.0.2"
-  url      "http://git-core.googlecode.com/files/git-1.8.0.2.tar.gz"
-  sha1     "1e1640794596da40f35194c29a8cc4e41c6b4f6d"
-
+  homepage "https://git-core.googlecode.com/"
+  url "https://git-core.googlecode.com/files/git-1.8.2.1.tar.gz"
+  sha1 "ad9f833e509ba31c83efe336fd3599e89a39394b"
   depends_on "curl"
 
   def install
+    module_list
     system "./configure --prefix=#{prefix} --with-curl=#{curl.prefix}"
     system "make"
     system "make install"
