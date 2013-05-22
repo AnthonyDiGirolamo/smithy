@@ -137,12 +137,16 @@ module Smithy
         # f.package.extract(:archive => d, :overwrite => true)
         f.package.extract(:archive => d)
 
-        ModuleFile.new(:package => f.package).create if options[:"modulefile"]
-
         Dir.chdir File.join(f.package.prefix, "source")
         if f.run_install
           f.package.create_valid_build_file
           f.package.set_file_permissions_recursive
+
+          if f.modulefile.present?
+            f.create_modulefile
+          elsif options[:"modulefile"]
+            ModuleFile.new(:package => f.package).create
+          end
         end
       end #packages.each
     end
