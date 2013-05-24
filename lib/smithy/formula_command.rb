@@ -82,6 +82,8 @@ module Smithy
 
       require formula_file_path(formula_name)
       f = "#{formula_name.underscore.camelize}Formula".constantize.new
+      # Set the actual formula file path, otherwise it's just formula.rb
+      f.formula_file = formula_file_path(formula_name)
 
       version = f.version      if version.blank?
       build = operating_system if build.blank?
