@@ -190,6 +190,14 @@ describe Formula do
           [build_name, prefix]
         end
       end
+
+      class Bzip2Formula < Formula
+        homepage "http://www.bzip.org/"
+        url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
+        modules ["ruby", "git"]
+        def install
+        end
+      end
     end
 
     let(:package1) { stub :name => "zlib",
@@ -240,6 +248,37 @@ describe Formula do
       z.modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
       z.set_package(package2)
       z.modules.should == ["bzip2", "1.0", "sles11.1_gnu4.2"]
+    end
+
+    it "properly loads modules" do
+      z = Bzip2Formula.new
+      z.modules.should == ["ruby", "git"]
+      z.module_setup.should include("GITDIR=")
+      z.module_setup.should include("GEM_HOME=")
+    end
+  end
+
+  describe "#module_commands" do
+    before(:all) do
+      class Hdf5Formula < Formula
+        homepage "http://www.hdfgroup.org/"
+        url "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.11.tar.gz"
+        module_commands ["swap PrgEnv-pgi PrgEnv-gnu", "swap gcc gcc/4.7.2", "load hdf5/1.8.8"]
+        def install
+          system "which gcc"
+        end
+      end
+    end
+
+    it "saves module commands" do
+      Hdf5Formula.new.module_commands.should == ["swap PrgEnv-pgi PrgEnv-gnu", "swap gcc gcc/4.7.2", "load hdf5/1.8.8"]
+    end
+
+    it "properly loads modules" do
+      h = Hdf5Formula.new
+      `#{h.module_setup} which pgcc     2>&1`.should include("which: no pgcc in")
+      `#{h.module_setup} which gcc      2>&1`.should include("/opt/gcc/4.7.2/bin/gcc")
+      `#{h.module_setup} echo $HDF5_DIR 2>&1`.should include("/opt/cray/hdf5/1.8.8/gnu/47")
     end
   end
 

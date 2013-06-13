@@ -14,31 +14,33 @@ module Smithy
       raise "no install method implemented" unless self.respond_to?(:install)
       raise "homepage must be specified" if homepage.blank?
       raise "url must be specified" if url.blank?
-      initialize_modules
       if passed_package
         set_package(passed_package)
       else
         # guess name and build_name
         @name = self.formula_name
         @build_name = operating_system
-        set_loaded_modules
+        initialize_modules
       end
     end
 
+    # setup module environment by purging and loading only what's needed
     def initialize_modules
+      @modules = nil # re-evaluate modules block
       @module_setup = ""
+      raise "please specify modules OR modules_command, not both" if modules.present? && module_commands.present?
       if ENV["MODULESHOME"]
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
-        @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null` << " "
-      end
-    end
-
-    def set_loaded_modules
-      @modules = nil # reset modules
-      if ENV["MODULESHOME"] && modules
-        raise "modules must return a list of strings" unless modules.is_a? Array
-        @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
+        if modules.present?
+          @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null` << " "
+          raise "modules must return a list of strings" unless modules.is_a? Array
+          @module_setup << `#{@module_setup} #{@modulecmd} load #{modules.join(" ")}` << " "
+        elsif module_commands.present?
+          module_commands.each do |command|
+            @module_setup << `#{@module_setup} #{@modulecmd} #{command}` << " "
+          end
+        end
       end
     end
 
@@ -48,14 +50,11 @@ module Smithy
       @version    = p.version
       @build_name = p.build_name
       @prefix     = p.prefix
-      # re-setup module environment
-      @modules = nil
       initialize_modules
-      set_loaded_modules
     end
 
     # DSL Methods
-    %w{ homepage url md5 sha1 sha2 sha256 modules depends_on modulefile }.each do |attr|
+    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           @#{attr} = block_given? ? block : value unless @#{attr}
