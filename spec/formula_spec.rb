@@ -192,13 +192,17 @@ describe Formula do
       end
     end
 
-    let(:p) { stub :name => "zlib",
-                :version => "1.2",
-             :build_name => "macos10.8_gnu4.2",
-                 :prefix => "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2" }
+    let(:package1) { stub :name => "zlib",
+                       :version => "1.2",
+                    :build_name => "macos10.8_gnu4.2",
+                        :prefix => "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2" }
+    let(:package2) { stub :name => "bzip2",
+                       :version => "1.0",
+                    :build_name => "sles11.1_gnu4.2",
+                        :prefix => "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2" }
 
     it "takes a package" do
-      z = ZlibFormula.new(p)
+      z = ZlibFormula.new(package1)
       z.name.should       == "zlib"
       z.version.should    == "1.2"
       z.build_name.should == "macos10.8_gnu4.2"
@@ -208,12 +212,21 @@ describe Formula do
 
     it "can set the package after initialization" do
       z = ZlibFormula.new
-      z.set_package(p)
+      z.set_package(package1)
       z.name.should       == "zlib"
       z.version.should    == "1.2"
       z.build_name.should == "macos10.8_gnu4.2"
       z.prefix.should     == "/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"
       z.install.should == ["macos10.8_gnu4.2","/tmp/smithy/zlib/1.2/macos10.8_gnu4.2"]
+    end
+
+    it "can take a block for modules that uses name, version, build_name" do
+      z = ZlibFormula.new
+      z.modules.should include "zlib"
+      z.modules.should include "1.2.7"
+      ZlibFormula.new(package1).modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
+      z.set_package(package1)
+      z.modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
     end
 
     it "saves module purge commands", :if => ENV["MODULESHOME"] do
@@ -222,12 +235,13 @@ describe Formula do
       z.module_setup.should include("export")
     end
 
-    it "can take a block for modules and use name, version, build_name" do
-      ZlibFormula.new.modules.should include "zlib"
-      ZlibFormula.new.modules.should include "1.2.7"
-      ZlibFormula.new(p).modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
+    it "properly resets module names if assigning a new package" do
+      z = ZlibFormula.new(package1)
+      z.modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
+      z.set_package(package2)
+      z.modules.should == ["bzip2", "1.0", "sles11.1_gnu4.2"]
     end
-
   end
+
 end
 
