@@ -27,6 +27,7 @@ module Smithy
     # setup module environment by purging and loading only what's needed
     def initialize_modules
       @modules = nil # re-evaluate modules block
+      @module_commands = nil # re-evaluate module_commands block
       @module_setup = ""
       raise "please specify modules OR modules_command, not both" if modules.present? && module_commands.present?
       if ENV["MODULESHOME"]
