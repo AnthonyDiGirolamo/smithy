@@ -1,14 +1,23 @@
-class IpythonFormula < Formula
-  homepage "http://ipython.org/"
-  url "https://github.com/downloads/ipython/ipython/ipython-0.13.1.tar.gz"
+class PythonPipFormula < Formula
+  homepage "https://pypi.python.org/pypi/pip"
+  url "https://pypi.python.org/packages/source/p/pip/pip-1.3.1.tar.gz"
 
-  depends_on "python"
+  depends_on do
+    case build_name
+    when /python3.3/
+      [ "python/3.3.0", "python_distribute/0.6.45/sles11.1_gnu4.3.4_python3.3.0" ]
+    when /python2.7/
+      [ "python/2.7.3", "python_distribute/0.6.45/sles11.1_gnu4.3.4_python2.7.3" ]
+    when /python2.6/
+      [ "python_distribute/0.6.45/sles11.1_gnu4.3.4_python2.6.8" ]
+    end
+  end
 
   modules do
     case build_name
-    when /python3.3.0/
+    when /python3.3/
       [ "python/3.3.0" ]
-    when /python2.7.3/
+    when /python2.7/
       [ "python/2.7.3" ]
     end
   end
@@ -22,10 +31,13 @@ class IpythonFormula < Formula
     when /python3.3/
       python_binary = "python3.3"
       libdirs << "#{prefix}/lib/python3.3/site-packages"
+      libdirs << "#{python_distribute.prefix}/lib/python3.3/site-packages"
     when /python2.7/
       libdirs << "#{prefix}/lib/python2.7/site-packages"
+      libdirs << "#{python_distribute.prefix}/lib/python2.7/site-packages"
     when /python2.6/
       libdirs << "#{prefix}/lib64/python2.6/site-packages"
+      libdirs << "#{python_distribute.prefix}/lib64/python2.6/site-packages"
     end
     FileUtils.mkdir_p libdirs.first
 

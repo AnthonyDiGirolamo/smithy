@@ -1,14 +1,14 @@
-class IpythonFormula < Formula
-  homepage "http://ipython.org/"
-  url "https://github.com/downloads/ipython/ipython/ipython-0.13.1.tar.gz"
+class PythonDistributeFormula < Formula
+  homepage "https://pypi.python.org/pypi/distribute"
+  url "https://pypi.python.org/packages/source/d/distribute/distribute-0.6.45.tar.gz"
 
   depends_on "python"
 
   modules do
     case build_name
-    when /python3.3.0/
+    when /python3.3/
       [ "python/3.3.0" ]
-    when /python2.7.3/
+    when /python2.7/
       [ "python/2.7.3" ]
     end
   end
