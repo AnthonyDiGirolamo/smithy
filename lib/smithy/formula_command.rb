@@ -44,7 +44,7 @@ module Smithy
 
     # Return the file path of a single formula file
     def self.formula_file_path(name)
-      formula_files.select{|f| f =~ /#{name}_formula.rb/}.first
+      formula_files.select{|f| f =~ /\/#{name}_formula.rb/}.first
     end
 
     # Return the file contents of a formula
