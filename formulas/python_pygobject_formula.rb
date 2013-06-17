@@ -1,17 +1,29 @@
-class IpythonFormula < Formula
-  homepage "http://ipython.org/"
-  url "https://github.com/downloads/ipython/ipython/ipython-0.13.1.tar.gz"
+class PythonPygobjectFormula < Formula
+  homepage "http://pygtk.org/"
+  url "http://ftp.gnome.org/pub/GNOME/sources/pygobject/2.12/pygobject-2.12.3.tar.bz2"
 
-  depends_on "python"
+  depends_on do
+    case build_name
+    when /python3.3/
+      [ "python/3.3.0" ]
+    when /python2.7/
+      [ "python/2.7.3" ]
+    when /python2.6/
+      [ ]
+    end
+  end
 
   modules do
     case build_name
-    when /python3.3.0/
+    when /python3.3/
       [ "python/3.3.0" ]
-    when /python2.7.3/
+    when /python2.7/
       [ "python/2.7.3" ]
+    when /python2.6/
+      [ ]
     end
   end
+
 
   def install
     module_list
@@ -29,7 +41,7 @@ class IpythonFormula < Formula
     end
     FileUtils.mkdir_p libdirs.first
 
-    system "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} setup.py install --prefix=#{prefix} --compile"
+    system "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} ./configure --prefix=#{prefix} && make && make install"
   end
 
   modulefile <<-MODULEFILE.strip_heredoc
@@ -53,11 +65,8 @@ class IpythonFormula < Formula
     }
     set PREFIX <%= @package.version_directory %>/$BUILD
 
-    prepend-path PATH            $PREFIX/bin
-    prepend-path LD_LIBRARY_PATH $PREFIX/lib
-    prepend-path LD_LIBRARY_PATH $PREFIX/lib64
-    prepend-path MANPATH         $PREFIX/share/man
+    prepend-path PKG_CONFIG_PATH $PREFIX/lib/pkgconfig
     prepend-path PYTHONPATH      $PREFIX/lib/$LIBDIR/site-packages
-    prepend-path PYTHONPATH      $PREFIX/lib64/$LIBDIR/site-packages
+    prepend-path PYTHONPATH      $PREFIX/lib/$LIBDIR/site-packages/gtk-2.0
   MODULEFILE
 end
