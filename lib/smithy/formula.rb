@@ -140,10 +140,12 @@ module Smithy
     def check_dependencies
       @depends_on = [depends_on] if depends_on.is_a? String
       missing_packages = []
+      notice "Searching for dependencies"
       depends_on.each do |package|
         name, version, build = package.split('/')
         path = Package.all(:name => name, :version => version, :build => build).first
         if path
+          notice_using(path)
           p = Package.new(:path => path)
           new_name = p.name.underscore
           class_eval %Q{

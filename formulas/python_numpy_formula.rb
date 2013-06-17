@@ -3,7 +3,7 @@ class PythonNumpyFormula < Formula
   url "http://downloads.sourceforge.net/project/numpy/NumPy/1.7.1/numpy-1.7.1.tar.gz"
 
   depends_on do
-    packages = [ "cblas/20110120/sles11.1_gnu4.7.2_acml5.2.0" ]
+    packages = [ "cblas/20110120/*acml5.2.0*", "acml/5.2.0" ]
     case build_name
     when /python3.3/
       packages << "python/3.3.0"
@@ -41,7 +41,7 @@ class PythonNumpyFormula < Formula
   def install
     module_list
 
-    acml_prefix = "/opt/acml/5.2.0/gfortran64"
+    acml_prefix = "#{acml.prefix}/gfortran64"
 
     FileUtils.mkdir_p "#{prefix}/lib"
     FileUtils.cp "#{cblas.prefix}/lib/libcblas.a", "#{prefix}/lib", verbose: true

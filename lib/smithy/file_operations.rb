@@ -43,6 +43,9 @@ module Smithy
   def notice_exist(file)
     puts "exists ".rjust(12).color(:blue).bright + file
   end
+  def notice_using(file)
+    puts "using ".rjust(12).color(:blue).bright + file
+  end
   def notice_link(file1, file2)
     puts "link ".rjust(12).bright + file1 + " -> " + file2
   end
