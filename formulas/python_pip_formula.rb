@@ -54,13 +54,13 @@ class PythonPipFormula < Formula
     module-whatis "<%= @package.name %> <%= @package.version %>"
 
     if [ is-loaded python/3.3.0 ] {
-      set BUILD sles11.1_gnu4.3.4_python3.3.0
+      set BUILD python3.3.0
       set LIBDIR python3.3
     } elseif { [ is-loaded python/2.7.3 ] || [ is-loaded python/2.7.2 ] } {
-      set BUILD sles11.1_gnu4.3.4_python2.7.3
+      set BUILD python2.7.3
       set LIBDIR python2.7
     } else {
-      set BUILD sles11.1_gnu4.3.4_python2.6.8
+      set BUILD python2.6.8
       set LIBDIR python2.6
     }
     set PREFIX <%= @package.version_directory %>/$BUILD
