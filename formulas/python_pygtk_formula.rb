@@ -5,24 +5,22 @@ class PythonPygtkFormula < Formula
   depends_on do
     case build_name
     when /python3.3/
-      [ "python/3.3.0" ]
-      # [ "python/3.3.0", "python_pygobject"]
+      [ "python/3.3.0", "python_pygobject" ]
     when /python2.7/
-      [ "python/2.7.3" ]
-      # [ "python/2.7.3", "python_pygobject" ]
+      [ "python/2.7.3", "python_pygobject", "python_pycairo" ]
     when /python2.6/
-      [ ]
+      [ "python_pygobject", "python_pycairo" ]
     end
   end
 
   modules do
     case build_name
     when /python3.3/
-      [ "python/3.3.0" ]
+      [ "python/3.3.0", "python_pygobject" ]
     when /python2.7/
-      [ "python/2.7.3" ]
+      [ "python/2.7.3", "python_pygobject", "python_pycairo" ]
     when /python2.6/
-      [ ]
+      [ "python_pygobject", "python_pycairo" ]
     end
   end
 
@@ -36,10 +34,10 @@ class PythonPygtkFormula < Formula
     when /python3.3/
       python_binary = "python3.3"
       libdirs << "#{prefix}/lib/python3.3/site-packages"
-      # libdirs << "#{python_pygobject.prefix}/lib/python3.3/site-packages"
+      libdirs << "#{python_pygobject.prefix}/lib/python3.3/site-packages"
     when /python2.7/
       libdirs << "#{prefix}/lib/python2.7/site-packages"
-      # libdirs << "#{python_pygobject.prefix}/lib/python2.7/site-packages"
+      libdirs << "#{python_pygobject.prefix}/lib/python2.7/site-packages"
     when /python2.6/
       libdirs << "#{prefix}/lib64/python2.6/site-packages"
       libdirs << "#{python_pygobject.prefix}/lib64/python2.6/site-packages"

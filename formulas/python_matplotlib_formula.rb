@@ -7,9 +7,9 @@ class PythonMatplotlibFormula < Formula
     when /python3.3/
       [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*acml5.2.0*" ]
     when /python2.7/
-      [ "python/2.7.3", "python_numpy/1.7.1/*python2.7.3*acml5.2.0*", "python_pygtk/*/*python2.7.3*", "python_pygobject/*/*python2.7.3*", "python_pycairo/*/*python2.7.3*"]
+      [ "python/2.7.3", "python_numpy/1.7.1/*python2.7.3*acml5.2.0*", "python_pygtk/*/*python2.7.3*", "python_pygobject/*/*python2.7.3*", "python_pycairo/*/*python2.7.3*" ]
     when /python2.6/
-      [ "python_numpy/1.7.1/*python2.6.8*acml5.2.0*" ]
+      [ "python_numpy/1.7.1/*python2.6.8*acml5.2.0*", "python_pygtk/*/*python2.7.3*", "python_pygobject/*/*python2.7.3*", "python_pycairo/*/*python2.7.3*" ]
     end
   end
 
@@ -20,14 +20,14 @@ class PythonMatplotlibFormula < Formula
     when /python2.7/
       [ "python/2.7.3", "python_numpy/1.7.1", "python_pygtk", "python_pygobject", "python_pycairo" ]
     when /python2.6/
-      [ "python_numpy/1.7.1" ]
+      [ "python_numpy/1.7.1", "python_pygtk", "python_pygobject", "python_pycairo" ]
     end
   end
 
   def install
     module_list
 
-    patch <<-EOF.strip_heredoc
+    patch <<-EOF.strip_heredoc unless build_name =~ /python3.3.0/
     diff --git a/setup.cfg b/setup.cfg
     new file mode 100644
     index 0000000..075c758
@@ -142,8 +142,8 @@ class PythonMatplotlibFormula < Formula
     # One line description
     module-whatis "<%= @package.name %> <%= @package.version %>"
 
-    module load python_pygtk python_pygobject python_pycairo python_numpy
-    prereq python_pygtk python_pygobject python_pycairo python_numpy
+    module load python_numpy
+    prereq python_numpy
 
     if [ is-loaded python/3.3.0 ] {
       set BUILD python3.3.0_numpy1.7.1
@@ -151,16 +151,16 @@ class PythonMatplotlibFormula < Formula
     } elseif { [ is-loaded python/2.7.3 ] || [ is-loaded python/2.7.2 ] } {
       set BUILD python2.7.3_numpy1.7.1
       set LIBDIR python2.7
+      module load python_pygtk python_pygobject python_pycairo
+      prereq python_pygtk python_pygobject python_pycairo
     } else {
       set BUILD python2.6.8_numpy1.7.1
       set LIBDIR python2.6
+      module load python_pygtk python_pygobject python_pycairo
+      prereq python_pygtk python_pygobject python_pycairo
     }
     set PREFIX <%= @package.version_directory %>/$BUILD
 
-    prepend-path PATH            $PREFIX/bin
-    prepend-path LD_LIBRARY_PATH $PREFIX/lib
-    prepend-path LD_LIBRARY_PATH $PREFIX/lib64
-    prepend-path MANPATH         $PREFIX/share/man
     prepend-path PYTHONPATH      $PREFIX/lib/$LIBDIR/site-packages
     prepend-path PYTHONPATH      $PREFIX/lib64/$LIBDIR/site-packages
   MODULEFILE
