@@ -1,7 +1,6 @@
 class Hdf5Formula < Formula
   homepage "http://www.hdfgroup.org/"
-  url "http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.11.tar.gz"
-  md5 "1a4cc04f7dbe34e072ddcf3325717504"
+  url "http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.8/src/hdf5-1.8.8.tar.bz2"
 
   depends_on "szip"
 
@@ -56,9 +55,7 @@ class Hdf5Formula < Formula
       "--with-zlib=/usr",
       "--with-szlib=$SZIP_DIR",
       "--enable-fortran",
-      "--enable-cxx",
-      "--enable-static",
-      "--disable-shared"
+      "--enable-cxx" #, "--enable-shared"#, "--enable-static"
     system "make"
     system "make install"
   end

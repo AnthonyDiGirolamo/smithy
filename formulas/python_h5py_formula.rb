@@ -4,7 +4,7 @@ class PythonH5pyFormula < Formula
   sha1 "7419cadd9892ab3a232e8ce779f3587ccff9ebff"
 
   depends_on do
-    packages = [ "python_numpy" ]
+    packages = [ "python_numpy", "hdf5/1.8.8/*gnu*" ]
     case build_name
     when /python3.3/
       packages << "python/3.3.0"
@@ -36,12 +36,16 @@ class PythonH5pyFormula < Formula
       m << "load python/2.7.3"
     end
     m << "load python_numpy"
-    m << "load hdf5"
+    m << "load szip"
+    m << "load hdf5/1.8.8"
     m
   end
 
   def install
     module_list
+
+    ENV["CPPFLAGS"] = "-I#{hdf5.prefix}/include"
+    ENV["LDFLAGS"]  = "-L#{hdf5.prefix}/lib"
 
     python_binary = "python"
     libdirs = []
@@ -56,9 +60,11 @@ class PythonH5pyFormula < Formula
     end
     FileUtils.mkdir_p libdirs.first
 
-    system "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} setup.py build"
-    system "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} setup.py test"
-    system "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} setup.py install --prefix=#{prefix} --compile"
+    python_start_command = "PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} "
+
+    system "#{python_start_command} setup.py build"
+    system "#{python_start_command} setup.py install --prefix=#{prefix} --compile"
+    system "#{python_start_command} setup.py test"
   end
 
   modulefile <<-MODULEFILE.strip_heredoc
