@@ -134,12 +134,16 @@ module Smithy
           # end
         end
 
-        d = DownloadCache.new(f, options[:"formula-name"]).get
-        raise "Download failure" unless d
-        # f.package.extract(:archive => d, :overwrite => true)
-        f.package.extract(:archive => d)
+        if f.url.eql?("none")
+          Dir.chdir File.join(f.package.prefix)
+        else
+          d = DownloadCache.new(f, options[:"formula-name"]).get
+          raise "Download failure" unless d
+          # f.package.extract(:archive => d, :overwrite => true)
+          f.package.extract(:archive => d)
+          Dir.chdir File.join(f.package.prefix, "source")
+        end
 
-        Dir.chdir File.join(f.package.prefix, "source")
         if f.run_install
           f.package.create_valid_build_file
           f.package.set_file_permissions_recursive
