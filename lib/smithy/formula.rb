@@ -110,6 +110,16 @@ module Smithy
       end
     end
 
+    def module_is_available?(mod)
+      return false unless @modulecmd
+
+      if `#{@modulecmd} avail #{mod} 2>&1` =~ /#{mod}/
+        true
+      else
+        false
+      end
+    end
+
     def patch(content)
       patch_file_name = "patch.diff"
       File.open(patch_file_name, "w+") do |f|
