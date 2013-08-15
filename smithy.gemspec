@@ -49,7 +49,7 @@ lib/smithy/package.rb
 lib/smithy_version.rb
 man/man1/smithy.1
   )
-  s.files += Dir["formulas/*"]
+  # s.files += Dir["formulas/*"]
   s.require_paths << 'lib'
   s.has_rdoc = true
   s.extra_rdoc_files = ['smithy.rdoc']
@@ -66,10 +66,10 @@ man/man1/smithy.1
   s.add_development_dependency('ronn')
   s.add_development_dependency('rspec')
   s.add_development_dependency('fuubar')
-  s.add_dependency('gli', '>= 2.3.0')
-  s.add_dependency('kramdown', '>= 0.14.0')
+  s.add_dependency('gli', '= 2.7.0')
+  s.add_dependency('kramdown', '>= 1.1.0')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
-  s.add_dependency('activesupport')
+  s.add_dependency('activesupport', '>= 4.0.0')
   s.add_dependency('terminal-table', '>= 1.4.5')
 end

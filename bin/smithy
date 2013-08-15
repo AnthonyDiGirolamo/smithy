@@ -618,7 +618,7 @@ command ['formula'] do |c|
     subcommand.switch [:m, "modulefile"], :negatable => false
 
     subcommand.desc "Clean exiting install prefix"
-    subcommand.default_value true
+    subcommand.default_value false
     subcommand.switch [:c, "clean"]
 
     subcommand.action do |global_options,options,args|

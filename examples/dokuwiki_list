@@ -6,5 +6,5 @@ do
   echo "" >> $DOKULIST
   echo "===== $arch =====" >> $DOKULIST
   echo "" >> $DOKULIST
-  bundle exec smithy --arch=$arch search --format=dokuwiki >> $DOKULIST
+  smithy --arch=$arch search --format=dokuwiki >> $DOKULIST
 done

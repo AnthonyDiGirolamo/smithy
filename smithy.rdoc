@@ -78,7 +78,7 @@ Be more verbose
 
 
 === --version
-
+Display the program version
 
 
 
