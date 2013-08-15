@@ -49,7 +49,7 @@ module Smithy
 
     # Return the file contents of a formula
     def self.formula_contents(name)
-      raise "unkown formula '#{formula_name}'" unless File.exists? formula_file_path(name)
+      raise "unkown formula '#{name}'" unless formula_file_path(name).present? && File.exists?(formula_file_path(name))
       File.read(formula_file_path(name))
     end
 
