@@ -120,12 +120,26 @@ module Smithy
       end
     end
 
-    def patch(content)
+    def fail_command
+      $stdout.flush
+      $stderr.flush
+      raise <<-EOF.strip_heredoc
+        The last command exited with status: #{$?.exitstatus}
+          Formula: #{formula_file}
+          Build Directory: #{@package.source_directory}
+      EOF
+    end
+
+    def patch(content, *args)
       patch_file_name = "patch.diff"
       File.open(patch_file_name, "w+") do |f|
         f.write(content)
       end
-      `patch -p1 <#{patch_file_name}`
+      args << "-p1" if args.empty?
+      patch_command = "patch #{args.join(' ')} <#{patch_file_name}"
+      notice patch_command
+      Kernel.system patch_command
+      fail_command if $?.exitstatus != 0
     end
 
     def system(*args)
@@ -136,15 +150,7 @@ module Smithy
       else
         Kernel.system @module_setup + args.join(' ')
       end
-      if $?.exitstatus != 0
-        $stdout.flush
-        $stderr.flush
-        raise <<-EOF.strip_heredoc
-          The last command exited with status: #{$?.exitstatus}
-            Formula: #{formula_file}
-            Build Directory: #{@package.source_directory}
-        EOF
-      end
+      fail_command if $?.exitstatus != 0
     end
 
     def check_dependencies
