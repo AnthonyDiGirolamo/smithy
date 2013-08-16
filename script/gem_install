@@ -8,9 +8,14 @@ source ${MODULESHOME}/init/bash
 module use $SMITHY_DIR/modulefiles
 module load smithy
 
+GP=$GEM_PATH 
+GH=$GEM_HOME
+
 export GEM_HOME=$SMITHY_DIR
+export GEM_PATH=$SMITHY_DIR
 gem uninstall software_smithy --all --executables
 gem install pkg/software_smithy-*.gem
 sed -i 's/#!\/.*/#!\/usr\/bin\/env ruby/g' $SMITHY_DIR/bin/*
 
-export GEM_HOME=$HOME/.gem/ruby/1.9.1
+export GEM_HOME=$GH
+export GEM_PATH=$GP

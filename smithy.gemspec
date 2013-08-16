@@ -70,6 +70,6 @@ man/man1/smithy.1
   s.add_dependency('kramdown', '>= 1.1.0')
   s.add_dependency('open4')
   s.add_dependency('rainbow')
-  s.add_dependency('activesupport', '>= 4.0.0')
+  s.add_dependency('activesupport', '= 3.2.14')
   s.add_dependency('terminal-table', '>= 1.4.5')
 end
