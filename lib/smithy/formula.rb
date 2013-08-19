@@ -120,6 +120,15 @@ module Smithy
       end
     end
 
+    def module_environment_variable(mod, var)
+      module_display = `#{@modulecmd} display #{mod} 2>&1`
+      if module_display =~ /(\S+)\s+#{var}\s+(.*)$/
+        return $2
+      else
+        return ""
+      end
+    end
+
     def fail_command
       $stdout.flush
       $stderr.flush
