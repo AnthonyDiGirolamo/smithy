@@ -6,6 +6,7 @@ smithy(1) -- build, test, and install software with ease.
 `smithy` `new` APPLICATION/VERSION/BUILD<br>
 `smithy` `edit` last<br>
 `smithy` `build` last<br>
+`smithy` `formula install` APPLICATION/VERSION/BUILD<br>
 
 ## DESCRIPTION
 
@@ -13,7 +14,8 @@ smithy(1) -- build, test, and install software with ease.
 follows all the same conventions as
 [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/). That is, directory
 structures, support files, and scripts are all in the same locations.  Smithy's
-goal is to make using those conventions easier.
+goal is to make using those conventions easier and provide new ways of
+installing software.
 
 This is still a work in progress. If you have any questions, suggestions, or
 encounter any errors please open an issue on github at
@@ -22,41 +24,101 @@ encounter any errors please open an issue on github at
 ## COMMANDS
 
 For help on all options and commands run `smithy help`. For help on a specific
-command run `smithy help COMMAND`.
+command run `smithy help COMMAND` or `smithy help COMMAND SUBCOMMAND`.
+
+## SYNOPSIS
+
+There are two ways of installing software using smithy:
+
+* build scripts
+* formulas
+
+### BUILD SCRIPTS
+
+Build scripts are shell scripts that live inside of a package's PREFIX and
+execute the steps required to perform the compilation. A hierarchy might look
+something like this:
+
+    /sw/xk6/subversion/1.6.17
+    `--- sles11.1_gnu4.3.4
+       `--- bin
+       `--- build-notes
+       `--- dependencies
+       `--- include
+       `--- lib
+       `--- rebuild
+       `--- relink
+       `--- remodule
+       `--- retest
+       `--- share
+       `--- subversion-1.6.17
+
+The prefix for the above package is
+`/sw/xk6/subversion/1.6.17/sles11.1_gnu4.3.4` within this directory you can see
+the usual `bin/include/lib/share` folders. Additionally there is the source
+directory `subversion-1.6.17` and three build scripts `rebuild`, `relink`, and
+`remodule`. The `rebuild` script will compile the software and set the prefix
+while the remodule script sets up the environment including loading modulefiles.
+
+### FORMULAS
+
+THE Problem with build scripts is that they are duplicated for every software
+installation. This makes installing new software difficult because you will have
+to go back and look at old ones and copy relevant steps to a new rebuild script.
+So much for don't repeat yourself!
+
+An alternative is to use formulas. This idea is heavily borrowed from the
+wonderful [homebrew](http://brew.sh/) package management system for Mac OS X.
+With a formula you can specify the modules to load, extra package dependencies,
+installation steps, and the modulefile in a single file. The formulas are
+written in ruby and can be as flexible and dynamic as you like. 
+
+A package installed with a formula has a simpler prefix directory structure.
+The only addition is the source files under the source directory.
+
+    /sw/xk6/subversion/1.7.8
+    `--- sles11.1_gnu4.3.4
+       `--- bin
+       `--- include
+       `--- lib
+       `--- source
+       `--- share
 
 ## EXAMPLES
 
-This section shows the typical work-flow for adding a new software build.  Let's
-imagine we want to install petsc 3.2 using the cray compiler. We must create a
-place for the software build, build it, and create a module.
+### INSTALLATIONS WITH FORMULAS
+
+### INSTALLATIONS WITH BUILD SCRIPTS
+
+This section shows the typical work-flow for adding a new software build using
+build scripts. Let's imagine we want to install petsc 3.2 using the cray
+compiler. We must create a place for the software build, build it, and create a
+module.
 
 Note: all commands, options, and arguments have tab-completion when using bash or zsh
 
-### 1. Creating The Build
+_1. Creating The Build_
 
 All software builds have the following name format: **APPLICATION/VERSION/BUILD**
 That is three different parts separated by forward slashes `/` Each part consists of:
 
   * **APPLICATION**:
-
     The name using lowercase characters
 
   * **VERSION**:
-
     Numbers with periods. I recommend that whatever you choose as a version
     allows it to be lexigraphically sorted from oldest to newest.
 
   * **BUILD**:
-
     Build is somewhat different, it consists of the intended operating system
     and compiler separated by underscores `_`. It is important to use compiler
     version numbers that correspond to module versions. This will allow smithy
     to auto-generate modulefiles for software with multiple builds. As an
     example:
 
-    `sles11.1_gnu4.6.2` corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2
+`sles11.1_gnu4.6.2` corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2
 
-    `cle4.0_pgi12.1.0` corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile
+`cle4.0_pgi12.1.0` corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile
 
 Let's use `petsc/3.2/cle4.0_cray8.0.1` as the name. This would be petsc designed
 to run on a cle4.0 compute node and compiled with the cray cce 8.0.1 compiler.
@@ -76,8 +138,7 @@ to the `source` directory. For the petsc example above this would be
 The `-t` option can also download an archive from a given URL. The archive is
 saved along side the source directory. As an example:
 
-    smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz \
-      petsc/3.2/cle4.0_cray8.0.1
+    smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
 
 This command will download petsc-3.2-p7.tar.gz, save it to
 `/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/petsc-3.2-p7.tar.gz` and extract it to
@@ -88,7 +149,7 @@ Additionally, if this is a brand new piece of software add the
 `--web-description` switch. This will create the application description files
 too.
 
-### 2. Editing and Building the Software:
+_2. Editing and Building the Software_
 
 Once you have created the build you may need to update the build (`rebuild`) and
 environment (`remodule`) scripts before building the software. Both files live
@@ -117,7 +178,7 @@ Once you have edited the files, it's time to build. Do so by running:
 The results of the run will be shown on the screen and simultaneously logged to
 `build.log` withing the software prefix folder.
 
-### 3. Create and edit a modulefile:
+_3. Create and edit a modulefile_
 
 This step is best done after all builds for a particular application have been
 created.  When you create a new software build a modulefile is created too.  For
@@ -156,7 +217,7 @@ Once the modulefile is ready, you can copy it into place using:
 For out petsc example, this command will copy
 `/sw/xk6/petsc/3.2/modulefile/petsc/3.2` to `/sw/xk6/modulefiles/petsc/3.2`
 
-### 4. Website Description
+_4. Website Description_
 
 If this is a new application you will need to add some information to the
 description file. For petsc this lives in: `/sw/xk6/petsc/description` This is

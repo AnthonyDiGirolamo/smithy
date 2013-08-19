@@ -57,6 +57,7 @@
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
     <a href="#COMMANDS">COMMANDS</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#EXAMPLES">EXAMPLES</a>
     <a href="#LICENSE">LICENSE</a>
   </div>
@@ -76,7 +77,8 @@
 
 <p><code>smithy</code> <code>new</code> APPLICATION/VERSION/BUILD<br />
 <code>smithy</code> <code>edit</code> last<br />
-<code>smithy</code> <code>build</code> last<br /></p>
+<code>smithy</code> <code>build</code> last<br />
+<code>smithy</code> <code>formula install</code> APPLICATION/VERSION/BUILD<br /></p>
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
@@ -84,7 +86,8 @@
 follows all the same conventions as
 <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>. That is, directory
 structures, support files, and scripts are all in the same locations.  Smithy's
-goal is to make using those conventions easier.</p>
+goal is to make using those conventions easier and provide new ways of
+installing software.</p>
 
 <p>This is still a work in progress. If you have any questions, suggestions, or
 encounter any errors please open an issue on github at
@@ -93,42 +96,104 @@ encounter any errors please open an issue on github at
 <h2 id="COMMANDS">COMMANDS</h2>
 
 <p>For help on all options and commands run <code>smithy help</code>. For help on a specific
-command run <code>smithy help COMMAND</code>.</p>
+command run <code>smithy help COMMAND</code> or <code>smithy help COMMAND SUBCOMMAND</code>.</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p>There are two ways of installing software using smithy:</p>
+
+<ul>
+<li>build scripts</li>
+<li>formulas</li>
+</ul>
+
+
+<h3 id="BUILD-SCRIPTS">BUILD SCRIPTS</h3>
+
+<p>Build scripts are shell scripts that live inside of a package's PREFIX and
+execute the steps required to perform the compilation. A hierarchy might look
+something like this:</p>
+
+<pre><code>/sw/xk6/subversion/1.6.17
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- build-notes
+   `--- dependencies
+   `--- include
+   `--- lib
+   `--- rebuild
+   `--- relink
+   `--- remodule
+   `--- retest
+   `--- share
+   `--- subversion-1.6.17
+</code></pre>
+
+<p>The prefix for the above package is
+<code>/sw/xk6/subversion/1.6.17/sles11.1_gnu4.3.4</code> within this directory you can see
+the usual <code>bin/include/lib/share</code> folders. Additionally there is the source
+directory <code>subversion-1.6.17</code> and three build scripts <code>rebuild</code>, <code>relink</code>, and
+<code>remodule</code>. The <code>rebuild</code> script will compile the software and set the prefix
+while the remodule script sets up the environment including loading modulefiles.</p>
+
+<h3 id="FORMULAS">FORMULAS</h3>
+
+<p>THE Problem with build scripts is that they are duplicated for every software
+installation. This makes installing new software difficult because you will have
+to go back and look at old ones and copy relevant steps to a new rebuild script.
+So much for don't repeat yourself!</p>
+
+<p>An alternative is to use formulas. This idea is heavily borrowed from the
+wonderful <a href="http://brew.sh/">homebrew</a> package management system for Mac OS X.
+With a formula you can specify the modules to load, extra package dependencies,
+installation steps, and the modulefile in a single file. The formulas are
+written in ruby and can be as flexible and dynamic as you like.</p>
+
+<p>A package installed with a formula has a simpler prefix directory structure.
+The only addition is the source files under the source directory.</p>
+
+<pre><code>/sw/xk6/subversion/1.7.8
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
 
 <h2 id="EXAMPLES">EXAMPLES</h2>
 
-<p>This section shows the typical work-flow for adding a new software build.  Let's
-imagine we want to install petsc 3.2 using the cray compiler. We must create a
-place for the software build, build it, and create a module.</p>
+<h3 id="INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</h3>
+
+<h3 id="INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</h3>
+
+<p>This section shows the typical work-flow for adding a new software build using
+build scripts. Let's imagine we want to install petsc 3.2 using the cray
+compiler. We must create a place for the software build, build it, and create a
+module.</p>
 
 <p>Note: all commands, options, and arguments have tab-completion when using bash or zsh</p>
 
-<h3 id="1-Creating-The-Build">1. Creating The Build</h3>
+<p><em>1. Creating The Build</em></p>
 
 <p>All software builds have the following name format: <strong>APPLICATION/VERSION/BUILD</strong>
 That is three different parts separated by forward slashes <code>/</code> Each part consists of:</p>
 
 <dl>
-<dt><strong>APPLICATION</strong>:</dt><dd><p></p>
-
-<p>The name using lowercase characters</p></dd>
-<dt><strong>VERSION</strong>:</dt><dd><p></p>
-
-<p>Numbers with periods. I recommend that whatever you choose as a version
+<dt><strong>APPLICATION</strong></dt><dd><p>The name using lowercase characters</p></dd>
+<dt class="flush"><strong>VERSION</strong></dt><dd><p>Numbers with periods. I recommend that whatever you choose as a version
 allows it to be lexigraphically sorted from oldest to newest.</p></dd>
-<dt class="flush"><strong>BUILD</strong>:</dt><dd><p></p>
-
-<p>Build is somewhat different, it consists of the intended operating system
+<dt class="flush"><strong>BUILD</strong></dt><dd><p>Build is somewhat different, it consists of the intended operating system
 and compiler separated by underscores <code>_</code>. It is important to use compiler
 version numbers that correspond to module versions. This will allow smithy
 to auto-generate modulefiles for software with multiple builds. As an
-example:</p>
+example:</p></dd>
+</dl>
+
 
 <p><code>sles11.1_gnu4.6.2</code> corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2</p>
 
-<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p></dd>
-</dl>
-
+<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p>
 
 <p>Let's use <code>petsc/3.2/cle4.0_cray8.0.1</code> as the name. This would be petsc designed
 to run on a cle4.0 compute node and compiled with the cray cce 8.0.1 compiler.
@@ -150,8 +215,7 @@ to the <code>source</code> directory. For the petsc example above this would be
 <p>The <code>-t</code> option can also download an archive from a given URL. The archive is
 saved along side the source directory. As an example:</p>
 
-<pre><code>smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz \
-  petsc/3.2/cle4.0_cray8.0.1
+<pre><code>smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
 </code></pre>
 
 <p>This command will download petsc-3.2-p7.tar.gz, save it to
@@ -163,7 +227,7 @@ command to work properly.</p>
 <code>--web-description</code> switch. This will create the application description files
 too.</p>
 
-<h3 id="2-Editing-and-Building-the-Software-">2. Editing and Building the Software:</h3>
+<p><em>2. Editing and Building the Software</em></p>
 
 <p>Once you have created the build you may need to update the build (<code>rebuild</code>) and
 environment (<code>remodule</code>) scripts before building the software. Both files live
@@ -195,7 +259,7 @@ last</code> to see.</p>
 <p>The results of the run will be shown on the screen and simultaneously logged to
 <code>build.log</code> withing the software prefix folder.</p>
 
-<h3 id="3-Create-and-edit-a-modulefile-">3. Create and edit a modulefile:</h3>
+<p><em>3. Create and edit a modulefile</em></p>
 
 <p>This step is best done after all builds for a particular application have been
 created.  When you create a new software build a modulefile is created too.  For
@@ -239,7 +303,7 @@ module load       petsc/3.2
 <p>For out petsc example, this command will copy
 <code>/sw/xk6/petsc/3.2/modulefile/petsc/3.2</code> to <code>/sw/xk6/modulefiles/petsc/3.2</code></p>
 
-<h3 id="4-Website-Description">4. Website Description</h3>
+<p><em>4. Website Description</em></p>
 
 <p>If this is a new application you will need to add some information to the
 description file. For petsc this lives in: <code>/sw/xk6/petsc/description</code> This is
@@ -301,7 +365,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
 
   <ol class='man-decor man-foot man foot'>
     <li class='tl'></li>
-    <li class='tc'>February 2013</li>
+    <li class='tc'>August 2013</li>
     <li class='tr'>smithy(1)</li>
   </ol>
 
