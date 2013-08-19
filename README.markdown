@@ -95,7 +95,7 @@ addition to ruby.
 
 Assuming you use environment modules you can install smithy to a separate
 directory e.g. `/sw/tools/smithy` with the
-[install\_smithy](https://github.com/AnthonyDiGirolamo/smithy/blob/master/install_smithy)
+[install\_smithy](https://github.com/AnthonyDiGirolamo/smithy/blob/master/script/install_smithy)
 script. This will setup a folder containing the smithy gem, a modulefile and a
 script that sets up shell completion. Users can load smithy into their
 environment by running:
@@ -104,13 +104,42 @@ environment by running:
 
 ### Loading smithy into your environment
 
-Smithy depends on a config file to define it's behavior. For an example see
-[etc/smithyrc](https://github.com/AnthonyDiGirolamo/smithy/blob/master/etc/smithyrc)
-This can be set via the `$SMITHY_CONFIG` environment variable.
+Smithy depends on a config file to define it's behavior. Once created you can
+point smithy to it's location using the `$SMITHY_CONFIG` environment variable.
+
+Here is an example config file:
+
+    ---
+    software-root: /sw
+    file-group-name: ccsstaff
+    hostname-architectures:
+      titan-ext: xk6
+      titan-login: xk6
+      chester-login: xk6
+      lens: analysis-x64
+      lens-login: analysis-x64
+      sith: redhat6
+      sith-login: redhat6
+      smoky: smoky
+      smoky-login: smoky
+    programming-environment-prefix:
+      default: PrgEnv-
+      smoky: PE-
+      sith: PE-
+    web-root: /ccs/proj/ccsstaff/swdesc/data
+    descriptions-root: /sw/descriptions
+    web-architecture-names:
+      xk6: titan
+      analysis-x64: lens
+      smoky: smoky
+    download-cache: /sw/sources
+    formula-directories:
+    - /sw/tools/smithy/formulas
+    global-error-log: /sw/tools/smithy/exceptions.log
 
 You may wish to set this using a modulefile or a shell script. Examples are
 provided in
-[modulefiles/smithy/1.0](https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.0)
+[modulefiles/smithy/1.1](https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.1)
 and
 [environment.sh](https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh)
 
@@ -118,7 +147,8 @@ License
 =======
 
 Smithy is based on the ideas created in SWTools and uses a BSD license. See
-LICENSE for the exact text.
+[LICENSE](https://github.com/AnthonyDiGirolamo/smithy/blob/master/LICENSE) for
+the exact text.
 
 Contributing and Support
 ========================
