@@ -179,6 +179,20 @@ module Smithy
       end
     end
 
+    def self.create_module_command(options,args)
+      packages = args.dup
+      raise "You must supply at least one package to install" if packages.empty?
+
+      packages.each do |package|
+        f = build_formula(package, options[:"formula-name"])
+        if f.modulefile.present?
+          f.create_modulefile
+        else
+          ModuleFile.new(:package => f.package).create
+        end
+      end
+    end
+
   end #FormulaCommand
 
 end

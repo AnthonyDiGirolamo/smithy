@@ -71,6 +71,8 @@ include Smithy
 
 version Smithy::VERSION
 
+subcommand_option_handling :normal
+
 program_desc "Smithy will help you build, test, and install software with ease."
 
 desc "Machine architecure to operate on"
@@ -608,7 +610,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Install a package using a formula"
-  c.arg_name "FORMULA|NAME/VERSION/BUILD|NAME/VERSION..."
+  c.arg_name "FORMULA | NAME/VERSION/BUILD | NAME/VERSION..."
   c.command :install do |subcommand|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"
@@ -623,6 +625,18 @@ command ['formula'] do |c|
 
     subcommand.action do |global_options,options,args|
       FormulaCommand.install_command(options,args)
+    end
+  end
+
+  c.desc "Create a modulefile for a given package"
+  c.arg_name "FORMULA | NAME/VERSION/BUILD | NAME/VERSION..."
+  c.command :create_modulefile do |subcommand|
+    subcommand.desc "Formula name"
+    subcommand.arg_name "NAME"
+    subcommand.flag [:f, "formula-name"]
+
+    subcommand.action do |global_options,options,args|
+      FormulaCommand.create_module_command(options,args)
     end
   end
 end
