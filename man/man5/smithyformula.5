@@ -55,19 +55,19 @@ smithy formula new \-\-name=subversion \-\-homepage=http://subversion\.apache\.o
 .IP "" 0
 .
 .P
-The format of this command is \fBsmithy formula new [command options] URL\fR\. The options and arguments are:
+The format of the new sub\-command is \fBsmithy formula new [command options] URL\fR\. The options and arguments are:
 .
 .TP
 \fB\-\-name\fR
-this is the name used for the formula file and class, if omitted smithy will try to guess the name based on the download URL
+This is the name used for the formula file and class, if omitted smithy will try to guess the name based on the download URL
 .
 .TP
 \fB\-\-homepage\fR
-this should be the main homepage for the software
+This should be the main homepage for the software
 .
 .TP
 \fBURL\fR
-a download URL for the software, this argument is required but may be "none" if you plan to checkout the code through a version control system or copy from another location as part of the formula
+A download URL for the software, this argument is required but may be "none" if you plan to checkout the code through a version control system or copy from another location as part of the formula
 .
 .P
 This will create a formula file inside \fB~/\.smithy/formulas\fR or the first formula directory specified in the \fB$SMITHY_CONFIG\fR file\. In either case, the full path to that file will be displayed\.
@@ -96,19 +96,176 @@ Formulas follow a specifc naming scheme\. The filename should end in \fB\'_formu
 .SS "RUBY BASICS"
 We will cover most of the basics you need for formula writing here but if you would like more info on ruby you might read through Ruby in Twenty Minutes \fIhttp://www\.ruby\-lang\.org/en/documentation/quickstart/\fR or try another source on the Ruby Documentation \fIhttp://www\.ruby\-lang\.org/en/documentation/\fR page\.
 .
-.SH "FORMULA DSL"
+.SH "FORMULA DSL METHODS"
+These methods should be defined at the highest level of the formula file, right after the \fBclass GitFormula < Formula\fR line\.
 .
-.SS "DSL METHODS"
+.SS "homepage"
+\fBREQUIRED\fR \- Defines the homepage, e\.g\. "http://git\-scm\.com/"
 .
-.TP
-\fBhomepage\fR
-\fBREQUIRED\fR \- defines the homepage, e\.g\. "http://git\-scm\.com/"
+.SS "url"
+\fBREQUIRED\fR \- The full URL to download a package, e\.g\. "http://git\-core\.googlecode\.com/files/git\-1\.8\.3\.4\.tar\.gz" may also be "none"
 .
-.TP
-\fBurl\fR
-\fBREQUIRED\fR \- the full URL to download a package, e\.g\. "http://git\-core\.googlecode\.com/files/git\-1\.8\.3\.4\.tar\.gz" may also be "none"
+.SS "sha1,sha256,md5"
+A hash of the downloaded file to verify the download performed correctly, e\.g\. \fBsha1 "fe633d02f7d964842d7ea804278b75120fc60c11"\fR
 .
-.TP
-\fBsha1,sha256,md5\fR
-a hash of the downloaded file to verify the download performed correctly, e\.g\. \fBsha1 "fe633d02f7d964842d7ea804278b75120fc60c11"\fR
+.SS "version"
+Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\.
+.
+.SS "depends_on"
+This method expects either a single string or an array of strings that define dependencies for this formula\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+depends_on "curl"
+depends_on [ "cmake", "qt", "openssl", "sqlite" ]
+depends_on %w{ cmake qt openssl sqlite }
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Using this method ensures that if a given dependency is not met smithy will abort the installation\. It also provides a way to query dependent packages information within the install method later on\. For example if you write \fBdepends_on "curl"\fR in your formula you gain access to an object named curl inside the install method\. This allows you to do things like:
+.
+.IP "" 4
+.
+.nf
+
+system "\./configure \-\-prefix=#{prefix} \-\-with\-curl=#{curl\.prefix}"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+In the above example \fB#{curl\.prefix}\fR is an example of a ruby interpolated string, everything between the \fB#{ }\fR is ruby code\. \fBcurl\.prefix\fR will return a string with the location curl is installed in\.
+.
+.P
+The strings passed to \fBdepends_on\fR are just the locations of installed software\. If you required a specific version of a dependency you could use specify the version or build numbers of existing installed software\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+depends_on [ "cmake/2\.8\.11\.2/sles11\.1_gnu4\.3\.4", "qt/4\.8\.5", "sqlite" ]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Assuming your software root is \fB/sw/xk6\fR smithy would look for the above software installs in \fB/sw/xk6/cmake/2\.8\.11\.2/sles11\.1_gnu4\.3\.4\fR \fB/sw/xk6/qt/4\.8\.5/*\fR and \fB/sw/xk6/sqlite/*/*\fR\. The \fB*\fR works similar to shell globbing\. If you needed to install a python module that depends on a specific version of another python module you might use:
+.
+.IP "" 4
+.
+.nf
+
+depends_on [ "python/3\.3\.0", "python_numpy/1\.7\.1/*python3\.3\.0*" ]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This would require a given formula to have access to both \fB/sw/xk6/python/3\.3\.0/*\fR and a python module with a build name that includes \fBpython3\.3\.0\fR located at \fB/sw/x6/python_numpy/1\.7\.1/*python3\.3\.0*\fR
+.
+.P
+You will also probably need to specifiy dependencies conditionally upon the type of build you are performing\. It\'s recommended to add the type of build to the build name when installing\. Given that, you can key off build names to specify dependencies\. Taking the python example further, lets extend it to support multiple versions of python\. You can pass a ruby block to the \fBdepends_on\fR method to make it more dynamic\. The syntax for this is:
+.
+.IP "" 4
+.
+.nf
+
+depends_on do
+  \.\.\.
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Any ruby code may go in here the last executed line of the block should be an array of strings containting the dependencies\. Lets use a ruby case statement for this:
+.
+.IP "" 4
+.
+.nf
+
+depends_on do
+  case build_name
+  when /python3\.3/
+    [ "python/3\.3\.0", "python_numpy/1\.7\.1/*python3\.3\.0*" ]
+  when /python2\.7/
+    [ "python/2\.7\.3", "python_numpy/1\.7\.1/*python2\.7\.3*" ]
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This allows the formula to set it\'s dependencies based off the type of build thats being performed\. Lets say this formula is \fBpython_matplotlib\fR\. You could run either of these commands to install it and expect the dependencies to be set correctly:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install python_matplotlib/1\.2\.3/python3\.3\.0
+smithy formula install python_matplotlib/1\.2\.3/python2\.7\.3
+.
+.fi
+.
+.IP "" 0
+.
+.SS "module_commands"
+something
+.
+.SS "modules"
+something
+.
+.SS "modulefile"
+This method expects the a string that represents the modulefile\. It\'s convinient to use heredoc string quoting in ruby\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+modulefile <<\-MODULEFILE\.strip_heredoc
+  #%Module
+  proc ModulesHelp { } {
+     puts stderr "<%= @package\.name %> <%= @package\.version %>"
+     puts stderr ""
+  }
+  module\-whatis "<%= @package\.name %> <%= @package\.version %>"
+
+  set PREFIX <%= @package\.prefix %>
+
+  prepend\-path PATH            $PREFIX/bin
+  prepend\-path LD_LIBRARY_PATH $PREFIX/lib
+  prepend\-path MANPATH         $PREFIX/share/man
+MODULEFILE
+.
+.fi
+.
+.IP "" 0
+.
+.SS "def install"
+This is the method that runs the software installation process\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+def install
+  system "\./configure"
+  system "make"
+  system "make install"
+end
+.
+.fi
+.
+.IP "" 0
 

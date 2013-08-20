@@ -610,7 +610,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Install a package using a formula"
-  c.arg_name "FORMULA | NAME/VERSION/BUILD | NAME/VERSION..."
+  c.arg_name "NAME | NAME/VERSION | NAME/VERSION/BUILD"
   c.command :install do |subcommand|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"
@@ -629,7 +629,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Create a modulefile for a given package"
-  c.arg_name "FORMULA | NAME/VERSION/BUILD | NAME/VERSION..."
+  c.arg_name "NAME | NAME/VERSION | NAME/VERSION/BUILD"
   c.command :create_modulefile do |subcommand|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"

@@ -32,18 +32,18 @@ the file. To create a new formula for subversion you might run:
 
     smithy formula new --name=subversion --homepage=http://subversion.apache.org/ http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
 
-The format of this command is `smithy formula new [command options] URL`.
+The format of the new sub-command is `smithy formula new [command options] URL`.
 The options and arguments are:
 
   * `--name`:
-    this is the name used for the formula file and class, if omitted smithy will
+    This is the name used for the formula file and class, if omitted smithy will
     try to guess the name based on the download URL
 
   * `--homepage`:
-    this should be the main homepage for the software
+    This should be the main homepage for the software
 
   * `URL`:
-    a download URL for the software, this argument is required but may be "none"
+    A download URL for the software, this argument is required but may be "none"
     if you plan to checkout the code through a version control system or copy
     from another location as part of the formula
 
@@ -78,32 +78,145 @@ Minutes](http://www.ruby-lang.org/en/documentation/quickstart/) or try another
 source on the [Ruby Documentation](http://www.ruby-lang.org/en/documentation/)
 page.
 
-## FORMULA DSL
+## FORMULA DSL METHODS
 
-### TOP LEVEL DSL METHODS
-
-These methods should be defined at the highest level of the formul file, right
+These methods should be defined at the highest level of the formula file, right
 after the `class GitFormula < Formula` line.
 
-* `homepage`:
-  **REQUIRED** - defines the homepage, e.g. "http://git-scm.com/"
+### homepage
+  **REQUIRED** - Defines the homepage, e.g. "http://git-scm.com/"
 
-* `url`:
-  **REQUIRED** - the full URL to download a package, e.g. "http://git-core.googlecode.com/files/git-1.8.3.4.tar.gz" may also be "none"
+### url
+  **REQUIRED** - The full URL to download a package, e.g. "http://git-core.googlecode.com/files/git-1.8.3.4.tar.gz" may also be "none"
 
-* `sha1,sha256,md5`:
-  a hash of the downloaded file to verify the download performed correctly, e.g.
+### sha1,sha256,md5
+  A hash of the downloaded file to verify the download performed correctly, e.g.
   `sha1 "fe633d02f7d964842d7ea804278b75120fc60c11"`
 
-* `version`:
+### version
   Manually define the version number, if omitted smithy will guess the version
   number from the url. This works best when the filename in a url follows the
   name-version.tar... format.
 
-* `depends_on`:
+### depends_on
+  This method expects either a single string or an array of strings that define
+  dependencies for this formula. e.g.
 
-* `module_commands`:
+    depends_on "curl"
+    depends_on [ "cmake", "qt", "openssl", "sqlite" ]
+    depends_on %w{ cmake qt openssl sqlite }
 
-* `modules`:
+  Using this method ensures that if a given dependency is not met smithy will
+  abort the installation. It also provides a way to query dependent packages
+  information within the install method later on. For example if you write
+  `depends_on "curl"` in your formula you gain access to an object named curl
+  inside the install method. This allows you to do things like:
+
+    system "./configure --prefix=#{prefix} --with-curl=#{curl.prefix}"
+
+  In the above example `#{curl.prefix}` is an example of a ruby interpolated
+  string, everything between the `#{ }` is ruby code. `curl.prefix` will return
+  a string with the location curl is installed in.
+
+  The strings passed to `depends_on` are just the locations of installed
+  software. If you required a specific version of a dependency you could use
+  specify the version or build numbers of existing installed software. e.g.
+
+    depends_on [ "cmake/2.8.11.2/sles11.1_gnu4.3.4", "qt/4.8.5", "sqlite" ]
+
+  Assuming your software root is `/sw/xk6` smithy would look for the above
+  software installs in `/sw/xk6/cmake/2.8.11.2/sles11.1_gnu4.3.4`
+  `/sw/xk6/qt/4.8.5/*` and `/sw/xk6/sqlite/*/*`. The `*` works similar to shell
+  globbing. If you needed to install a python module that depends on a specific
+  version of another python module you might use:
+
+    depends_on [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*" ]
+
+  This would require a given formula to have access to both
+  `/sw/xk6/python/3.3.0/*` and a python module with a build name that includes
+  `python3.3.0` located at `/sw/x6/python_numpy/1.7.1/*python3.3.0*`
+
+  You will also probably need to specifiy dependencies conditionally upon the
+  type of build you are performing. It's recommended to add the type of
+  build to the build name when installing. Given that, you can key off build
+  names to specify dependencies. Taking the python example further, lets extend
+  it to support multiple versions of python. You can pass a ruby block to the
+  `depends_on` method to make it more dynamic. The syntax for this is:
+
+    depends_on do
+      ...
+    end
+
+  Any ruby code may go in here the last executed line of the block should be an
+  array of strings containting the dependencies. Lets use a ruby case statement
+  for this:
+
+    depends_on do
+      case build_name
+      when /python3.3/
+        [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*" ]
+      when /python2.7/
+        [ "python/2.7.3", "python_numpy/1.7.1/*python2.7.3*" ]
+      end
+    end
+
+  This allows the formula to set it's dependencies based off the type of build
+  thats being performed. Lets say this formula is `python_matplotlib`. You could
+  run either of these commands to install it and expect the dependencies to be
+  set correctly:
+
+    smithy formula install python_matplotlib/1.2.3/python3.3.0
+    smithy formula install python_matplotlib/1.2.3/python2.7.3
+
+### module_commands
+  something
+
+### modules
+  something
+
+### modulefile
+  This method expects the a string that represents the modulefile. It's
+  convinient to use heredoc string quoting in ruby. e.g.
+
+    modulefile <<-MODULEFILE.strip_heredoc
+      #%Module
+      proc ModulesHelp { } {
+         puts stderr "<%= @package.name %> <%= @package.version %>"
+         puts stderr ""
+      }
+      module-whatis "<%= @package.name %> <%= @package.version %>"
+
+      set PREFIX <%= @package.prefix %>
+
+      prepend-path PATH            $PREFIX/bin
+      prepend-path LD_LIBRARY_PATH $PREFIX/lib
+      prepend-path MANPATH         $PREFIX/share/man
+    MODULEFILE
+
+  TODO more info on module file format and options...
+
+### def install
+  This is the method that runs the software installation process. e.g.
+
+    def install
+      system "./configure"
+      system "make"
+      system "make install"
+    end
+
+## OTHER FORMULA METHODS
+
+These methods are designed to be used within the `install` part of a formula
+file.
+
+### module_list
+
+### name
+
+### version
+
+### build_name
+
+### prefix
 
 

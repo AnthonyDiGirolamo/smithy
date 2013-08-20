@@ -125,6 +125,34 @@ Install a package using a formula
 \fBcreate_modulefile\fR
 Create a modulefile for a given package
 .
+.P
+Once a formula has been written installing is straightforward using the install command\. For example to install subversion to your software root under the \fBsubversion/1\.7\.8/sles11\.1_gnu4\.3\.4\fR directory you might run:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install subversion/1\.7\.8/sles11\.1_gnu4\.3\.4
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The format of the install sub\-command is: \fBsmithy formula install [command options] NAME | NAME/VERSION | NAME/VERSION/BUILD\fR\. The options and arguments include:
+.
+.TP
+\fB\-\-[no\-]clean\fR
+This will delete all existing files in the target directory before performing the installation\.
+.
+.TP
+\fB\-\-formula\-name\fR
+By default smithy will guess the formula name based on the target directory NAME/VERSION/BUILD argument\. You may wish you install to a location named differently than a formula\. In this case, use \fB\-\-formula\-name\fR to define which formula to use\.
+.
+.TP
+\fBNAME | NAME/VERSION | NAME/VERSION/BUILD\fR
+This is the destination directory that the software will be installed in\. If you omit the BUILD or VERSION/BUILD directories smithy will try to guess the version based on the formula, and the build based on the operating system and version of gcc available\. If in doubt, specify the full destination\.
+.
 .SS "INSTALLATIONS WITH BUILD SCRIPTS"
 This section shows the typical work\-flow for adding a new software build using build scripts\. Let\'s imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
 .
