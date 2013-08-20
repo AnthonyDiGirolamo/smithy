@@ -42,7 +42,7 @@ module Smithy
         :arch, :root, :full_root, :web_root, :file_group, :descriptions_root,
         :web_architecture_names
 
-      def group_writeable?
+      def group_writable?
         @global[:"disable-group-writable"] ? false : true
       end
 

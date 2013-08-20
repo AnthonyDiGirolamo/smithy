@@ -99,7 +99,7 @@ module Smithy
         else
           command = "chmod g+w #{f}"
           unless options[:noop]
-            # Check to see if it's already group writeable
+            # Check to see if it's already group writable
             # convert the integer to a string in base 8
             mode = File.stat(f).mode.to_s(8)
             # check the group bit, convert back to integer

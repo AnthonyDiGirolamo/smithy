@@ -66,7 +66,8 @@ module Smithy
       @build_name = $3
       @group = Smithy::Config.file_group
 
-      @group_writeable = Smithy::Config.group_writeable?
+      @group_writable = Smithy::Config.group_writable?
+      @group_writable = args[:group_writable] if args.has_key?(:group_writable)
     end
 
     def get_binding
@@ -120,8 +121,8 @@ module Smithy
       return file_list
     end
 
-    def group_writeable?
-      @group_writeable
+    def group_writable?
+      @group_writable
     end
 
     def valid?
@@ -211,7 +212,7 @@ module Smithy
       else
         FileUtils.touch(lock_file)
         FileOperations.set_group(lock_file, group)
-        FileOperations.make_group_writable(lock_file) if group_writeable?
+        FileOperations.make_group_writable(lock_file) if group_writable?
         return true
       end
     end
@@ -228,7 +229,7 @@ module Smithy
       unless File.exists? valid_build_file
         FileUtils.touch(valid_build_file)
         FileOperations.set_group(valid_build_file, group)
-        FileOperations.make_group_writable(valid_build_file) if group_writeable?
+        FileOperations.make_group_writable(valid_build_file) if group_writable?
         return true
       end
     end
@@ -262,7 +263,7 @@ module Smithy
           log_file = File.open(log_file_path, 'w') unless args[:dry_run]
 
           FileOperations.set_group(log_file, group)
-          FileOperations.make_group_writable(log_file) if group_writeable?
+          FileOperations.make_group_writable(log_file) if group_writable?
         end
         if args[:dry_run] || log_file != nil
           notice "Logging to #{log_file_path}"
@@ -313,9 +314,11 @@ module Smithy
     end
 
     def set_file_permissions_recursive
-      notice "Setting permissions on installed files"
-      FileOperations.set_group prefix, @group, :recursive => true
-      FileOperations.make_group_writable prefix, :recursive => true if group_writeable?
+      if group_writable?
+        notice "Setting permissions on installed files"
+        FileOperations.set_group prefix, @group, :recursive => true
+        FileOperations.make_group_writable prefix, :recursive => true if group_writable?
+      end
     end
 
     def extract(args = {})
@@ -377,7 +380,7 @@ module Smithy
         FileUtils.rm_rf temp_dir
 
         FileOperations.set_group source_directory, @group, :recursive => true
-        FileOperations.make_group_writable source_directory, :recursive => true if group_writeable?
+        FileOperations.make_group_writable source_directory, :recursive => true if group_writable?
       end
     end
 
@@ -394,7 +397,7 @@ module Smithy
 
       FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
       FileOperations.set_group version_table_file, group, options
-      FileOperations.make_group_writable version_table_file, options if group_writeable?
+      FileOperations.make_group_writable version_table_file, options if group_writable?
     end
 
     def create(args = {})
@@ -407,7 +410,7 @@ module Smithy
         [application_directory].each do |dir|
           FileOperations.make_directory dir, options
           FileOperations.set_group dir, group, options
-          FileOperations.make_group_writable dir, options if group_writeable?
+          FileOperations.make_group_writable dir, options if group_writable?
         end
 
         update_version_table_file(options)
@@ -417,7 +420,7 @@ module Smithy
           #if dir == prefix
             FileOperations.make_directory dir, options
             FileOperations.set_group dir, group, options
-            FileOperations.make_group_writable dir, options if group_writeable?
+            FileOperations.make_group_writable dir, options if group_writable?
           #end
         end
 
@@ -444,7 +447,7 @@ module Smithy
           end
 
           FileOperations.set_group file[:dest], group, options
-          FileOperations.make_group_writable file[:dest], options if group_writeable?
+          FileOperations.make_group_writable file[:dest], options if group_writable?
           FileOperations.make_executable file[:dest], options if file[:dest] =~ /(#{ExecutableBuildFileNames.join('|')})/
         end
 
@@ -497,7 +500,7 @@ module Smithy
           if missing_package.include?(file[:name])
             FileOperations.install_file file[:src], file[:dest], options
             FileOperations.set_group file[:dest], group, options
-            FileOperations.make_group_writable file[:dest], options if group_writeable?
+            FileOperations.make_group_writable file[:dest], options if group_writable?
           end
         end
       end
@@ -507,7 +510,7 @@ module Smithy
           if missing_build.include?(file[:name])
             FileOperations.install_file file[:src], file[:dest], options
             FileOperations.set_group file[:dest], group, options
-            FileOperations.make_group_writable file[:dest], options if group_writeable?
+            FileOperations.make_group_writable file[:dest], options if group_writable?
           end
         end
       end
@@ -515,11 +518,11 @@ module Smithy
       notice "Setting permissions for #{prefix}"
 
       FileOperations.set_group prefix, group, options.merge(:recursive => true)
-      FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writeable?
+      FileOperations.make_group_writable prefix, options.merge(:recursive => true) if group_writable?
 
       [version_directory, application_directory].each do |dir|
         FileOperations.set_group dir, group, options
-        FileOperations.make_group_writable dir, options if group_writeable?
+        FileOperations.make_group_writable dir, options if group_writable?
       end
     end
 
@@ -661,7 +664,7 @@ The following information is available by running `module help #{name}`
         ops = {:noop => options[:"dry-run"] ? true : false}
         FileOperations.install_from_string(help_content, help_dest, ops)
         FileOperations.set_group help_dest, p.group, ops
-        FileOperations.make_group_writable help_dest, ops if p.group_writeable?
+        FileOperations.make_group_writable help_dest, ops if p.group_writable?
       end
     end
 

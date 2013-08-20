@@ -87,7 +87,7 @@ module Smithy
 
       version = f.version      if version.blank?
       build = operating_system if build.blank?
-      p = Package.new :path => [name, version, build].join("/")
+      p = Package.new :path => [name, version, build].join("/"), :group_writable => f.group_writable?
       f.set_package(p) if p.valid?
 
       return f

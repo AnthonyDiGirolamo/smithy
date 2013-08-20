@@ -55,7 +55,7 @@ module Smithy
     end
 
     # DSL Methods
-    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile }.each do |attr|
+    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile disable_group_writable }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           @#{attr} = block_given? ? block : value unless @#{attr}
@@ -83,6 +83,10 @@ module Smithy
     def version
       @version = self.class.version unless @version
       @version
+    end
+
+    def group_writable?
+      ! self.class.disable_group_writable
     end
 
     def run_install
