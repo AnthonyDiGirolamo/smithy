@@ -1,0 +1,114 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "SMITHYFORMULA" "5" "August 2013" "" ""
+.
+.SH "NAME"
+\fBsmithyformula\fR \- writing formulas for smithy
+.
+.SH "DESCRIPTION"
+The main goal of formulas is to consolidate all knowledge required to build a software package\. This can include:
+.
+.IP "\(bu" 4
+defining dependencies
+.
+.IP "\(bu" 4
+loading or swapping modules
+.
+.IP "\(bu" 4
+setting environment variables
+.
+.IP "\(bu" 4
+applying patches
+.
+.IP "\(bu" 4
+creating or changing makefiles
+.
+.IP "\(bu" 4
+running the compilation
+.
+.IP "\(bu" 4
+running tests
+.
+.IP "\(bu" 4
+defining a modulefile
+.
+.IP "" 0
+.
+.P
+Once written it\'s easy to see everything required to build a given piece of software\. Reproducing those steps is as simple as running one command but only if the formula is as complete as possible\.
+.
+.P
+It\'s common for build scripts to run the compilation but omit patches, changes to makefile, or any other modification to the source\. With formulas it\'s easy to make patches and output any files needed to compile software\.
+.
+.SH "CREATING NEW FORMULAS"
+To help create new formula files you can use the \fBsmithy formula new\fR subcommand\. For more info on this command run \fBsmithy help formula new\fR\. To create a new formula file you need to know the homepage and a url to download the file\. To create a new formula for subversion you might run:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula new \-\-name=subversion \-\-homepage=http://subversion\.apache\.org/ http://mirror\.cogentco\.com/pub/apache/subversion/subversion\-1\.7\.8\.tar\.bz2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The format of this command is \fBsmithy formula new [command options] URL\fR\. The options and arguments are:
+.
+.TP
+\fB\-\-name\fR
+this is the name used for the formula file and class, if omitted smithy will try to guess the name based on the download URL
+.
+.TP
+\fB\-\-homepage\fR
+this should be the main homepage for the software
+.
+.TP
+\fBURL\fR
+a download URL for the software, this argument is required but may be "none" if you plan to checkout the code through a version control system or copy from another location as part of the formula
+.
+.P
+This will create a formula file inside \fB~/\.smithy/formulas\fR or the first formula directory specified in the \fB$SMITHY_CONFIG\fR file\. In either case, the full path to that file will be displayed\.
+.
+.SH "STRUCTURE"
+Formulas attempt to create a domain specific language with the support of a full programming language, ruby\. The structure of a formula is the same as a ruby class\. For example:
+.
+.IP "" 4
+.
+.nf
+
+class SubversionFormula < Formula
+
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Every method call that defines the formula will happen between these two lines\.
+.
+.SS "Formula File and Class Naming"
+Formulas follow a specifc naming scheme\. The filename should end in \fB\'_formula\.rb\'\fR and start with the name of the software in all lowercase characters\. The class name should be the same name specified in the file but CamelCased \fIhttp://en\.wikipedia\.org/wiki/CamelCase\fR and end in \fB\'Formula\'\fR\.
+.
+.SS "RUBY BASICS"
+We will cover most of the basics you need for formula writing here but if you would like more info on ruby you might read through Ruby in Twenty Minutes \fIhttp://www\.ruby\-lang\.org/en/documentation/quickstart/\fR or try another source on the Ruby Documentation \fIhttp://www\.ruby\-lang\.org/en/documentation/\fR page\.
+.
+.SH "FORMULA DSL"
+.
+.SS "DSL METHODS"
+.
+.TP
+\fBhomepage\fR
+\fBREQUIRED\fR \- defines the homepage, e\.g\. "http://git\-scm\.com/"
+.
+.TP
+\fBurl\fR
+\fBREQUIRED\fR \- the full URL to download a package, e\.g\. "http://git\-core\.googlecode\.com/files/git\-1\.8\.3\.4\.tar\.gz" may also be "none"
+.
+.TP
+\fBsha1,sha256,md5\fR
+a hash of the downloaded file to verify the download performed correctly, e\.g\. \fBsha1 "fe633d02f7d964842d7ea804278b75120fc60c11"\fR
+

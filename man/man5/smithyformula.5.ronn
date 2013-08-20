@@ -1,0 +1,109 @@
+smithyformula(5) -- writing formulas for smithy
+===============================================
+
+## DESCRIPTION
+
+The main goal of formulas is to consolidate all knowledge required to build a
+software package. This can include:
+
+* defining dependencies
+* loading or swapping modules
+* setting environment variables
+* applying patches
+* creating or changing makefiles
+* running the compilation
+* running tests
+* defining a modulefile
+
+Once written it's easy to see everything required to build a given piece of
+software. Reproducing those steps is as simple as running one command but only
+if the formula is as complete as possible.
+
+It's common for build scripts to run the compilation but omit patches, changes
+to makefile, or any other modification to the source. With formulas it's easy to
+make patches and output any files needed to compile software.
+
+## CREATING NEW FORMULAS
+
+To help create new formula files you can use the `smithy formula new`
+subcommand. For more info on this command run `smithy help formula new`. To
+create a new formula file you need to know the homepage and a url to download
+the file. To create a new formula for subversion you might run:
+
+    smithy formula new --name=subversion --homepage=http://subversion.apache.org/ http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+
+The format of this command is `smithy formula new [command options] URL`.
+The options and arguments are:
+
+  * `--name`:
+    this is the name used for the formula file and class, if omitted smithy will
+    try to guess the name based on the download URL
+
+  * `--homepage`:
+    this should be the main homepage for the software
+
+  * `URL`:
+    a download URL for the software, this argument is required but may be "none"
+    if you plan to checkout the code through a version control system or copy
+    from another location as part of the formula
+
+This will create a formula file inside `~/.smithy/formulas` or the first formula
+directory specified in the `$SMITHY_CONFIG` file. In either case, the full path
+to that file will be displayed.
+
+## STRUCTURE
+
+Formulas attempt to create a domain specific language with the support of a full
+programming language, ruby. The structure of a formula is the same as a ruby class.
+For example:
+
+    class SubversionFormula < Formula
+
+    end
+
+Every method call that defines the formula will happen between these two lines.
+
+### Formula File and Class Naming
+
+Formulas follow a specifc naming scheme. The filename should end in
+`'_formula.rb'` and start with the name of the software in all lowercase
+characters. The class name should be the same name specified in the file but
+[CamelCased](http://en.wikipedia.org/wiki/CamelCase) and end in `'Formula'`.
+
+### RUBY BASICS
+
+We will cover most of the basics you need for formula writing here but if you
+would like more info on ruby you might read through [Ruby in Twenty
+Minutes](http://www.ruby-lang.org/en/documentation/quickstart/) or try another
+source on the [Ruby Documentation](http://www.ruby-lang.org/en/documentation/)
+page.
+
+## FORMULA DSL
+
+### TOP LEVEL DSL METHODS
+
+These methods should be defined at the highest level of the formul file, right
+after the `class GitFormula < Formula` line.
+
+* `homepage`:
+  **REQUIRED** - defines the homepage, e.g. "http://git-scm.com/"
+
+* `url`:
+  **REQUIRED** - the full URL to download a package, e.g. "http://git-core.googlecode.com/files/git-1.8.3.4.tar.gz" may also be "none"
+
+* `sha1,sha256,md5`:
+  a hash of the downloaded file to verify the download performed correctly, e.g.
+  `sha1 "fe633d02f7d964842d7ea804278b75120fc60c11"`
+
+* `version`:
+  Manually define the version number, if omitted smithy will guess the version
+  number from the url. This works best when the filename in a url follows the
+  name-version.tar... format.
+
+* `depends_on`:
+
+* `module_commands`:
+
+* `modules`:
+
+

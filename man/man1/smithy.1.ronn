@@ -1,5 +1,5 @@
-smithy(1) -- build, test, and install software with ease.
-=====================================================
+smithy(1) -- build, test, and install software with ease
+========================================================
 
 ## SYNOPSIS
 
@@ -62,7 +62,7 @@ while the remodule script sets up the environment including loading modulefiles.
 
 ### FORMULAS
 
-THE Problem with build scripts is that they are duplicated for every software
+The Problem with build scripts is that they are duplicated for every software
 installation. This makes installing new software difficult because you will have
 to go back and look at old ones and copy relevant steps to a new rebuild script.
 So much for don't repeat yourself!
@@ -71,7 +71,7 @@ An alternative is to use formulas. This idea is heavily borrowed from the
 wonderful [homebrew](http://brew.sh/) package management system for Mac OS X.
 With a formula you can specify the modules to load, extra package dependencies,
 installation steps, and the modulefile in a single file. The formulas are
-written in ruby and can be as flexible and dynamic as you like. 
+written in ruby and can be as flexible and dynamic as you like.
 
 A package installed with a formula has a simpler prefix directory structure.
 The only addition is the source files under the source directory.
@@ -87,6 +87,23 @@ The only addition is the source files under the source directory.
 ## EXAMPLES
 
 ### INSTALLATIONS WITH FORMULAS
+
+For details on writing formulas please see the smithyformula(5) man page.
+
+Smithy formula sub-commands include:
+
+* `new`:
+  Create a new formula
+* `list`:
+  List known formulas
+* `which`:
+  Display a formula location
+* `display`:
+  Display a formula
+* `install`:
+  Install a package using a formula
+* `create_modulefile`:
+  Create a modulefile for a given package
 
 ### INSTALLATIONS WITH BUILD SCRIPTS
 

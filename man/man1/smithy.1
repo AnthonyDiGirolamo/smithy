@@ -4,7 +4,7 @@
 .TH "SMITHY" "1" "August 2013" "" ""
 .
 .SH "NAME"
-\fBsmithy\fR \- build, test, and install software with ease\.
+\fBsmithy\fR \- build, test, and install software with ease
 .
 .SH "SYNOPSIS"
 \fBsmithy\fR \fBnew\fR APPLICATION/VERSION/BUILD
@@ -69,7 +69,7 @@ Build scripts are shell scripts that live inside of a package\'s PREFIX and exec
 The prefix for the above package is \fB/sw/xk6/subversion/1\.6\.17/sles11\.1_gnu4\.3\.4\fR within this directory you can see the usual \fBbin/include/lib/share\fR folders\. Additionally there is the source directory \fBsubversion\-1\.6\.17\fR and three build scripts \fBrebuild\fR, \fBrelink\fR, and \fBremodule\fR\. The \fBrebuild\fR script will compile the software and set the prefix while the remodule script sets up the environment including loading modulefiles\.
 .
 .SS "FORMULAS"
-THE Problem with build scripts is that they are duplicated for every software installation\. This makes installing new software difficult because you will have to go back and look at old ones and copy relevant steps to a new rebuild script\. So much for don\'t repeat yourself!
+The Problem with build scripts is that they are duplicated for every software installation\. This makes installing new software difficult because you will have to go back and look at old ones and copy relevant steps to a new rebuild script\. So much for don\'t repeat yourself!
 .
 .P
 An alternative is to use formulas\. This idea is heavily borrowed from the wonderful homebrew \fIhttp://brew\.sh/\fR package management system for Mac OS X\. With a formula you can specify the modules to load, extra package dependencies, installation steps, and the modulefile in a single file\. The formulas are written in ruby and can be as flexible and dynamic as you like\.
@@ -96,6 +96,34 @@ A package installed with a formula has a simpler prefix directory structure\. Th
 .SH "EXAMPLES"
 .
 .SS "INSTALLATIONS WITH FORMULAS"
+For details on writing formulas please see the smithyformula(5) man page\.
+.
+.P
+Smithy formula sub\-commands include:
+.
+.TP
+\fBnew\fR
+Create a new formula
+.
+.TP
+\fBlist\fR
+List known formulas
+.
+.TP
+\fBwhich\fR
+Display a formula location
+.
+.TP
+\fBdisplay\fR
+Display a formula
+.
+.TP
+\fBinstall\fR
+Install a package using a formula
+.
+.TP
+\fBcreate_modulefile\fR
+Create a modulefile for a given package
 .
 .SS "INSTALLATIONS WITH BUILD SCRIPTS"
 This section shows the typical work\-flow for adding a new software build using build scripts\. Let\'s imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
