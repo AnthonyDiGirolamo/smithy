@@ -157,8 +157,8 @@ is `/sw/xk6/` the finished directory structure would look like:
 
     /sw/xk6/subversion/1.7.8
     `--- modulefile
-       `--- subversion
-          `--- 1.7.8
+    |  `--- subversion
+    |     `--- 1.7.8
     `--- sles11.1_gnu4.3.4
        `--- bin
        `--- include

@@ -370,21 +370,119 @@ in the modulefile. Otherwise, if we have only one build, <code>set PREFIX &lt;%=
 end
 </code></pre>
 
+<p>  The contents of the install method depends heavily on the software being
+  installed. For a list of additional helper methods for use inside install see
+  the <a href="#FORMULA-HELPER-METHODS" title="FORMULA HELPER METHODS" data-bare-link="true">FORMULA HELPER METHODS</a> section.</p>
+
 <h2 id="MODULEFILE-HELPER-METHODS">MODULEFILE HELPER METHODS</h2>
 
 <h3 id="-package-name-"><code>&lt;%= @package.name %&gt;</code></h3>
 
+<p>This will return the name of the application being installed. It is the same as
+the APPLICATION part of the <code>smithy formula install APPLICATION/VERSION/BUILD</code>
+command.</p>
+
 <h3 id="-package-version-"><code>&lt;%= @package.version %&gt;</code></h3>
+
+<p>Similar to the above, this returns the version number.</p>
 
 <h3 id="-package-build_name-"><code>&lt;%= @package.build_name %&gt;</code></h3>
 
+<p>Same as the name and version methods, this will return the build name of the
+applcation.</p>
+
 <h3 id="-package-prefix-"><code>&lt;%= @package.prefix %&gt;</code></h3>
+
+<p>This line will return the full prefix to an application. If we run <code>smithy
+formula install bzip2/1.0.4/pgi13.4</code> and our software-root is <code>/sw/xk6</code> this
+command will return <code>/sw/xk6/bzip2/1.0.4/pgi13.4</code></p>
 
 <h3 id="-builds-"><code>&lt;%= @builds %></code></h3>
 
+<p>The <code>@builds</code> variable is an array of strings that contain the list of available
+builds for a given application. Say we have a bzip2 formula and ran the
+following installs:</p>
+
+<pre><code>smithy formula install bzip2/1.0.4/gnu4.3.4
+smithy formula install bzip2/1.0.4/gnu4.7.2
+smithy formula install bzip2/1.0.4/pgi13.4
+smithy formula install bzip2/1.0.4/intel12
+</code></pre>
+
+<p>The directory structure for the above builds would look like (assuming <code>/sw/xk6</code>
+is the software-root):</p>
+
+<pre><code>/sw/xk6/bzip2/1.0.4
+`--- modulefile
+|  `--- bzip2
+|     `--- 1.0.4
+`--- gnu4.3.4
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- gnu4.7.2
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- pgi13.4
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- intel12
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
+
+<p>The <code>@builds</code> array would then be <code>[ "gnu4.3.4", "gnu4.7.2", "pgi13.4",
+"intel12" ]</code>. This lets you figure out what builds exist and use them in your
+modulefile.</p>
+
 <h3 id="-builds-size-"><code>&lt;%= @builds.size %&gt;</code></h3>
 
+<p><a href="http://ruby-doc.org/core-2.0/Array.html#method-i-size">size</a> is a standard ruby
+method that counts the number of elements in an array. For the above example
+this would return <code>4</code>.</p>
+
 <h3 id="-module_build_list-package-builds-"><code>&lt;%= module_build_list @package, @builds %></code></h3>
+
+<p>This is a helper method in smithy that will generate the tcl necessary to
+conditionally load builds based on what compiler programming environment
+modules a user has loaded. It takes <code>@package</code> and <code>@builds</code> as arguments.
+Using the above bzip2 example the result of using this method would be:</p>
+
+<pre><code>if [ is-loaded PrgEnv-gnu ] {
+  if [ is-loaded gcc/4.3.4 ] {
+    set BUILD gnu4.3.4
+  } elseif [ is-loaded gcc/4.7.2 ] {
+    set BUILD gnu4.7.2
+  } else {
+    set BUILD gnu4.7.2
+  }
+} elseif [ is-loaded PrgEnv-pgi ] {
+  set BUILD pgi13.4
+} elseif [ is-loaded PrgEnv-intel ] {
+  set BUILD intel12
+} elseif [ is-loaded PrgEnv-cray ] {
+  puts stderr "Not implemented for the cray compiler"
+}
+if {![info exists BUILD]} {
+  puts stderr "[module-info name] is only available for the following environments:"
+  puts stderr "gnu4.3.4"
+  puts stderr "gnu4.7.2"
+  puts stderr "intel12"
+  puts stderr "pgi13.4"
+  break
+}
+</code></pre>
 
 <h3 id="-if-"><code>&lt;% if ... %&gt;</code></h3>
 

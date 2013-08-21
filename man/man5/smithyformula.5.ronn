@@ -271,15 +271,116 @@ in the modulefile. Otherwise, if we have only one build, `set PREFIX <%=
       system "make install"
     end
 
+  The contents of the install method depends heavily on the software being
+  installed. For a list of additional helper methods for use inside install see
+  the [FORMULA HELPER METHODS][] section.
+
 ## MODULEFILE HELPER METHODS
 
 ### `<%= @package.name %>`
+
+This will return the name of the application being installed. It is the same as
+the APPLICATION part of the `smithy formula install APPLICATION/VERSION/BUILD`
+command.
+
 ### `<%= @package.version %>`
+
+Similar to the above, this returns the version number.
+
 ### `<%= @package.build_name %>`
+
+Same as the name and version methods, this will return the build name of the
+applcation.
+
 ### `<%= @package.prefix %>`
+
+This line will return the full prefix to an application. If we run `smithy
+formula install bzip2/1.0.4/pgi13.4` and our software-root is `/sw/xk6` this
+command will return `/sw/xk6/bzip2/1.0.4/pgi13.4`
+
 ### `<%= @builds %>`
+
+The `@builds` variable is an array of strings that contain the list of available
+builds for a given application. Say we have a bzip2 formula and ran the
+following installs:
+
+    smithy formula install bzip2/1.0.4/gnu4.3.4
+    smithy formula install bzip2/1.0.4/gnu4.7.2
+    smithy formula install bzip2/1.0.4/pgi13.4
+    smithy formula install bzip2/1.0.4/intel12
+
+The directory structure for the above builds would look like (assuming `/sw/xk6`
+is the software-root):
+
+    /sw/xk6/bzip2/1.0.4
+    `--- modulefile
+    |  `--- bzip2
+    |     `--- 1.0.4
+    `--- gnu4.3.4
+    |  `--- bin
+    |  `--- include
+    |  `--- lib
+    |  `--- source
+    |  `--- share
+    `--- gnu4.7.2
+    |  `--- bin
+    |  `--- include
+    |  `--- lib
+    |  `--- source
+    |  `--- share
+    `--- pgi13.4
+    |  `--- bin
+    |  `--- include
+    |  `--- lib
+    |  `--- source
+    |  `--- share
+    `--- intel12
+       `--- bin
+       `--- include
+       `--- lib
+       `--- source
+       `--- share
+
+The `@builds` array would then be `[ "gnu4.3.4", "gnu4.7.2", "pgi13.4",
+"intel12" ]`. This lets you figure out what builds exist and use them in your
+modulefile.
+
 ### `<%= @builds.size %>`
+
+[size](http://ruby-doc.org/core-2.0/Array.html#method-i-size) is a standard ruby
+method that counts the number of elements in an array. For the above example
+this would return `4`.
+
 ### `<%= module_build_list @package, @builds %>`
+
+This is a helper method in smithy that will generate the tcl necessary to
+conditionally load builds based on what compiler programming environment
+modules a user has loaded. It takes `@package` and `@builds` as arguments.
+Using the above bzip2 example the result of using this method would be:
+
+    if [ is-loaded PrgEnv-gnu ] {
+      if [ is-loaded gcc/4.3.4 ] {
+        set BUILD gnu4.3.4
+      } elseif [ is-loaded gcc/4.7.2 ] {
+        set BUILD gnu4.7.2
+      } else {
+        set BUILD gnu4.7.2
+      }
+    } elseif [ is-loaded PrgEnv-pgi ] {
+      set BUILD pgi13.4
+    } elseif [ is-loaded PrgEnv-intel ] {
+      set BUILD intel12
+    } elseif [ is-loaded PrgEnv-cray ] {
+      puts stderr "Not implemented for the cray compiler"
+    }
+    if {![info exists BUILD]} {
+      puts stderr "[module-info name] is only available for the following environments:"
+      puts stderr "gnu4.3.4"
+      puts stderr "gnu4.7.2"
+      puts stderr "intel12"
+      puts stderr "pgi13.4"
+      break
+    }
 
 ### `<% if ... %>`
 This is standard erb ruby code. Delimiters like `<% ... %>` do NOT put their

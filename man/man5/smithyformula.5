@@ -328,21 +328,119 @@ end
 .
 .IP "" 0
 .
+.P
+The contents of the install method depends heavily on the software being installed\. For a list of additional helper methods for use inside install see the \fIFORMULA HELPER METHODS\fR section\.
+.
 .SH "MODULEFILE HELPER METHODS"
 .
 .SS "<code><%= @package\.name %></code>"
+This will return the name of the application being installed\. It is the same as the APPLICATION part of the \fBsmithy formula install APPLICATION/VERSION/BUILD\fR command\.
 .
 .SS "<code><%= @package\.version %></code>"
+Similar to the above, this returns the version number\.
 .
 .SS "<code><%= @package\.build_name %></code>"
+Same as the name and version methods, this will return the build name of the applcation\.
 .
 .SS "<code><%= @package\.prefix %></code>"
+This line will return the full prefix to an application\. If we run \fBsmithy formula install bzip2/1\.0\.4/pgi13\.4\fR and our software\-root is \fB/sw/xk6\fR this command will return \fB/sw/xk6/bzip2/1\.0\.4/pgi13\.4\fR
 .
 .SS "<code><%= @builds %></code>"
+The \fB@builds\fR variable is an array of strings that contain the list of available builds for a given application\. Say we have a bzip2 formula and ran the following installs:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install bzip2/1\.0\.4/gnu4\.3\.4
+smithy formula install bzip2/1\.0\.4/gnu4\.7\.2
+smithy formula install bzip2/1\.0\.4/pgi13\.4
+smithy formula install bzip2/1\.0\.4/intel12
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The directory structure for the above builds would look like (assuming \fB/sw/xk6\fR is the software\-root):
+.
+.IP "" 4
+.
+.nf
+
+/sw/xk6/bzip2/1\.0\.4
+`\-\-\- modulefile
+|  `\-\-\- bzip2
+|     `\-\-\- 1\.0\.4
+`\-\-\- gnu4\.3\.4
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- gnu4\.7\.2
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- pgi13\.4
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- intel12
+   `\-\-\- bin
+   `\-\-\- include
+   `\-\-\- lib
+   `\-\-\- source
+   `\-\-\- share
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The \fB@builds\fR array would then be \fB[ "gnu4\.3\.4", "gnu4\.7\.2", "pgi13\.4", "intel12" ]\fR\. This lets you figure out what builds exist and use them in your modulefile\.
 .
 .SS "<code><%= @builds\.size %></code>"
+size \fIhttp://ruby\-doc\.org/core\-2\.0/Array\.html#method\-i\-size\fR is a standard ruby method that counts the number of elements in an array\. For the above example this would return \fB4\fR\.
 .
 .SS "<code><%= module_build_list @package, @builds %></code>"
+This is a helper method in smithy that will generate the tcl necessary to conditionally load builds based on what compiler programming environment modules a user has loaded\. It takes \fB@package\fR and \fB@builds\fR as arguments\. Using the above bzip2 example the result of using this method would be:
+.
+.IP "" 4
+.
+.nf
+
+if [ is\-loaded PrgEnv\-gnu ] {
+  if [ is\-loaded gcc/4\.3\.4 ] {
+    set BUILD gnu4\.3\.4
+  } elseif [ is\-loaded gcc/4\.7\.2 ] {
+    set BUILD gnu4\.7\.2
+  } else {
+    set BUILD gnu4\.7\.2
+  }
+} elseif [ is\-loaded PrgEnv\-pgi ] {
+  set BUILD pgi13\.4
+} elseif [ is\-loaded PrgEnv\-intel ] {
+  set BUILD intel12
+} elseif [ is\-loaded PrgEnv\-cray ] {
+  puts stderr "Not implemented for the cray compiler"
+}
+if {![info exists BUILD]} {
+  puts stderr "[module\-info name] is only available for the following environments:"
+  puts stderr "gnu4\.3\.4"
+  puts stderr "gnu4\.7\.2"
+  puts stderr "intel12"
+  puts stderr "pgi13\.4"
+  break
+}
+.
+.fi
+.
+.IP "" 0
 .
 .SS "<code><% if \.\.\. %></code>"
 This is standard erb ruby code\. Delimiters like \fB<% \.\.\. %>\fR do NOT put their results in the final modulefile, they are only used for control flow\. Delimiters with the extra = sign \fB<%= \.\.\. %>\fR will put their results in the final modulefile\.
