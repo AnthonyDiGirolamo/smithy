@@ -25,12 +25,19 @@ make patches and output any files needed to compile software.
 
 ## CREATING NEW FORMULAS
 
-To help create new formula files you can use the `smithy formula new`
-subcommand. For more info on this command run `smithy help formula new`. To
+The best way to create a new formula is to start with a working example. There
+are many complete working examples in the [smithy_formulas
+repo](https://github.com/AnthonyDiGirolamo/smithy_formulas).
+
+If you want to create a new formula from scratch you can use the `smithy formula
+new` subcommand. For more info on this command run `smithy help formula new`. To
 create a new formula file you need to know the homepage and a url to download
 the file. To create a new formula for subversion you might run:
 
-    smithy formula new --name=subversion --homepage=http://subversion.apache.org/ http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+    smithy formula new \
+      --name=subversion \
+      --homepage=http://subversion.apache.org/ \
+      http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
 
 The format of the new sub-command is `smithy formula new [command options] URL`.
 The options and arguments are:
@@ -63,7 +70,7 @@ For example:
 
 Every method call that defines the formula will happen between these two lines.
 
-### Formula File and Class Naming
+### FORMULA FILE AND CLASS NAMING
 
 Formulas follow a specifc naming scheme. The filename should end in
 `'_formula.rb'` and start with the name of the software in all lowercase
@@ -169,14 +176,29 @@ after the `class GitFormula < Formula` line.
     smithy formula install python_matplotlib/1.2.3/python2.7.3
 
 ### module_commands
+
   something
 
 ### modules
+
   something
 
 ### modulefile
-  This method expects the a string that represents the modulefile. It's
-  convinient to use heredoc string quoting in ruby. e.g.
+
+This method expects the a string that represents the modulefile. Generally
+modulefiles in smithy take two forms ones that point to a single build and ones
+that use multiple builds and set the build based on a users environment (already
+loaded modules). It's recommended to have one modulefile per application version
+and set multiple builds dynamically inside the modulefile.
+
+Writing modulefiles is a topic in and of itself. For details on the modulefile
+format see the [modulefile(4)
+manpage](http://modules.sourceforge.net/man/modulefile.html) Modulefiles are
+written in tcl and can take many forms.
+
+Here is an example of a modulefile that points to a single build. It's
+convenient to use heredoc string quoting in ruby so that the string can span
+multiple lines. e.g.
 
     modulefile <<-MODULEFILE.strip_heredoc
       #%Module
@@ -193,10 +215,55 @@ after the `class GitFormula < Formula` line.
       prepend-path MANPATH         $PREFIX/share/man
     MODULEFILE
 
-  TODO more info on module file format and options...
+The modulefile definition uses the [erb
+format](http://ruby-doc.org/stdlib-2.0/libdoc/erb/rdoc/ERB.html) Anything
+between the `<%= ... %>` delimiters will be interpreted as ruby code. There are
+a few helper methods that you can use inside these delimiters see the next
+section titled [MODULEFILE HELPER METHODS][] for details.
+
+A more complicated modulefile may examine already loaded modules to determine
+which build to load. For instance if the user has gcc or a gnu programming
+environment module loaded then your modulefile will want to load the gnu build.
+Here is an example designed to dynamically set the build:
+
+    #%Module
+    proc ModulesHelp { } {
+       puts stderr "<%= @package.name %> <%= @package.version %>"
+       puts stderr ""
+    }
+    # One line description
+    module-whatis "<%= @package.name %> <%= @package.version %>"
+
+    <% if @builds.size > 1 %>
+    <%= module_build_list @package, @builds %>
+
+    set PREFIX <%= @package.version_directory %>/$BUILD
+    <% else %>
+    set PREFIX <%= @package.prefix %>
+    <% end %>
+
+    # Helpful ENV Vars
+    setenv <%= @package.name.upcase %>_DIR $PREFIX
+    setenv <%= @package.name.upcase %>_LIB "-L$PREFIX/lib"
+    setenv <%= @package.name.upcase %>_INC "-I$PREFIX/include"
+
+    # Common Paths
+    prepend-path PATH            $PREFIX/bin
+    prepend-path LD_LIBRARY_PATH $PREFIX/lib
+    prepend-path MANPATH         $PREFIX/share/man
+    prepend-path INFOPATH        $PREFIX/info
+    prepend-path PKG_CONFIG_PATH $PREFIX/lib/pkgconfig
+    prepend-path PYTHONPATH      $PREFIX/lib/python2.7/site-packages
+    prepend-path PERL5PATH       $PREFIX/lib/perl5/site_perl
+
+The main difference from the first example is the `<%= if @builds.size > 1 %>`
+block. This basically checks to see if we have installed multiple builds or
+not. If that condition is true everything up until the `<% else %>` will be put
+in the modulefile. Otherwise, if we have only one build, `set PREFIX <%=
+@package.prefix %>` will be put in the modulefile.
 
 ### def install
-  This is the method that runs the software installation process. e.g.
+  **REQUIRED** - This is the method that runs the software installation process. It normally runs system commands, performs patches, and sets environment variables. e.g.
 
     def install
       system "./configure"
@@ -204,19 +271,51 @@ after the `class GitFormula < Formula` line.
       system "make install"
     end
 
-## OTHER FORMULA METHODS
+## MODULEFILE HELPER METHODS
 
-These methods are designed to be used within the `install` part of a formula
+### `<%= @package.name %>`
+### `<%= @package.version %>`
+### `<%= @package.build_name %>`
+### `<%= @package.prefix %>`
+### `<%= @builds %>`
+### `<%= @builds.size %>`
+### `<%= module_build_list @package, @builds %>`
+
+### `<% if ... %>`
+This is standard erb ruby code. Delimiters like `<% ... %>` do NOT put their
+results in the final modulefile, they are only used for control flow. Delimiters
+with the extra = sign `<%= ... %>` will put their results in the final
+modulefile.
+
+This is best used to conditionally render content to the modulefile and takes
+the form:
+
+    <% if @builds.size > 1 %>
+      ...
+    <% else %>
+      ...
+    <% end %>
+
+Where `@builds.size > 1` can be any expression which returns true or false.
+
+## FORMULA HELPER METHODS
+
+These methods are designed to be used within the `install` method of a formula
 file.
 
-### module_list
-
 ### name
-
 ### version
-
 ### build_name
-
 ### prefix
+### module_list
+### patch
+### system
 
+## COMMON OPERATIONS
 
+### Setting Environment Variables
+### Creating Files
+
+## SEE ALSO
+
+smithy(1)

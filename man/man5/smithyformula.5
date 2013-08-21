@@ -42,13 +42,19 @@ Once written it\'s easy to see everything required to build a given piece of sof
 It\'s common for build scripts to run the compilation but omit patches, changes to makefile, or any other modification to the source\. With formulas it\'s easy to make patches and output any files needed to compile software\.
 .
 .SH "CREATING NEW FORMULAS"
-To help create new formula files you can use the \fBsmithy formula new\fR subcommand\. For more info on this command run \fBsmithy help formula new\fR\. To create a new formula file you need to know the homepage and a url to download the file\. To create a new formula for subversion you might run:
+The best way to create a new formula is to start with a working example\. There are many complete working examples in the smithy_formulas repo \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas\fR\.
+.
+.P
+If you want to create a new formula from scratch you can use the \fBsmithy formula new\fR subcommand\. For more info on this command run \fBsmithy help formula new\fR\. To create a new formula file you need to know the homepage and a url to download the file\. To create a new formula for subversion you might run:
 .
 .IP "" 4
 .
 .nf
 
-smithy formula new \-\-name=subversion \-\-homepage=http://subversion\.apache\.org/ http://mirror\.cogentco\.com/pub/apache/subversion/subversion\-1\.7\.8\.tar\.bz2
+smithy formula new \e
+  \-\-name=subversion \e
+  \-\-homepage=http://subversion\.apache\.org/ \e
+  http://mirror\.cogentco\.com/pub/apache/subversion/subversion\-1\.7\.8\.tar\.bz2
 .
 .fi
 .
@@ -90,7 +96,7 @@ end
 .P
 Every method call that defines the formula will happen between these two lines\.
 .
-.SS "Formula File and Class Naming"
+.SS "FORMULA FILE AND CLASS NAMING"
 Formulas follow a specifc naming scheme\. The filename should end in \fB\'_formula\.rb\'\fR and start with the name of the software in all lowercase characters\. The class name should be the same name specified in the file but CamelCased \fIhttp://en\.wikipedia\.org/wiki/CamelCase\fR and end in \fB\'Formula\'\fR\.
 .
 .SS "RUBY BASICS"
@@ -227,7 +233,13 @@ something
 something
 .
 .SS "modulefile"
-This method expects the a string that represents the modulefile\. It\'s convinient to use heredoc string quoting in ruby\. e\.g\.
+This method expects the a string that represents the modulefile\. Generally modulefiles in smithy take two forms ones that point to a single build and ones that use multiple builds and set the build based on a users environment (already loaded modules)\. It\'s recommended to have one modulefile per application version and set multiple builds dynamically inside the modulefile\.
+.
+.P
+Writing modulefiles is a topic in and of itself\. For details on the modulefile format see the modulefile(4) manpage \fIhttp://modules\.sourceforge\.net/man/modulefile\.html\fR Modulefiles are written in tcl and can take many forms\.
+.
+.P
+Here is an example of a modulefile that points to a single build\. It\'s convenient to use heredoc string quoting in ruby so that the string can span multiple lines\. e\.g\.
 .
 .IP "" 4
 .
@@ -252,8 +264,55 @@ MODULEFILE
 .
 .IP "" 0
 .
+.P
+The modulefile definition uses the erb format \fIhttp://ruby\-doc\.org/stdlib\-2\.0/libdoc/erb/rdoc/ERB\.html\fR Anything between the \fB<%= \.\.\. %>\fR delimiters will be interpreted as ruby code\. There are a few helper methods that you can use inside these delimiters see the next section titled \fIMODULEFILE HELPER METHODS\fR for details\.
+.
+.P
+A more complicated modulefile may examine already loaded modules to determine which build to load\. For instance if the user has gcc or a gnu programming environment module loaded then your modulefile will want to load the gnu build\. Here is an example designed to dynamically set the build:
+.
+.IP "" 4
+.
+.nf
+
+#%Module
+proc ModulesHelp { } {
+   puts stderr "<%= @package\.name %> <%= @package\.version %>"
+   puts stderr ""
+}
+# One line description
+module\-whatis "<%= @package\.name %> <%= @package\.version %>"
+
+<% if @builds\.size > 1 %>
+<%= module_build_list @package, @builds %>
+
+set PREFIX <%= @package\.version_directory %>/$BUILD
+<% else %>
+set PREFIX <%= @package\.prefix %>
+<% end %>
+
+# Helpful ENV Vars
+setenv <%= @package\.name\.upcase %>_DIR $PREFIX
+setenv <%= @package\.name\.upcase %>_LIB "\-L$PREFIX/lib"
+setenv <%= @package\.name\.upcase %>_INC "\-I$PREFIX/include"
+
+# Common Paths
+prepend\-path PATH            $PREFIX/bin
+prepend\-path LD_LIBRARY_PATH $PREFIX/lib
+prepend\-path MANPATH         $PREFIX/share/man
+prepend\-path INFOPATH        $PREFIX/info
+prepend\-path PKG_CONFIG_PATH $PREFIX/lib/pkgconfig
+prepend\-path PYTHONPATH      $PREFIX/lib/python2\.7/site\-packages
+prepend\-path PERL5PATH       $PREFIX/lib/perl5/site_perl
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The main difference from the first example is the \fB<%= if @builds\.size > 1 %>\fR block\. This basically checks to see if we have installed multiple builds or not\. If that condition is true everything up until the \fB<% else %>\fR will be put in the modulefile\. Otherwise, if we have only one build, \fBset PREFIX <%= @package\.prefix %>\fR will be put in the modulefile\.
+.
 .SS "def install"
-This is the method that runs the software installation process\. e\.g\.
+\fBREQUIRED\fR \- This is the method that runs the software installation process\. It normally runs system commands, performs patches, and sets environment variables\. e\.g\.
 .
 .IP "" 4
 .
@@ -268,4 +327,68 @@ end
 .fi
 .
 .IP "" 0
+.
+.SH "MODULEFILE HELPER METHODS"
+.
+.SS "<code><%= @package\.name %></code>"
+.
+.SS "<code><%= @package\.version %></code>"
+.
+.SS "<code><%= @package\.build_name %></code>"
+.
+.SS "<code><%= @package\.prefix %></code>"
+.
+.SS "<code><%= @builds %></code>"
+.
+.SS "<code><%= @builds\.size %></code>"
+.
+.SS "<code><%= module_build_list @package, @builds %></code>"
+.
+.SS "<code><% if \.\.\. %></code>"
+This is standard erb ruby code\. Delimiters like \fB<% \.\.\. %>\fR do NOT put their results in the final modulefile, they are only used for control flow\. Delimiters with the extra = sign \fB<%= \.\.\. %>\fR will put their results in the final modulefile\.
+.
+.P
+This is best used to conditionally render content to the modulefile and takes the form:
+.
+.IP "" 4
+.
+.nf
 
+<% if @builds\.size > 1 %>
+  \.\.\.
+<% else %>
+  \.\.\.
+<% end %>
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Where \fB@builds\.size > 1\fR can be any expression which returns true or false\.
+.
+.SH "FORMULA HELPER METHODS"
+These methods are designed to be used within the \fBinstall\fR method of a formula file\.
+.
+.SS "name"
+.
+.SS "version"
+.
+.SS "build_name"
+.
+.SS "prefix"
+.
+.SS "module_list"
+.
+.SS "patch"
+.
+.SS "system"
+.
+.SH "COMMON OPERATIONS"
+.
+.SS "Setting Environment Variables"
+.
+.SS "Creating Files"
+.
+.SH "SEE ALSO"
+smithy(1)

@@ -211,7 +211,7 @@ end
 
 
 desc "Build software"
-long_desc "The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD."
+long_desc "The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: APPLICATION/VERSION/BUILD."
 arg_name "PATH"
 command ['build'] do |c|
   c.desc 'Build log file name located within the software prefix.'
@@ -255,9 +255,9 @@ end
 
 desc "Generate a new build and all necessary files"
 long_desc <<-EOS
-The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format APPLICATION/VERSION/BUILD
 
-- NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+- APPLICATION of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
 
 - VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
 
@@ -610,7 +610,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Install a package using a formula"
-  c.arg_name "NAME | NAME/VERSION | NAME/VERSION/BUILD"
+  c.arg_name "APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD"
   c.command :install do |subcommand|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"
@@ -629,7 +629,7 @@ command ['formula'] do |c|
   end
 
   c.desc "Create a modulefile for a given package"
-  c.arg_name "NAME | NAME/VERSION | NAME/VERSION/BUILD"
+  c.arg_name "APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD"
   c.command :create_modulefile do |subcommand|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"

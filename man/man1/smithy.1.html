@@ -41,6 +41,12 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
 </head>
 <!--
   The following styles are deprecated and will be removed at some point:
@@ -56,10 +62,14 @@
     <a href="#NAME">NAME</a>
     <a href="#SYNOPSIS">SYNOPSIS</a>
     <a href="#DESCRIPTION">DESCRIPTION</a>
-    <a href="#COMMANDS">COMMANDS</a>
-    <a href="#SYNOPSIS">SYNOPSIS</a>
-    <a href="#EXAMPLES">EXAMPLES</a>
-    <a href="#LICENSE">LICENSE</a>
+    <a href="#COMMAND-LINE-HELP">COMMAND LINE HELP</a>
+    <a href="#SOFTWARE-INSTALLATION-METHODS">SOFTWARE INSTALLATION METHODS</a>
+    <a href="#BUILD-SCRIPTS">BUILD SCRIPTS</a>
+    <a href="#FORMULAS">FORMULAS</a>
+    <a href="#NAMING-SOFTWARE-BUILDS">NAMING SOFTWARE BUILDS</a>
+    <a href="#INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</a>
+    <a href="#INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
 
   <ol class='man-decor man-head man head'>
@@ -82,33 +92,29 @@
 
 <h2 id="DESCRIPTION">DESCRIPTION</h2>
 
-<p><code>smithy</code> will help you get software installed quickly and painlessly. This tool
-follows all the same conventions as
-<a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>. That is, directory
-structures, support files, and scripts are all in the same locations.  Smithy's
-goal is to make using those conventions easier and provide new ways of
-installing software.</p>
+<p><code>smithy</code> is a command line software installation tool that borrows ideas heavily
+from the excellent <a href="http://brew.sh/">homebrew</a> package management system for Mac OS X and <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.</p>
 
 <p>This is still a work in progress. If you have any questions, suggestions, or
 encounter any errors please open an issue on github at
 <a href="https://github.com/AnthonyDiGirolamo/smithy/issues" data-bare-link="true">https://github.com/AnthonyDiGirolamo/smithy/issues</a>.</p>
 
-<h2 id="COMMANDS">COMMANDS</h2>
+<h2 id="COMMAND-LINE-HELP">COMMAND LINE HELP</h2>
 
-<p>For help on all options and commands run <code>smithy help</code>. For help on a specific
-command run <code>smithy help COMMAND</code> or <code>smithy help COMMAND SUBCOMMAND</code>.</p>
+<p>For help on all options and commands run <code>smithy help</code><br />
+For help on a specific command run <code>smithy help COMMAND</code> or <code>smithy help COMMAND SUBCOMMAND</code></p>
 
-<h2 id="SYNOPSIS">SYNOPSIS</h2>
+<h2 id="SOFTWARE-INSTALLATION-METHODS">SOFTWARE INSTALLATION METHODS</h2>
 
 <p>There are two ways of installing software using smithy:</p>
 
 <ul>
-<li>build scripts</li>
-<li>formulas</li>
+<li><strong>build scripts</strong> (similar to swtools)</li>
+<li><strong>formulas</strong> (similar to homebrew)</li>
 </ul>
 
 
-<h3 id="BUILD-SCRIPTS">BUILD SCRIPTS</h3>
+<h2 id="BUILD-SCRIPTS">BUILD SCRIPTS</h2>
 
 <p>Build scripts are shell scripts that live inside of a package's PREFIX and
 execute the steps required to perform the compilation. A hierarchy might look
@@ -136,7 +142,7 @@ directory <code>subversion-1.6.17</code> and three build scripts <code>rebuild</
 <code>remodule</code>. The <code>rebuild</code> script will compile the software and set the prefix
 while the remodule script sets up the environment including loading modulefiles.</p>
 
-<h3 id="FORMULAS">FORMULAS</h3>
+<h2 id="FORMULAS">FORMULAS</h2>
 
 <p>The Problem with build scripts is that they are duplicated for every software
 installation. This makes installing new software difficult because you will have
@@ -161,11 +167,40 @@ The only addition is the source files under the source directory.</p>
    `--- share
 </code></pre>
 
-<h2 id="EXAMPLES">EXAMPLES</h2>
+<h2 id="NAMING-SOFTWARE-BUILDS">NAMING SOFTWARE BUILDS</h2>
 
-<h3 id="INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</h3>
+<p>All software builds have the following name format: <strong>APPLICATION/VERSION/BUILD</strong>
+That is three different parts separated by forward slashes <code>/</code> Each part consists of:</p>
 
-<p>For details on writing formulas please see the <span class="man-ref">smithyformula<span class="s">(5)</span></span> man page.</p>
+<h3 id="APPLICATION">APPLICATION</h3>
+
+<p>The name using lowercase characters</p>
+
+<h3 id="VERSION">VERSION</h3>
+
+<p>Numbers with periods. I recommend that whatever you choose as a version allows
+it to be lexigraphically sorted from oldest to newest. For example use
+2013-02-14 instead of Feb14-2013.</p>
+
+<h3 id="BUILD">BUILD</h3>
+
+<p>Build is somewhat different, it consists of the intended operating system and
+compiler separated by underscores <code>_</code>. It is important to use compiler version
+numbers that correspond to module versions. This will allow smithy to
+auto-generate modulefiles for software with multiple builds.</p>
+
+<p><code>sles11.1_gnu4.6.2</code> corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2</p>
+
+<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p>
+
+<p>You may also add any other details relevant to the build. For instance, add
+python2.7 to the build name of a python module compiled for python2.7 and
+python3.3 for python3.3.</p>
+
+<h2 id="INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</h2>
+
+<p>For details on writing formulas please see the <span class="man-ref">smithyformula<span class="s">(5)</span></span> man page. This
+section covers only how to install software using existing formulas.</p>
 
 <p>Smithy formula sub-commands include:</p>
 
@@ -186,57 +221,82 @@ command. For example to install subversion to your software root under the
 <pre><code>smithy formula install subversion/1.7.8/sles11.1_gnu4.3.4
 </code></pre>
 
-<p>The format of the install sub-command is: <code>smithy formula install [command
-options] NAME | NAME/VERSION | NAME/VERSION/BUILD</code>. The options and arguments
+<p>See <a href="#NAMING-SOFTWARE-BUILDS" title="NAMING SOFTWARE BUILDS" data-bare-link="true">NAMING SOFTWARE BUILDS</a> for details on naming a software build.
+The format of the install sub-command is: <code>smithy formula install [command
+options] APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</code>. The options and arguments
 include:</p>
 
 <dl>
 <dt><code>--[no-]clean</code></dt><dd>This will delete all existing files in the target directory before performing
 the installation.</dd>
 <dt><code>--formula-name</code></dt><dd>By default smithy will guess the formula name based on the target directory
-NAME/VERSION/BUILD argument. You may wish you install to a location named
+APPLICATION/VERSION/BUILD argument. You may wish you install to a location named
 differently than a formula. In this case, use <code>--formula-name</code> to define
 which formula to use.</dd>
-<dt><code>NAME | NAME/VERSION | NAME/VERSION/BUILD</code></dt><dd>This is the destination directory that the software will be installed in. If
+<dt><code>APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</code></dt><dd>This is the destination directory that the software will be installed in. If
 you omit the BUILD or VERSION/BUILD directories smithy will try to guess the
 version based on the formula, and the build based on the operating system and
 version of gcc available. If in doubt, specify the full destination.</dd>
 </dl>
 
 
-<h3 id="INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</h3>
+<p>Assuming we install subversion with the previous command and our software-root
+is <code>/sw/xk6/</code> the finished directory structure would look like:</p>
+
+<pre><code>/sw/xk6/subversion/1.7.8
+`--- modulefile
+   `--- subversion
+      `--- 1.7.8
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
+
+<p>A <code>modulefile</code> folder will be created alongside the <code>sles11.1_gnu4.3.4</code> build
+directory so that the modulefile can be tested. To test the modulefile you need
+to add the modulefile folder to the <code>$MODULEPATH</code> environment variable. Running
+any of the following will do this:</p>
+
+<pre><code>smithy module use last
+smithy module use subversion/1.7.8/sles11.1_gnu4.3.4
+module use /sw/xk6/subversion/1.7.8/modulefile/subversion
+</code></pre>
+
+<p><code>last</code> is an alias to the last software build smithy worked on. <code>smithy show
+last</code> will display the last build you worked on.</p>
+
+<p>Once loaded, you should be able to interact with the new module file as normal
+using:</p>
+
+<pre><code>module avail subversion/1.7.8
+module display subversion/1.7.8
+module load subversion/1.7.8
+</code></pre>
+
+<p>You can now deploy the module to make it available to other users. This should
+be done once you're confident the modulefile is working properly. To do so run
+either:</p>
+
+<pre><code>smithy module deploy last
+smithy module deploy subversion/1.7.8/sles11.1_gnu4.3.4
+</code></pre>
+
+<h2 id="INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</h2>
 
 <p>This section shows the typical work-flow for adding a new software build using
 build scripts. Let's imagine we want to install petsc 3.2 using the cray
 compiler. We must create a place for the software build, build it, and create a
 module.</p>
 
-<p>Note: all commands, options, and arguments have tab-completion when using bash or zsh</p>
+<h3 id="1-Creating-The-Build">1. Creating The Build</h3>
 
-<p><em>1. Creating The Build</em></p>
-
-<p>All software builds have the following name format: <strong>APPLICATION/VERSION/BUILD</strong>
-That is three different parts separated by forward slashes <code>/</code> Each part consists of:</p>
-
-<dl>
-<dt><strong>APPLICATION</strong></dt><dd><p>The name using lowercase characters</p></dd>
-<dt class="flush"><strong>VERSION</strong></dt><dd><p>Numbers with periods. I recommend that whatever you choose as a version
-allows it to be lexigraphically sorted from oldest to newest.</p></dd>
-<dt class="flush"><strong>BUILD</strong></dt><dd><p>Build is somewhat different, it consists of the intended operating system
-and compiler separated by underscores <code>_</code>. It is important to use compiler
-version numbers that correspond to module versions. This will allow smithy
-to auto-generate modulefiles for software with multiple builds. As an
-example:</p></dd>
-</dl>
-
-
-<p><code>sles11.1_gnu4.6.2</code> corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2</p>
-
-<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p>
-
-<p>Let's use <code>petsc/3.2/cle4.0_cray8.0.1</code> as the name. This would be petsc designed
-to run on a cle4.0 compute node and compiled with the cray cce 8.0.1 compiler.
-This can be accomplished by running:</p>
+<p>Let's use <code>petsc/3.2/cle4.0_cray8.0.1</code> as the name for our new package.  See
+<a href="#NAMING-SOFTWARE-BUILDS" title="NAMING SOFTWARE BUILDS" data-bare-link="true">NAMING SOFTWARE BUILDS</a> for details on naming a software build.  This would
+be petsc designed to run on a cle4.0 compute node and compiled with the cray cce
+8.0.1 compiler.  This can be accomplished by running:</p>
 
 <pre><code>smithy new petsc/3.2/cle4.0_cray8.0.1
 </code></pre>
@@ -266,7 +326,7 @@ command to work properly.</p>
 <code>--web-description</code> switch. This will create the application description files
 too.</p>
 
-<p><em>2. Editing and Building the Software</em></p>
+<h3 id="2-Editing-and-Building-the-Software">2. Editing and Building the Software</h3>
 
 <p>Once you have created the build you may need to update the build (<code>rebuild</code>) and
 environment (<code>remodule</code>) scripts before building the software. Both files live
@@ -298,7 +358,7 @@ last</code> to see.</p>
 <p>The results of the run will be shown on the screen and simultaneously logged to
 <code>build.log</code> withing the software prefix folder.</p>
 
-<p><em>3. Create and edit a modulefile</em></p>
+<h3 id="3-Create-and-edit-a-modulefile">3. Create and edit a modulefile</h3>
 
 <p>This step is best done after all builds for a particular application have been
 created.  When you create a new software build a modulefile is created too.  For
@@ -342,7 +402,7 @@ module load       petsc/3.2
 <p>For out petsc example, this command will copy
 <code>/sw/xk6/petsc/3.2/modulefile/petsc/3.2</code> to <code>/sw/xk6/modulefiles/petsc/3.2</code></p>
 
-<p><em>4. Website Description</em></p>
+<h3 id="4-Website-Description">4. Website Description</h3>
 
 <p>If this is a new application you will need to add some information to the
 description file. For petsc this lives in: <code>/sw/xk6/petsc/description</code> This is
@@ -362,44 +422,9 @@ takes precedence.</p>
 <pre><code>smithy publish petsc
 </code></pre>
 
-<h2 id="LICENSE">LICENSE</h2>
+<h2 id="SEE-ALSO">SEE ALSO</h2>
 
-<p>Smithy is freely available under the terms of the BSD license given below.</p>
-
-<p>Copyright (c) 2012. UT-BATTELLE, LLC. All rights reserved.</p>
-
-<p>Produced by the National Center for Computational Sciences at Oak Ridge National
-Laboratory. Smithy is a based on SWTools, more information on SWTools can be
-found at: <a href="http://www.olcf.ornl.gov/center-projects/swtools/" data-bare-link="true">http://www.olcf.ornl.gov/center-projects/swtools/</a></p>
-
-<p>This product includes software produced by UT-Battelle, LLC under Contract No.
-DE-AC05-00OR22725 with the Department of Energy.</p>
-
-<p>Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:</p>
-
-<ul>
-<li><p>Redistributions of source code must retain the above copyright notice, this
-list of conditions and the following disclaimer.</p></li>
-<li><p>Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.</p></li>
-<li><p>Neither the name of the UT-BATTELLE nor the names of its contributors may
-be used to endorse or promote products derived from this software without
-specific prior written permission.</p></li>
-</ul>
-
-
-<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
-ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p><span class="man-ref">smithyformula<span class="s">(5)</span></span></p>
 
 
   <ol class='man-decor man-foot man foot'>

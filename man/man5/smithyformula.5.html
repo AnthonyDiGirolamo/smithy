@@ -41,6 +41,12 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
   </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
 </head>
 <!--
   The following styles are deprecated and will be removed at some point:
@@ -58,6 +64,10 @@
     <a href="#CREATING-NEW-FORMULAS">CREATING NEW FORMULAS</a>
     <a href="#STRUCTURE">STRUCTURE</a>
     <a href="#FORMULA-DSL-METHODS">FORMULA DSL METHODS</a>
+    <a href="#MODULEFILE-HELPER-METHODS">MODULEFILE HELPER METHODS</a>
+    <a href="#FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</a>
+    <a href="#COMMON-OPERATIONS">COMMON OPERATIONS</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
 
   <ol class='man-decor man-head man head'>
@@ -98,12 +108,19 @@ make patches and output any files needed to compile software.</p>
 
 <h2 id="CREATING-NEW-FORMULAS">CREATING NEW FORMULAS</h2>
 
-<p>To help create new formula files you can use the <code>smithy formula new</code>
-subcommand. For more info on this command run <code>smithy help formula new</code>. To
+<p>The best way to create a new formula is to start with a working example. There
+are many complete working examples in the <a href="https://github.com/AnthonyDiGirolamo/smithy_formulas">smithy_formulas
+repo</a>.</p>
+
+<p>If you want to create a new formula from scratch you can use the <code>smithy formula
+new</code> subcommand. For more info on this command run <code>smithy help formula new</code>. To
 create a new formula file you need to know the homepage and a url to download
 the file. To create a new formula for subversion you might run:</p>
 
-<pre><code>smithy formula new --name=subversion --homepage=http://subversion.apache.org/ http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+<pre><code>smithy formula new \
+  --name=subversion \
+  --homepage=http://subversion.apache.org/ \
+  http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
 </code></pre>
 
 <p>The format of the new sub-command is <code>smithy formula new [command options] URL</code>.
@@ -136,7 +153,7 @@ end
 
 <p>Every method call that defines the formula will happen between these two lines.</p>
 
-<h3 id="Formula-File-and-Class-Naming">Formula File and Class Naming</h3>
+<h3 id="FORMULA-FILE-AND-CLASS-NAMING">FORMULA FILE AND CLASS NAMING</h3>
 
 <p>Formulas follow a specifc naming scheme. The filename should end in
 <code>'_formula.rb'</code> and start with the name of the software in all lowercase
@@ -263,8 +280,20 @@ smithy formula install python_matplotlib/1.2.3/python2.7.3
 
 <h3 id="modulefile">modulefile</h3>
 
-<p>  This method expects the a string that represents the modulefile. It's
-  convinient to use heredoc string quoting in ruby. e.g.</p>
+<p>This method expects the a string that represents the modulefile. Generally
+modulefiles in smithy take two forms ones that point to a single build and ones
+that use multiple builds and set the build based on a users environment (already
+loaded modules). It's recommended to have one modulefile per application version
+and set multiple builds dynamically inside the modulefile.</p>
+
+<p>Writing modulefiles is a topic in and of itself. For details on the modulefile
+format see the <a href="http://modules.sourceforge.net/man/modulefile.html">modulefile(4)
+manpage</a> Modulefiles are
+written in tcl and can take many forms.</p>
+
+<p>Here is an example of a modulefile that points to a single build. It's
+convenient to use heredoc string quoting in ruby so that the string can span
+multiple lines. e.g.</p>
 
 <pre><code>modulefile &lt;&lt;-MODULEFILE.strip_heredoc
   #%Module
@@ -282,9 +311,57 @@ smithy formula install python_matplotlib/1.2.3/python2.7.3
 MODULEFILE
 </code></pre>
 
+<p>The modulefile definition uses the <a href="http://ruby-doc.org/stdlib-2.0/libdoc/erb/rdoc/ERB.html">erb
+format</a> Anything
+between the <code>&lt;%= ... %&gt;</code> delimiters will be interpreted as ruby code. There are
+a few helper methods that you can use inside these delimiters see the next
+section titled <a href="#MODULEFILE-HELPER-METHODS" title="MODULEFILE HELPER METHODS" data-bare-link="true">MODULEFILE HELPER METHODS</a> for details.</p>
+
+<p>A more complicated modulefile may examine already loaded modules to determine
+which build to load. For instance if the user has gcc or a gnu programming
+environment module loaded then your modulefile will want to load the gnu build.
+Here is an example designed to dynamically set the build:</p>
+
+<pre><code>#%Module
+proc ModulesHelp { } {
+   puts stderr "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+   puts stderr ""
+}
+# One line description
+module-whatis "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+
+&lt;% if @builds.size &gt; 1 %&gt;
+&lt;%= module_build_list @package, @builds %>
+
+set PREFIX &lt;%= @package.version_directory %&gt;/$BUILD
+&lt;% else %>
+set PREFIX &lt;%= @package.prefix %&gt;
+&lt;% end %>
+
+# Helpful ENV Vars
+setenv &lt;%= @package.name.upcase %&gt;_DIR $PREFIX
+setenv &lt;%= @package.name.upcase %&gt;_LIB "-L$PREFIX/lib"
+setenv &lt;%= @package.name.upcase %&gt;_INC "-I$PREFIX/include"
+
+# Common Paths
+prepend-path PATH            $PREFIX/bin
+prepend-path LD_LIBRARY_PATH $PREFIX/lib
+prepend-path MANPATH         $PREFIX/share/man
+prepend-path INFOPATH        $PREFIX/info
+prepend-path PKG_CONFIG_PATH $PREFIX/lib/pkgconfig
+prepend-path PYTHONPATH      $PREFIX/lib/python2.7/site-packages
+prepend-path PERL5PATH       $PREFIX/lib/perl5/site_perl
+</code></pre>
+
+<p>The main difference from the first example is the <code>&lt;%= if @builds.size &gt; 1 %&gt;</code>
+block. This basically checks to see if we have installed multiple builds or
+not. If that condition is true everything up until the <code>&lt;% else %></code> will be put
+in the modulefile. Otherwise, if we have only one build, <code>set PREFIX &lt;%=
+@package.prefix %&gt;</code> will be put in the modulefile.</p>
+
 <h3 id="def-install">def install</h3>
 
-<p>  This is the method that runs the software installation process. e.g.</p>
+<p>  <strong>REQUIRED</strong> - This is the method that runs the software installation process. It normally runs system commands, performs patches, and sets environment variables. e.g.</p>
 
 <pre><code>def install
   system "./configure"
@@ -292,6 +369,70 @@ MODULEFILE
   system "make install"
 end
 </code></pre>
+
+<h2 id="MODULEFILE-HELPER-METHODS">MODULEFILE HELPER METHODS</h2>
+
+<h3 id="-package-name-"><code>&lt;%= @package.name %&gt;</code></h3>
+
+<h3 id="-package-version-"><code>&lt;%= @package.version %&gt;</code></h3>
+
+<h3 id="-package-build_name-"><code>&lt;%= @package.build_name %&gt;</code></h3>
+
+<h3 id="-package-prefix-"><code>&lt;%= @package.prefix %&gt;</code></h3>
+
+<h3 id="-builds-"><code>&lt;%= @builds %></code></h3>
+
+<h3 id="-builds-size-"><code>&lt;%= @builds.size %&gt;</code></h3>
+
+<h3 id="-module_build_list-package-builds-"><code>&lt;%= module_build_list @package, @builds %></code></h3>
+
+<h3 id="-if-"><code>&lt;% if ... %&gt;</code></h3>
+
+<p>This is standard erb ruby code. Delimiters like <code>&lt;% ... %&gt;</code> do NOT put their
+results in the final modulefile, they are only used for control flow. Delimiters
+with the extra = sign <code>&lt;%= ... %&gt;</code> will put their results in the final
+modulefile.</p>
+
+<p>This is best used to conditionally render content to the modulefile and takes
+the form:</p>
+
+<pre><code>&lt;% if @builds.size &gt; 1 %&gt;
+  ...
+&lt;% else %>
+  ...
+&lt;% end %>
+</code></pre>
+
+<p>Where <code>@builds.size &gt; 1</code> can be any expression which returns true or false.</p>
+
+<h2 id="FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</h2>
+
+<p>These methods are designed to be used within the <code>install</code> method of a formula
+file.</p>
+
+<h3 id="name">name</h3>
+
+<h3 id="version">version</h3>
+
+<h3 id="build_name">build_name</h3>
+
+<h3 id="prefix">prefix</h3>
+
+<h3 id="module_list">module_list</h3>
+
+<h3 id="patch">patch</h3>
+
+<h3 id="system">system</h3>
+
+<h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
+
+<h3 id="Setting-Environment-Variables">Setting Environment Variables</h3>
+
+<h3 id="Creating-Files">Creating Files</h3>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><span class="man-ref">smithy<span class="s">(1)</span></span></p>
 
 
   <ol class='man-decor man-foot man foot'>

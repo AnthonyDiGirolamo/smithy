@@ -21,26 +21,29 @@
 .br
 .
 .SH "DESCRIPTION"
-\fBsmithy\fR will help you get software installed quickly and painlessly\. This tool follows all the same conventions as SWTools \fIhttp://www\.olcf\.ornl\.gov/center\-projects/swtools/\fR\. That is, directory structures, support files, and scripts are all in the same locations\. Smithy\'s goal is to make using those conventions easier and provide new ways of installing software\.
+\fBsmithy\fR is a command line software installation tool that borrows ideas heavily from the excellent homebrew \fIhttp://brew\.sh/\fR package management system for Mac OS X and SWTools \fIhttp://www\.olcf\.ornl\.gov/center\-projects/swtools/\fR\.
 .
 .P
 This is still a work in progress\. If you have any questions, suggestions, or encounter any errors please open an issue on github at \fIhttps://github\.com/AnthonyDiGirolamo/smithy/issues\fR\.
 .
-.SH "COMMANDS"
-For help on all options and commands run \fBsmithy help\fR\. For help on a specific command run \fBsmithy help COMMAND\fR or \fBsmithy help COMMAND SUBCOMMAND\fR\.
+.SH "COMMAND LINE HELP"
+For help on all options and commands run \fBsmithy help\fR
 .
-.SH "SYNOPSIS"
+.br
+For help on a specific command run \fBsmithy help COMMAND\fR or \fBsmithy help COMMAND SUBCOMMAND\fR
+.
+.SH "SOFTWARE INSTALLATION METHODS"
 There are two ways of installing software using smithy:
 .
 .IP "\(bu" 4
-build scripts
+\fBbuild scripts\fR (similar to swtools)
 .
 .IP "\(bu" 4
-formulas
+\fBformulas\fR (similar to homebrew)
 .
 .IP "" 0
 .
-.SS "BUILD SCRIPTS"
+.SH "BUILD SCRIPTS"
 Build scripts are shell scripts that live inside of a package\'s PREFIX and execute the steps required to perform the compilation\. A hierarchy might look something like this:
 .
 .IP "" 4
@@ -68,7 +71,7 @@ Build scripts are shell scripts that live inside of a package\'s PREFIX and exec
 .P
 The prefix for the above package is \fB/sw/xk6/subversion/1\.6\.17/sles11\.1_gnu4\.3\.4\fR within this directory you can see the usual \fBbin/include/lib/share\fR folders\. Additionally there is the source directory \fBsubversion\-1\.6\.17\fR and three build scripts \fBrebuild\fR, \fBrelink\fR, and \fBremodule\fR\. The \fBrebuild\fR script will compile the software and set the prefix while the remodule script sets up the environment including loading modulefiles\.
 .
-.SS "FORMULAS"
+.SH "FORMULAS"
 The Problem with build scripts is that they are duplicated for every software installation\. This makes installing new software difficult because you will have to go back and look at old ones and copy relevant steps to a new rebuild script\. So much for don\'t repeat yourself!
 .
 .P
@@ -93,10 +96,29 @@ A package installed with a formula has a simpler prefix directory structure\. Th
 .
 .IP "" 0
 .
-.SH "EXAMPLES"
+.SH "NAMING SOFTWARE BUILDS"
+All software builds have the following name format: \fBAPPLICATION/VERSION/BUILD\fR That is three different parts separated by forward slashes \fB/\fR Each part consists of:
 .
-.SS "INSTALLATIONS WITH FORMULAS"
-For details on writing formulas please see the smithyformula(5) man page\.
+.SS "APPLICATION"
+The name using lowercase characters
+.
+.SS "VERSION"
+Numbers with periods\. I recommend that whatever you choose as a version allows it to be lexigraphically sorted from oldest to newest\. For example use 2013\-02\-14 instead of Feb14\-2013\.
+.
+.SS "BUILD"
+Build is somewhat different, it consists of the intended operating system and compiler separated by underscores \fB_\fR\. It is important to use compiler version numbers that correspond to module versions\. This will allow smithy to auto\-generate modulefiles for software with multiple builds\.
+.
+.P
+\fBsles11\.1_gnu4\.6\.2\fR corresponds to SuSE Linux Enterprise Server 11\.1 and the GNU gcc compiler 4\.6\.2
+.
+.P
+\fBcle4\.0_pgi12\.1\.0\fR corresponds to Cray Linux Environment 4\.0 and the PGI 12\.1\.0 compile
+.
+.P
+You may also add any other details relevant to the build\. For instance, add python2\.7 to the build name of a python module compiled for python2\.7 and python3\.3 for python3\.3\.
+.
+.SH "INSTALLATIONS WITH FORMULAS"
+For details on writing formulas please see the smithyformula(5) man page\. This section covers only how to install software using existing formulas\.
 .
 .P
 Smithy formula sub\-commands include:
@@ -139,7 +161,7 @@ smithy formula install subversion/1\.7\.8/sles11\.1_gnu4\.3\.4
 .IP "" 0
 .
 .P
-The format of the install sub\-command is: \fBsmithy formula install [command options] NAME | NAME/VERSION | NAME/VERSION/BUILD\fR\. The options and arguments include:
+See \fINAMING SOFTWARE BUILDS\fR for details on naming a software build\. The format of the install sub\-command is: \fBsmithy formula install [command options] APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD\fR\. The options and arguments include:
 .
 .TP
 \fB\-\-[no\-]clean\fR
@@ -147,44 +169,86 @@ This will delete all existing files in the target directory before performing th
 .
 .TP
 \fB\-\-formula\-name\fR
-By default smithy will guess the formula name based on the target directory NAME/VERSION/BUILD argument\. You may wish you install to a location named differently than a formula\. In this case, use \fB\-\-formula\-name\fR to define which formula to use\.
+By default smithy will guess the formula name based on the target directory APPLICATION/VERSION/BUILD argument\. You may wish you install to a location named differently than a formula\. In this case, use \fB\-\-formula\-name\fR to define which formula to use\.
 .
 .TP
-\fBNAME | NAME/VERSION | NAME/VERSION/BUILD\fR
+\fBAPPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD\fR
 This is the destination directory that the software will be installed in\. If you omit the BUILD or VERSION/BUILD directories smithy will try to guess the version based on the formula, and the build based on the operating system and version of gcc available\. If in doubt, specify the full destination\.
 .
-.SS "INSTALLATIONS WITH BUILD SCRIPTS"
+.P
+Assuming we install subversion with the previous command and our software\-root is \fB/sw/xk6/\fR the finished directory structure would look like:
+.
+.IP "" 4
+.
+.nf
+
+/sw/xk6/subversion/1\.7\.8
+`\-\-\- modulefile
+   `\-\-\- subversion
+      `\-\-\- 1\.7\.8
+`\-\-\- sles11\.1_gnu4\.3\.4
+   `\-\-\- bin
+   `\-\-\- include
+   `\-\-\- lib
+   `\-\-\- source
+   `\-\-\- share
+.
+.fi
+.
+.IP "" 0
+.
+.P
+A \fBmodulefile\fR folder will be created alongside the \fBsles11\.1_gnu4\.3\.4\fR build directory so that the modulefile can be tested\. To test the modulefile you need to add the modulefile folder to the \fB$MODULEPATH\fR environment variable\. Running any of the following will do this:
+.
+.IP "" 4
+.
+.nf
+
+smithy module use last
+smithy module use subversion/1\.7\.8/sles11\.1_gnu4\.3\.4
+module use /sw/xk6/subversion/1\.7\.8/modulefile/subversion
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBlast\fR is an alias to the last software build smithy worked on\. \fBsmithy show last\fR will display the last build you worked on\.
+.
+.P
+Once loaded, you should be able to interact with the new module file as normal using:
+.
+.IP "" 4
+.
+.nf
+
+module avail subversion/1\.7\.8
+module display subversion/1\.7\.8
+module load subversion/1\.7\.8
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can now deploy the module to make it available to other users\. This should be done once you\'re confident the modulefile is working properly\. To do so run either:
+.
+.IP "" 4
+.
+.nf
+
+smithy module deploy last
+smithy module deploy subversion/1\.7\.8/sles11\.1_gnu4\.3\.4
+.
+.fi
+.
+.IP "" 0
+.
+.SH "INSTALLATIONS WITH BUILD SCRIPTS"
 This section shows the typical work\-flow for adding a new software build using build scripts\. Let\'s imagine we want to install petsc 3\.2 using the cray compiler\. We must create a place for the software build, build it, and create a module\.
 .
-.P
-Note: all commands, options, and arguments have tab\-completion when using bash or zsh
-.
-.P
-\fI1\. Creating The Build\fR
-.
-.P
-All software builds have the following name format: \fBAPPLICATION/VERSION/BUILD\fR That is three different parts separated by forward slashes \fB/\fR Each part consists of:
-.
-.TP
-\fBAPPLICATION\fR
-The name using lowercase characters
-.
-.TP
-\fBVERSION\fR
-Numbers with periods\. I recommend that whatever you choose as a version allows it to be lexigraphically sorted from oldest to newest\.
-.
-.TP
-\fBBUILD\fR
-Build is somewhat different, it consists of the intended operating system and compiler separated by underscores \fB_\fR\. It is important to use compiler version numbers that correspond to module versions\. This will allow smithy to auto\-generate modulefiles for software with multiple builds\. As an example:
-.
-.P
-\fBsles11\.1_gnu4\.6\.2\fR corresponds to SuSE Linux Enterprise Server 11\.1 and the GNU gcc compiler 4\.6\.2
-.
-.P
-\fBcle4\.0_pgi12\.1\.0\fR corresponds to Cray Linux Environment 4\.0 and the PGI 12\.1\.0 compile
-.
-.P
-Let\'s use \fBpetsc/3\.2/cle4\.0_cray8\.0\.1\fR as the name\. This would be petsc designed to run on a cle4\.0 compute node and compiled with the cray cce 8\.0\.1 compiler\. This can be accomplished by running:
+.SS "1\. Creating The Build"
+Let\'s use \fBpetsc/3\.2/cle4\.0_cray8\.0\.1\fR as the name for our new package\. See \fINAMING SOFTWARE BUILDS\fR for details on naming a software build\. This would be petsc designed to run on a cle4\.0 compute node and compiled with the cray cce 8\.0\.1 compiler\. This can be accomplished by running:
 .
 .IP "" 4
 .
@@ -231,10 +295,7 @@ This command will download petsc\-3\.2\-p7\.tar\.gz, save it to \fB/sw/xk6/petsc
 .P
 Additionally, if this is a brand new piece of software add the \fB\-\-web\-description\fR switch\. This will create the application description files too\.
 .
-.P
-\fI2\. Editing and Building the Software\fR
-.
-.P
+.SS "2\. Editing and Building the Software"
 Once you have created the build you may need to update the build (\fBrebuild\fR) and environment (\fBremodule\fR) scripts before building the software\. Both files live within the software prefix\. For our example it is located in \fB/sw/xk6/petsc/3\.2/cle4\.0_cray8\.0\.1\fR\. You can edit this and other related files using the \fBedit\fR command:
 .
 .IP "" 4
@@ -279,10 +340,7 @@ smithy build last
 .P
 The results of the run will be shown on the screen and simultaneously logged to \fBbuild\.log\fR withing the software prefix folder\.
 .
-.P
-\fI3\. Create and edit a modulefile\fR
-.
-.P
+.SS "3\. Create and edit a modulefile"
 This step is best done after all builds for a particular application have been created\. When you create a new software build a modulefile is created too\. For our petsc install it lives in: \fB/sw/xk6/petsc/3\.2/modulefile\fR All builds of a particular application share a single modulefile\.
 .
 .P
@@ -358,10 +416,7 @@ smithy module deploy last
 .P
 For out petsc example, this command will copy \fB/sw/xk6/petsc/3\.2/modulefile/petsc/3\.2\fR to \fB/sw/xk6/modulefiles/petsc/3\.2\fR
 .
-.P
-\fI4\. Website Description\fR
-.
-.P
+.SS "4\. Website Description"
 If this is a new application you will need to add some information to the description file\. For petsc this lives in: \fB/sw/xk6/petsc/description\fR This is an html formatted file\. Alternatively, it can live in \fB/sw/xk6/petsc/description\.markdown\fR this file is in markdown format and is a bit simpler to write than html\. See \fIhttp://kramdown\.rubyforge\.org/quickref\.html\fR for more information on markdown syntax\. If both files exist, the markdown file takes precedence\.
 .
 .P
@@ -390,31 +445,5 @@ smithy publish petsc
 .
 .IP "" 0
 .
-.SH "LICENSE"
-Smithy is freely available under the terms of the BSD license given below\.
-.
-.P
-Copyright (c) 2012\. UT\-BATTELLE, LLC\. All rights reserved\.
-.
-.P
-Produced by the National Center for Computational Sciences at Oak Ridge National Laboratory\. Smithy is a based on SWTools, more information on SWTools can be found at: \fIhttp://www\.olcf\.ornl\.gov/center\-projects/swtools/\fR
-.
-.P
-This product includes software produced by UT\-Battelle, LLC under Contract No\. DE\-AC05\-00OR22725 with the Department of Energy\.
-.
-.P
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-.
-.IP "\(bu" 4
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer\.
-.
-.IP "\(bu" 4
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution\.
-.
-.IP "\(bu" 4
-Neither the name of the UT\-BATTELLE nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission\.
-.
-.IP "" 0
-.
-.P
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED\. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE\.
+.SH "SEE ALSO"
+smithyformula(5)

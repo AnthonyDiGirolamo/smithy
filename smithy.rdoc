@@ -86,7 +86,7 @@ Display the program version
 ==== Command: <tt>build  PATH</tt>
 Build software
 
-The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: NAME/VERSION/BUILD.
+The software to build may be either the absolute path or the full name of the software. The full name includes version numbers and build names using the format: APPLICATION/VERSION/BUILD.
 ===== Options
 ===== --log-name FILE
 
@@ -145,11 +145,23 @@ Specify one or more additional formula directories separated with commas
 
 
 ===== Commands
+====== Command: <tt>create_modulefile  APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</tt>
+Create a modulefile for a given package
+
+
+======= Options
+======= -f|--formula-name NAME
+
+Formula name
+
+[Default Value] None
+
+
 ====== Command: <tt>display  FORMULA</tt>
 Display a formula
 
 
-====== Command: <tt>install  FORMULA|NAME/VERSION/BUILD|NAME/VERSION...</tt>
+====== Command: <tt>install  APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</tt>
 Install a package using a formula
 
 
@@ -238,9 +250,9 @@ Run the proper module command to add a package's modulefile to the MODULEPATH. T
 ==== Command: <tt>new  NAME</tt>
 Generate a new build and all necessary files
 
-The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format NAME/VERSION/BUILD
+The new command will create all necessary files needed to add a new software package. Some care should be given to naming new packages. Some considerations are package names, version numbers, and build names. New package names should be of the format APPLICATION/VERSION/BUILD
 
-- NAME of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
+- APPLICATION of the package should be all lower case and one word. If multiple words are necessary separate them with dashes '-'.
 
 - VERSION numbers should be standard numbers separated by periods. If another format is necessary ensure that the numbers can be lexigraphically sorted in order of oldest release to newest.
 
