@@ -501,7 +501,9 @@ the form:</p>
 &lt;% end %>
 </code></pre>
 
-<p>Where <code>@builds.size &gt; 1</code> can be any expression which returns true or false.</p>
+<p>Where <code>@builds.size &gt; 1</code> can be any expression which returns true or false. If
+the if condition is true then the lines between the if and else will be put in
+the modulefile, otherwise lines between the else and end will be used.</p>
 
 <h2 id="FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</h2>
 

@@ -397,7 +397,9 @@ the form:
       ...
     <% end %>
 
-Where `@builds.size > 1` can be any expression which returns true or false.
+Where `@builds.size > 1` can be any expression which returns true or false. If
+the if condition is true then the lines between the if and else will be put in
+the modulefile, otherwise lines between the else and end will be used.
 
 ## FORMULA HELPER METHODS
 
