@@ -9,7 +9,7 @@ from the excellent [homebrew](http://brew.sh/) package management system for Mac
 
 More information and a tutorial can be found on the [smithy manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
 
-Details on writing formulas can be found on the [smithyformula manpage](http://anthonydigirolamo.github.com/smithy/smithyformulas.5.html).
+Details on writing formulas can be found on the [smithyformula manpage](http://anthonydigirolamo.github.com/smithy/smithyformula.5.html).
 
 Features
 --------
