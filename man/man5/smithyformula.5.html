@@ -192,6 +192,8 @@ after the <code>class GitFormula &lt; Formula</code> line.</p>
   number from the url. This works best when the filename in a url follows the
   name-version.tar... format.</p>
 
+<h3 id="disable_group_writable">disable_group_writable</h3>
+
 <h3 id="depends_on">depends_on</h3>
 
 <p>  This method expects either a single string or an array of strings that define
@@ -508,7 +510,7 @@ the modulefile, otherwise lines between the else and end will be used.</p>
 <h2 id="FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</h2>
 
 <p>These methods are designed to be used within the <code>install</code> method of a formula
-file.</p>
+file or within a block passed to one <a href="#FORMULA-DSL-METHODS" title="FORMULA DSL METHODS" data-bare-link="true">FORMULA DSL METHODS</a>.</p>
 
 <h3 id="name">name</h3>
 
@@ -523,6 +525,12 @@ file.</p>
 <h3 id="patch">patch</h3>
 
 <h3 id="system">system</h3>
+
+<h3 id="group_writable-">group_writable?</h3>
+
+<h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
+
+<h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
 
 <h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
 

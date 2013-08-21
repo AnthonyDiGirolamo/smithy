@@ -117,6 +117,8 @@ A hash of the downloaded file to verify the download performed correctly, e\.g\.
 .SS "version"
 Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\.
 .
+.SS "disable_group_writable"
+.
 .SS "depends_on"
 This method expects either a single string or an array of strings that define dependencies for this formula\. e\.g\.
 .
@@ -466,7 +468,7 @@ This is best used to conditionally render content to the modulefile and takes th
 Where \fB@builds\.size > 1\fR can be any expression which returns true or false\. If the if condition is true then the lines between the if and else will be put in the modulefile, otherwise lines between the else and end will be used\.
 .
 .SH "FORMULA HELPER METHODS"
-These methods are designed to be used within the \fBinstall\fR method of a formula file\.
+These methods are designed to be used within the \fBinstall\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
 .
 .SS "name"
 .
@@ -481,6 +483,12 @@ These methods are designed to be used within the \fBinstall\fR method of a formu
 .SS "patch"
 .
 .SS "system"
+.
+.SS "group_writable?"
+.
+.SS "module_is_available?(\"modulename\")"
+.
+.SS "module_environment_variable(\"modulename\", \"VARIABLE_NAME\")"
 .
 .SH "COMMON OPERATIONS"
 .

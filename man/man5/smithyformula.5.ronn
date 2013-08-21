@@ -105,6 +105,8 @@ after the `class GitFormula < Formula` line.
   number from the url. This works best when the filename in a url follows the
   name-version.tar... format.
 
+### disable_group_writable
+
 ### depends_on
   This method expects either a single string or an array of strings that define
   dependencies for this formula. e.g.
@@ -404,7 +406,7 @@ the modulefile, otherwise lines between the else and end will be used.
 ## FORMULA HELPER METHODS
 
 These methods are designed to be used within the `install` method of a formula
-file.
+file or within a block passed to one [FORMULA DSL METHODS][].
 
 ### name
 ### version
@@ -413,6 +415,10 @@ file.
 ### module_list
 ### patch
 ### system
+### group_writable?
+
+### module_is_available?("modulename")
+### module_environment_variable("modulename", "VARIABLE_NAME")
 
 ## COMMON OPERATIONS
 
