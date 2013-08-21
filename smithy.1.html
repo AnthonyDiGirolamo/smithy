@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>smithy(1) - build, test, and install software with ease</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#SYNOPSIS">SYNOPSIS</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#COMMAND-LINE-HELP">COMMAND LINE HELP</a>
+    <a href="#SOFTWARE-INSTALLATION-METHODS">SOFTWARE INSTALLATION METHODS</a>
+    <a href="#BUILD-SCRIPTS">BUILD SCRIPTS</a>
+    <a href="#FORMULAS">FORMULAS</a>
+    <a href="#NAMING-SOFTWARE-BUILDS">NAMING SOFTWARE BUILDS</a>
+    <a href="#INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</a>
+    <a href="#INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>smithy(1)</li>
+    <li class='tc'></li>
+    <li class='tr'>smithy(1)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>smithy</code> - <span class="man-whatis">build, test, and install software with ease</span>
+</p>
+
+<h2 id="SYNOPSIS">SYNOPSIS</h2>
+
+<p><code>smithy</code> <code>new</code> APPLICATION/VERSION/BUILD<br />
+<code>smithy</code> <code>edit</code> APPLICATION/VERSION/BUILD<br />
+<code>smithy</code> <code>build</code> APPLICATION/VERSION/BUILD<br />
+<code>smithy</code> <code>formula install</code> APPLICATION/VERSION/BUILD<br /></p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p><code>smithy</code> is a command line software installation tool that borrows ideas heavily
+from the excellent <a href="http://brew.sh/">homebrew</a> package management system for Mac OS X and <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.</p>
+
+<p>This is still a work in progress. If you have any questions, suggestions, or
+encounter any errors please open an issue on github at
+<a href="https://github.com/AnthonyDiGirolamo/smithy/issues" data-bare-link="true">https://github.com/AnthonyDiGirolamo/smithy/issues</a>.</p>
+
+<h2 id="COMMAND-LINE-HELP">COMMAND LINE HELP</h2>
+
+<p>For help on all options and commands run <code>smithy help</code><br />
+For help on a specific command run <code>smithy help COMMAND</code> or <code>smithy help COMMAND SUBCOMMAND</code></p>
+
+<h2 id="SOFTWARE-INSTALLATION-METHODS">SOFTWARE INSTALLATION METHODS</h2>
+
+<p>There are two ways of installing software using smithy:</p>
+
+<ul>
+<li><strong>build scripts</strong> (similar to swtools)</li>
+<li><strong>formulas</strong> (similar to homebrew)</li>
+</ul>
+
+
+<h2 id="BUILD-SCRIPTS">BUILD SCRIPTS</h2>
+
+<p>Build scripts are shell scripts that live inside of a package's PREFIX and
+execute the steps required to perform the compilation. A hierarchy might look
+something like this:</p>
+
+<pre><code>/sw/xk6/subversion/1.6.17
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- build-notes
+   `--- dependencies
+   `--- include
+   `--- lib
+   `--- rebuild
+   `--- relink
+   `--- remodule
+   `--- retest
+   `--- share
+   `--- subversion-1.6.17
+</code></pre>
+
+<p>The prefix for the above package is
+<code>/sw/xk6/subversion/1.6.17/sles11.1_gnu4.3.4</code> within this directory you can see
+the usual <code>bin/include/lib/share</code> folders. Additionally there is the source
+directory <code>subversion-1.6.17</code> and three build scripts <code>rebuild</code>, <code>relink</code>, and
+<code>remodule</code>. The <code>rebuild</code> script will compile the software and set the prefix
+while the remodule script sets up the environment including loading modulefiles.</p>
+
+<h2 id="FORMULAS">FORMULAS</h2>
+
+<p>The Problem with build scripts is that they are duplicated for every software
+installation. This makes installing new software difficult because you will have
+to go back and look at old ones and copy relevant steps to a new rebuild script.
+So much for don't repeat yourself!</p>
+
+<p>An alternative is to use formulas. This idea is heavily borrowed from the
+wonderful <a href="http://brew.sh/">homebrew</a> package management system for Mac OS X.
+With a formula you can specify the modules to load, extra package dependencies,
+installation steps, and the modulefile in a single file. The formulas are
+written in ruby and can be as flexible and dynamic as you like.</p>
+
+<p>A package installed with a formula has a simpler prefix directory structure.
+The only addition is the source files under the source directory.</p>
+
+<pre><code>/sw/xk6/subversion/1.7.8
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
+
+<h2 id="NAMING-SOFTWARE-BUILDS">NAMING SOFTWARE BUILDS</h2>
+
+<p>All software builds have the following name format: <strong>APPLICATION/VERSION/BUILD</strong>
+That is three different parts separated by forward slashes <code>/</code> Each part consists of:</p>
+
+<h3 id="APPLICATION">APPLICATION</h3>
+
+<p>The name using lowercase characters</p>
+
+<h3 id="VERSION">VERSION</h3>
+
+<p>Numbers with periods. I recommend that whatever you choose as a version allows
+it to be lexigraphically sorted from oldest to newest. For example use
+2013-02-14 instead of Feb14-2013.</p>
+
+<h3 id="BUILD">BUILD</h3>
+
+<p>Build is somewhat different, it consists of the intended operating system and
+compiler separated by underscores <code>_</code>. It is important to use compiler version
+numbers that correspond to module versions. This will allow smithy to
+auto-generate modulefiles for software with multiple builds.</p>
+
+<p><code>sles11.1_gnu4.6.2</code> corresponds to SuSE Linux Enterprise Server 11.1 and the GNU gcc compiler 4.6.2</p>
+
+<p><code>cle4.0_pgi12.1.0</code> corresponds to Cray Linux Environment 4.0 and the PGI 12.1.0 compile</p>
+
+<p>You may also add any other details relevant to the build. For instance, add
+python2.7 to the build name of a python module compiled for python2.7 and
+python3.3 for python3.3.</p>
+
+<h2 id="INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</h2>
+
+<p>For details on writing formulas please see the <span class="man-ref">smithyformula<span class="s">(5)</span></span> man page. This
+section covers only how to install software using existing formulas.</p>
+
+<p>Smithy formula sub-commands include:</p>
+
+<dl>
+<dt class="flush"><code>new</code></dt><dd>Create a new formula</dd>
+<dt class="flush"><code>list</code></dt><dd>List known formulas</dd>
+<dt class="flush"><code>which</code></dt><dd>Display a formula location</dd>
+<dt class="flush"><code>display</code></dt><dd>Display a formula</dd>
+<dt class="flush"><code>install</code></dt><dd>Install a package using a formula</dd>
+<dt><code>create_modulefile</code></dt><dd>Create a modulefile for a given package</dd>
+</dl>
+
+
+<p>Once a formula has been written installing is straightforward using the install
+command. For example to install subversion to your software root under the
+<code>subversion/1.7.8/sles11.1_gnu4.3.4</code> directory you might run:</p>
+
+<pre><code>smithy formula install subversion/1.7.8/sles11.1_gnu4.3.4
+</code></pre>
+
+<p>See <a href="#NAMING-SOFTWARE-BUILDS" title="NAMING SOFTWARE BUILDS" data-bare-link="true">NAMING SOFTWARE BUILDS</a> for details on naming a software build.
+The format of the install sub-command is: <code>smithy formula install [command
+options] APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</code>. The options and arguments
+include:</p>
+
+<dl>
+<dt><code>--[no-]clean</code></dt><dd>This will delete all existing files in the target directory before performing
+the installation.</dd>
+<dt><code>--formula-name</code></dt><dd>By default smithy will guess the formula name based on the target directory
+APPLICATION/VERSION/BUILD argument. You may wish you install to a location named
+differently than a formula. In this case, use <code>--formula-name</code> to define
+which formula to use.</dd>
+<dt><code>APPLICATION | APPLICATION/VERSION | APPLICATION/VERSION/BUILD</code></dt><dd>This is the destination directory that the software will be installed in. If
+you omit the BUILD or VERSION/BUILD directories smithy will try to guess the
+version based on the formula, and the build based on the operating system and
+version of gcc available. If in doubt, specify the full destination.</dd>
+</dl>
+
+
+<p>Assuming we install subversion with the previous command and our software-root
+is <code>/sw/xk6/</code> the finished directory structure would look like:</p>
+
+<pre><code>/sw/xk6/subversion/1.7.8
+`--- modulefile
+|  `--- subversion
+|     `--- 1.7.8
+`--- sles11.1_gnu4.3.4
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
+
+<p>A <code>modulefile</code> folder will be created alongside the <code>sles11.1_gnu4.3.4</code> build
+directory so that the modulefile can be tested. To test the modulefile you need
+to add the modulefile folder to the <code>$MODULEPATH</code> environment variable. Running
+any of the following will do this:</p>
+
+<pre><code>smithy module use last
+smithy module use subversion/1.7.8/sles11.1_gnu4.3.4
+module use /sw/xk6/subversion/1.7.8/modulefile/subversion
+</code></pre>
+
+<p><code>last</code> is an alias to the last software build smithy worked on. <code>smithy show
+last</code> will display the last build you worked on.</p>
+
+<p>Once loaded, you should be able to interact with the new module file as normal
+using:</p>
+
+<pre><code>module avail subversion/1.7.8
+module display subversion/1.7.8
+module load subversion/1.7.8
+</code></pre>
+
+<p>You can now deploy the module to make it available to other users. This should
+be done once you're confident the modulefile is working properly. To do so run
+either:</p>
+
+<pre><code>smithy module deploy last
+smithy module deploy subversion/1.7.8/sles11.1_gnu4.3.4
+</code></pre>
+
+<h2 id="INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</h2>
+
+<p>This section shows the typical work-flow for adding a new software build using
+build scripts. Let's imagine we want to install petsc 3.2 using the cray
+compiler. We must create a place for the software build, build it, and create a
+module.</p>
+
+<h3 id="1-Creating-The-Build">1. Creating The Build</h3>
+
+<p>Let's use <code>petsc/3.2/cle4.0_cray8.0.1</code> as the name for our new package.  See
+<a href="#NAMING-SOFTWARE-BUILDS" title="NAMING SOFTWARE BUILDS" data-bare-link="true">NAMING SOFTWARE BUILDS</a> for details on naming a software build.  This would
+be petsc designed to run on a cle4.0 compute node and compiled with the cray cce
+8.0.1 compiler.  This can be accomplished by running:</p>
+
+<pre><code>smithy new petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>You can save yourself some extra time by telling smithy where the source tar file for
+petsc is:</p>
+
+<pre><code>smithy new -t petsc-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>When using the <code>-t</code>, <code>--tarfile=</code> option smithy will extract the given archive
+to the <code>source</code> directory. For the petsc example above this would be
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source</code></p>
+
+<p>The <code>-t</code> option can also download an archive from a given URL. The archive is
+saved along side the source directory. As an example:</p>
+
+<pre><code>smithy new -t http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>This command will download petsc-3.2-p7.tar.gz, save it to
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/petsc-3.2-p7.tar.gz</code> and extract it to
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1/source</code>. This feature requires the <code>curl</code>
+command to work properly.</p>
+
+<p>Additionally, if this is a brand new piece of software add the
+<code>--web-description</code> switch. This will create the application description files
+too.</p>
+
+<h3 id="2-Editing-and-Building-the-Software">2. Editing and Building the Software</h3>
+
+<p>Once you have created the build you may need to update the build (<code>rebuild</code>) and
+environment (<code>remodule</code>) scripts before building the software. Both files live
+within the software prefix. For our example it is located in
+<code>/sw/xk6/petsc/3.2/cle4.0_cray8.0.1</code>. You can edit this and other related files
+using the <code>edit</code> command:</p>
+
+<pre><code>smithy edit build petsc/3.2/cle4.0_cray8.0.1
+</code></pre>
+
+<p>This is just a convenience command to editing the rebuild script. It will expect
+the <code>$EDITOR</code> environment variable to be set to the edior of your choice. You
+can alternatively use the <code>-e</code>,<code>--editor=</code> option. To make things quicker you
+can run:</p>
+
+<pre><code>smithy edit last
+</code></pre>
+
+<p>By omitting the build argument, smithy will prompt you to select the file to
+edit.  The <code>last</code> argument will tell smithy to use the last software build it
+worked with. If you are not sure what the last one is you can run <code>smithy show
+last</code> to see.</p>
+
+<p>Once you have edited the files, it's time to build. Do so by running:</p>
+
+<pre><code>smithy build last
+</code></pre>
+
+<p>The results of the run will be shown on the screen and simultaneously logged to
+<code>build.log</code> withing the software prefix folder.</p>
+
+<h3 id="3-Create-and-edit-a-modulefile">3. Create and edit a modulefile</h3>
+
+<p>This step is best done after all builds for a particular application have been
+created.  When you create a new software build a modulefile is created too.  For
+our petsc install it lives in: <code>/sw/xk6/petsc/3.2/modulefile</code> All builds of a
+particular application share a single modulefile.</p>
+
+<p>Smithy does some guessing as to what should be inside the modulefile based on
+what builds you have. If there is only one build the modulefile is relatively
+simple. If you have multiple builds for different compilers then it will be more
+complicated.</p>
+
+<p>To be sure the modulefile is up to date on each build, regenerate it with:</p>
+
+<pre><code>smithy module create last
+</code></pre>
+
+<p>Launch your editor with:</p>
+
+<pre><code>smithy edit modulefile last
+</code></pre>
+
+<p>Add any relevant variables to your application. Next you will need to test it to
+make sure it is loading properly for each build and that there are no errors.
+You can add the modulefile to your <code>$MODULEPATH</code> using:</p>
+
+<pre><code>smithy module use last
+</code></pre>
+
+<p>Now you are free to display and load it using the normal module commands:</p>
+
+<pre><code>module avail      petsc
+module display    petsc/3.2
+module load       petsc/3.2
+</code></pre>
+
+<p>Once the modulefile is ready, you can copy it into place using:</p>
+
+<pre><code>smithy module deploy last
+</code></pre>
+
+<p>For out petsc example, this command will copy
+<code>/sw/xk6/petsc/3.2/modulefile/petsc/3.2</code> to <code>/sw/xk6/modulefiles/petsc/3.2</code></p>
+
+<h3 id="4-Website-Description">4. Website Description</h3>
+
+<p>If this is a new application you will need to add some information to the
+description file. For petsc this lives in: <code>/sw/xk6/petsc/description</code> This is
+an html formatted file.  Alternatively, it can live in
+<code>/sw/xk6/petsc/description.markdown</code> this file is in markdown format and is a
+bit simpler to write than html. See <a href="http://kramdown.rubyforge.org/quickref.html" data-bare-link="true">http://kramdown.rubyforge.org/quickref.html</a>
+for more information on markdown syntax. If both files exist, the markdown file
+takes precedence.</p>
+
+<p>If the description file is missing you can generate one by running:</p>
+
+<pre><code>smithy repair last
+</code></pre>
+
+<p>To publish to the website run:</p>
+
+<pre><code>smithy publish petsc
+</code></pre>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><span class="man-ref">smithyformula<span class="s">(5)</span></span></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>August 2013</li>
+    <li class='tr'>smithy(1)</li>
+  </ol>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv='content-type' value='text/html;charset=utf8'>
+  <meta name='generator' value='Ronn/v0.7.3 (http://github.com/rtomayko/ronn/tree/0.7.3)'>
+  <title>smithyformula(5) - writing formulas for smithy</title>
+  <style type='text/css' media='all'>
+  /* style: man */
+  body#manpage {margin:0}
+  .mp {max-width:100ex;padding:0 9ex 1ex 4ex}
+  .mp p,.mp pre,.mp ul,.mp ol,.mp dl {margin:0 0 20px 0}
+  .mp h2 {margin:10px 0 0 0}
+  .mp > p,.mp > pre,.mp > ul,.mp > ol,.mp > dl {margin-left:8ex}
+  .mp h3 {margin:0 0 0 4ex}
+  .mp dt {margin:0;clear:left}
+  .mp dt.flush {float:left;width:8ex}
+  .mp dd {margin:0 0 0 9ex}
+  .mp h1,.mp h2,.mp h3,.mp h4 {clear:left}
+  .mp pre {margin-bottom:20px}
+  .mp pre+h2,.mp pre+h3 {margin-top:22px}
+  .mp h2+pre,.mp h3+pre {margin-top:5px}
+  .mp img {display:block;margin:auto}
+  .mp h1.man-title {display:none}
+  .mp,.mp code,.mp pre,.mp tt,.mp kbd,.mp samp,.mp h3,.mp h4 {font-family:monospace;font-size:14px;line-height:1.42857142857143}
+  .mp h2 {font-size:16px;line-height:1.25}
+  .mp h1 {font-size:20px;line-height:2}
+  .mp {text-align:justify;background:#fff}
+  .mp,.mp code,.mp pre,.mp pre code,.mp tt,.mp kbd,.mp samp {color:#131211}
+  .mp h1,.mp h2,.mp h3,.mp h4 {color:#030201}
+  .mp u {text-decoration:underline}
+  .mp code,.mp strong,.mp b {font-weight:bold;color:#131211}
+  .mp em,.mp var {font-style:italic;color:#232221;text-decoration:none}
+  .mp a,.mp a:link,.mp a:hover,.mp a code,.mp a pre,.mp a tt,.mp a kbd,.mp a samp {color:#0000ff}
+  .mp b.man-ref {font-weight:normal;color:#434241}
+  .mp pre {padding:0 4ex}
+  .mp pre code {font-weight:normal;color:#434241}
+  .mp h2+pre,h3+pre {padding-left:0}
+  ol.man-decor,ol.man-decor li {margin:3px 0 10px 0;padding:0;float:left;width:33%;list-style-type:none;text-transform:uppercase;color:#999;letter-spacing:1px}
+  ol.man-decor {width:100%}
+  ol.man-decor li.tl {text-align:left}
+  ol.man-decor li.tc {text-align:center;letter-spacing:4px}
+  ol.man-decor li.tr {text-align:right;float:right}
+  </style>
+  <style type='text/css' media='all'>
+  /* style: toc */
+  .man-navigation {display:block !important;position:fixed;top:0;left:113ex;height:100%;width:100%;padding:48px 0 0 0;border-left:1px solid #dbdbdb;background:#eee}
+  .man-navigation a,.man-navigation a:hover,.man-navigation a:link,.man-navigation a:visited {display:block;margin:0;padding:5px 2px 5px 30px;color:#999;text-decoration:none}
+  .man-navigation a:hover {color:#111;text-decoration:underline}
+  </style>
+</head>
+<!--
+  The following styles are deprecated and will be removed at some point:
+  div#man, div#man ol.man, div#man ol.head, div#man ol.man.
+
+  The .man-page, .man-decor, .man-head, .man-foot, .man-title, and
+  .man-navigation should be used instead.
+-->
+<body id='manpage'>
+  <div class='mp' id='man'>
+
+  <div class='man-navigation' style='display:none'>
+    <a href="#NAME">NAME</a>
+    <a href="#DESCRIPTION">DESCRIPTION</a>
+    <a href="#CREATING-NEW-FORMULAS">CREATING NEW FORMULAS</a>
+    <a href="#STRUCTURE">STRUCTURE</a>
+    <a href="#FORMULA-DSL-METHODS">FORMULA DSL METHODS</a>
+    <a href="#MODULEFILE-HELPER-METHODS">MODULEFILE HELPER METHODS</a>
+    <a href="#FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</a>
+    <a href="#COMMON-OPERATIONS">COMMON OPERATIONS</a>
+    <a href="#SEE-ALSO">SEE ALSO</a>
+  </div>
+
+  <ol class='man-decor man-head man head'>
+    <li class='tl'>smithyformula(5)</li>
+    <li class='tc'></li>
+    <li class='tr'>smithyformula(5)</li>
+  </ol>
+
+  <h2 id="NAME">NAME</h2>
+<p class="man-name">
+  <code>smithyformula</code> - <span class="man-whatis">writing formulas for smithy</span>
+</p>
+
+<h2 id="DESCRIPTION">DESCRIPTION</h2>
+
+<p>The main goal of formulas is to consolidate all knowledge required to build a
+software package. This can include:</p>
+
+<ul>
+<li>defining dependencies</li>
+<li>loading or swapping modules</li>
+<li>setting environment variables</li>
+<li>applying patches</li>
+<li>creating or changing makefiles</li>
+<li>running the compilation</li>
+<li>running tests</li>
+<li>defining a modulefile</li>
+</ul>
+
+
+<p>Once written it's easy to see everything required to build a given piece of
+software. Reproducing those steps is as simple as running one command but only
+if the formula is as complete as possible.</p>
+
+<p>It's common for build scripts to run the compilation but omit patches, changes
+to makefile, or any other modification to the source. With formulas it's easy to
+make patches and output any files needed to compile software.</p>
+
+<h2 id="CREATING-NEW-FORMULAS">CREATING NEW FORMULAS</h2>
+
+<p>The best way to create a new formula is to start with a working example. There
+are many complete working examples in the <a href="https://github.com/AnthonyDiGirolamo/smithy_formulas">smithy_formulas
+repo</a>.</p>
+
+<p>If you want to create a new formula from scratch you can use the <code>smithy formula
+new</code> subcommand. For more info on this command run <code>smithy help formula new</code>. To
+create a new formula file you need to know the homepage and a url to download
+the file. To create a new formula for subversion you might run:</p>
+
+<pre><code>smithy formula new \
+  --name=subversion \
+  --homepage=http://subversion.apache.org/ \
+  http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+</code></pre>
+
+<p>The format of the new sub-command is <code>smithy formula new [command options] URL</code>.
+The options and arguments are:</p>
+
+<dl>
+<dt class="flush"><code>--name</code></dt><dd><p>This is the name used for the formula file and class, if omitted smithy will
+try to guess the name based on the download URL</p></dd>
+<dt><code>--homepage</code></dt><dd><p>This should be the main homepage for the software</p></dd>
+<dt class="flush"><code>URL</code></dt><dd><p>A download URL for the software, this argument is required but may be "none"
+if you plan to checkout the code through a version control system or copy
+from another location as part of the formula</p></dd>
+</dl>
+
+
+<p>This will create a formula file inside <code>~/.smithy/formulas</code> or the first formula
+directory specified in the <code>$SMITHY_CONFIG</code> file. In either case, the full path
+to that file will be displayed.</p>
+
+<h2 id="STRUCTURE">STRUCTURE</h2>
+
+<p>Formulas attempt to create a domain specific language with the support of a full
+programming language, ruby. The structure of a formula is the same as a ruby class.
+For example:</p>
+
+<pre><code>class SubversionFormula &lt; Formula
+
+end
+</code></pre>
+
+<p>Every method call that defines the formula will happen between these two lines.</p>
+
+<h3 id="FORMULA-FILE-AND-CLASS-NAMING">FORMULA FILE AND CLASS NAMING</h3>
+
+<p>Formulas follow a specifc naming scheme. The filename should end in
+<code>'_formula.rb'</code> and start with the name of the software in all lowercase
+characters. The class name should be the same name specified in the file but
+<a href="http://en.wikipedia.org/wiki/CamelCase">CamelCased</a> and end in <code>'Formula'</code>.</p>
+
+<h3 id="RUBY-BASICS">RUBY BASICS</h3>
+
+<p>We will cover most of the basics you need for formula writing here but if you
+would like more info on ruby you might read through <a href="http://www.ruby-lang.org/en/documentation/quickstart/">Ruby in Twenty
+Minutes</a> or try another
+source on the <a href="http://www.ruby-lang.org/en/documentation/">Ruby Documentation</a>
+page.</p>
+
+<h2 id="FORMULA-DSL-METHODS">FORMULA DSL METHODS</h2>
+
+<p>These methods should be defined at the highest level of the formula file, right
+after the <code>class GitFormula &lt; Formula</code> line.</p>
+
+<h3 id="homepage">homepage</h3>
+
+<p>  <strong>REQUIRED</strong> - Defines the homepage, e.g. "http://git-scm.com/"</p>
+
+<h3 id="url">url</h3>
+
+<p>  <strong>REQUIRED</strong> - The full URL to download a package, e.g. "http://git-core.googlecode.com/files/git-1.8.3.4.tar.gz" may also be "none"</p>
+
+<h3 id="sha1-sha256-md5">sha1,sha256,md5</h3>
+
+<p>  A hash of the downloaded file to verify the download performed correctly, e.g.
+  <code>sha1 "fe633d02f7d964842d7ea804278b75120fc60c11"</code></p>
+
+<h3 id="version">version</h3>
+
+<p>  Manually define the version number, if omitted smithy will guess the version
+  number from the url. This works best when the filename in a url follows the
+  name-version.tar... format.</p>
+
+<h3 id="disable_group_writable">disable_group_writable</h3>
+
+<h3 id="depends_on">depends_on</h3>
+
+<p>  This method expects either a single string or an array of strings that define
+  dependencies for this formula. e.g.</p>
+
+<pre><code>depends_on "curl"
+depends_on [ "cmake", "qt", "openssl", "sqlite" ]
+depends_on %w{ cmake qt openssl sqlite }
+</code></pre>
+
+<p>  Using this method ensures that if a given dependency is not met smithy will
+  abort the installation. It also provides a way to query dependent packages
+  information within the install method later on. For example if you write
+  <code>depends_on "curl"</code> in your formula you gain access to an object named curl
+  inside the install method. This allows you to do things like:</p>
+
+<pre><code>system "./configure --prefix=#{prefix} --with-curl=#{curl.prefix}"
+</code></pre>
+
+<p>  In the above example <code>#{curl.prefix}</code> is an example of a ruby interpolated
+  string, everything between the <code>#{ }</code> is ruby code. <code>curl.prefix</code> will return
+  a string with the location curl is installed in.</p>
+
+<p>  The strings passed to <code>depends_on</code> are just the locations of installed
+  software. If you required a specific version of a dependency you could use
+  specify the version or build numbers of existing installed software. e.g.</p>
+
+<pre><code>depends_on [ "cmake/2.8.11.2/sles11.1_gnu4.3.4", "qt/4.8.5", "sqlite" ]
+</code></pre>
+
+<p>  Assuming your software root is <code>/sw/xk6</code> smithy would look for the above
+  software installs in <code>/sw/xk6/cmake/2.8.11.2/sles11.1_gnu4.3.4</code>
+  <code>/sw/xk6/qt/4.8.5/*</code> and <code>/sw/xk6/sqlite/*/*</code>. The <code>*</code> works similar to shell
+  globbing. If you needed to install a python module that depends on a specific
+  version of another python module you might use:</p>
+
+<pre><code>depends_on [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*" ]
+</code></pre>
+
+<p>  This would require a given formula to have access to both
+  <code>/sw/xk6/python/3.3.0/*</code> and a python module with a build name that includes
+  <code>python3.3.0</code> located at <code>/sw/x6/python_numpy/1.7.1/*python3.3.0*</code></p>
+
+<p>  You will also probably need to specifiy dependencies conditionally upon the
+  type of build you are performing. It's recommended to add the type of
+  build to the build name when installing. Given that, you can key off build
+  names to specify dependencies. Taking the python example further, lets extend
+  it to support multiple versions of python. You can pass a ruby block to the
+  <code>depends_on</code> method to make it more dynamic. The syntax for this is:</p>
+
+<pre><code>depends_on do
+  ...
+end
+</code></pre>
+
+<p>  Any ruby code may go in here the last executed line of the block should be an
+  array of strings containting the dependencies. Lets use a ruby case statement
+  for this:</p>
+
+<pre><code>depends_on do
+  case build_name
+  when /python3.3/
+    [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*" ]
+  when /python2.7/
+    [ "python/2.7.3", "python_numpy/1.7.1/*python2.7.3*" ]
+  end
+end
+</code></pre>
+
+<p>  This allows the formula to set it's dependencies based off the type of build
+  thats being performed. Lets say this formula is <code>python_matplotlib</code>. You could
+  run either of these commands to install it and expect the dependencies to be
+  set correctly:</p>
+
+<pre><code>smithy formula install python_matplotlib/1.2.3/python3.3.0
+smithy formula install python_matplotlib/1.2.3/python2.7.3
+</code></pre>
+
+<h3 id="module_commands">module_commands</h3>
+
+<p>  something</p>
+
+<h3 id="modules">modules</h3>
+
+<p>  something</p>
+
+<h3 id="modulefile">modulefile</h3>
+
+<p>This method expects the a string that represents the modulefile. Generally
+modulefiles in smithy take two forms ones that point to a single build and ones
+that use multiple builds and set the build based on a users environment (already
+loaded modules). It's recommended to have one modulefile per application version
+and set multiple builds dynamically inside the modulefile.</p>
+
+<p>Writing modulefiles is a topic in and of itself. For details on the modulefile
+format see the <a href="http://modules.sourceforge.net/man/modulefile.html">modulefile(4)
+manpage</a> Modulefiles are
+written in tcl and can take many forms.</p>
+
+<p>Here is an example of a modulefile that points to a single build. It's
+convenient to use heredoc string quoting in ruby so that the string can span
+multiple lines. e.g.</p>
+
+<pre><code>modulefile &lt;&lt;-MODULEFILE.strip_heredoc
+  #%Module
+  proc ModulesHelp { } {
+     puts stderr "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+     puts stderr ""
+  }
+  module-whatis "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+
+  set PREFIX &lt;%= @package.prefix %&gt;
+
+  prepend-path PATH            $PREFIX/bin
+  prepend-path LD_LIBRARY_PATH $PREFIX/lib
+  prepend-path MANPATH         $PREFIX/share/man
+MODULEFILE
+</code></pre>
+
+<p>The modulefile definition uses the <a href="http://ruby-doc.org/stdlib-2.0/libdoc/erb/rdoc/ERB.html">erb
+format</a> Anything
+between the <code>&lt;%= ... %&gt;</code> delimiters will be interpreted as ruby code. There are
+a few helper methods that you can use inside these delimiters see the next
+section titled <a href="#MODULEFILE-HELPER-METHODS" title="MODULEFILE HELPER METHODS" data-bare-link="true">MODULEFILE HELPER METHODS</a> for details.</p>
+
+<p>A more complicated modulefile may examine already loaded modules to determine
+which build to load. For instance if the user has gcc or a gnu programming
+environment module loaded then your modulefile will want to load the gnu build.
+Here is an example designed to dynamically set the build:</p>
+
+<pre><code>#%Module
+proc ModulesHelp { } {
+   puts stderr "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+   puts stderr ""
+}
+# One line description
+module-whatis "&lt;%= @package.name %&gt; &lt;%= @package.version %&gt;"
+
+&lt;% if @builds.size &gt; 1 %&gt;
+&lt;%= module_build_list @package, @builds %>
+
+set PREFIX &lt;%= @package.version_directory %&gt;/$BUILD
+&lt;% else %>
+set PREFIX &lt;%= @package.prefix %&gt;
+&lt;% end %>
+
+# Helpful ENV Vars
+setenv &lt;%= @package.name.upcase %&gt;_DIR $PREFIX
+setenv &lt;%= @package.name.upcase %&gt;_LIB "-L$PREFIX/lib"
+setenv &lt;%= @package.name.upcase %&gt;_INC "-I$PREFIX/include"
+
+# Common Paths
+prepend-path PATH            $PREFIX/bin
+prepend-path LD_LIBRARY_PATH $PREFIX/lib
+prepend-path MANPATH         $PREFIX/share/man
+prepend-path INFOPATH        $PREFIX/info
+prepend-path PKG_CONFIG_PATH $PREFIX/lib/pkgconfig
+prepend-path PYTHONPATH      $PREFIX/lib/python2.7/site-packages
+prepend-path PERL5PATH       $PREFIX/lib/perl5/site_perl
+</code></pre>
+
+<p>The main difference from the first example is the <code>&lt;%= if @builds.size &gt; 1 %&gt;</code>
+block. This basically checks to see if we have installed multiple builds or
+not. If that condition is true everything up until the <code>&lt;% else %></code> will be put
+in the modulefile. Otherwise, if we have only one build, <code>set PREFIX &lt;%=
+@package.prefix %&gt;</code> will be put in the modulefile.</p>
+
+<h3 id="def-install">def install</h3>
+
+<p>  <strong>REQUIRED</strong> - This is the method that runs the software installation process. It normally runs system commands, performs patches, and sets environment variables. e.g.</p>
+
+<pre><code>def install
+  system "./configure"
+  system "make"
+  system "make install"
+end
+</code></pre>
+
+<p>  The contents of the install method depends heavily on the software being
+  installed. For a list of additional helper methods for use inside install see
+  the <a href="#FORMULA-HELPER-METHODS" title="FORMULA HELPER METHODS" data-bare-link="true">FORMULA HELPER METHODS</a> section.</p>
+
+<h2 id="MODULEFILE-HELPER-METHODS">MODULEFILE HELPER METHODS</h2>
+
+<h3 id="-package-name-"><code>&lt;%= @package.name %&gt;</code></h3>
+
+<p>This will return the name of the application being installed. It is the same as
+the APPLICATION part of the <code>smithy formula install APPLICATION/VERSION/BUILD</code>
+command.</p>
+
+<h3 id="-package-version-"><code>&lt;%= @package.version %&gt;</code></h3>
+
+<p>Similar to the above, this returns the version number.</p>
+
+<h3 id="-package-build_name-"><code>&lt;%= @package.build_name %&gt;</code></h3>
+
+<p>Same as the name and version methods, this will return the build name of the
+applcation.</p>
+
+<h3 id="-package-prefix-"><code>&lt;%= @package.prefix %&gt;</code></h3>
+
+<p>This line will return the full prefix to an application. If we run <code>smithy
+formula install bzip2/1.0.4/pgi13.4</code> and our software-root is <code>/sw/xk6</code> this
+command will return <code>/sw/xk6/bzip2/1.0.4/pgi13.4</code></p>
+
+<h3 id="-builds-"><code>&lt;%= @builds %></code></h3>
+
+<p>The <code>@builds</code> variable is an array of strings that contain the list of available
+builds for a given application. Say we have a bzip2 formula and ran the
+following installs:</p>
+
+<pre><code>smithy formula install bzip2/1.0.4/gnu4.3.4
+smithy formula install bzip2/1.0.4/gnu4.7.2
+smithy formula install bzip2/1.0.4/pgi13.4
+smithy formula install bzip2/1.0.4/intel12
+</code></pre>
+
+<p>The directory structure for the above builds would look like (assuming <code>/sw/xk6</code>
+is the software-root):</p>
+
+<pre><code>/sw/xk6/bzip2/1.0.4
+`--- modulefile
+|  `--- bzip2
+|     `--- 1.0.4
+`--- gnu4.3.4
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- gnu4.7.2
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- pgi13.4
+|  `--- bin
+|  `--- include
+|  `--- lib
+|  `--- source
+|  `--- share
+`--- intel12
+   `--- bin
+   `--- include
+   `--- lib
+   `--- source
+   `--- share
+</code></pre>
+
+<p>The <code>@builds</code> array would then be <code>[ "gnu4.3.4", "gnu4.7.2", "pgi13.4",
+"intel12" ]</code>. This lets you figure out what builds exist and use them in your
+modulefile.</p>
+
+<h3 id="-builds-size-"><code>&lt;%= @builds.size %&gt;</code></h3>
+
+<p><a href="http://ruby-doc.org/core-2.0/Array.html#method-i-size">size</a> is a standard ruby
+method that counts the number of elements in an array. For the above example
+this would return <code>4</code>.</p>
+
+<h3 id="-module_build_list-package-builds-"><code>&lt;%= module_build_list @package, @builds %></code></h3>
+
+<p>This is a helper method in smithy that will generate the tcl necessary to
+conditionally load builds based on what compiler programming environment
+modules a user has loaded. It takes <code>@package</code> and <code>@builds</code> as arguments.
+Using the above bzip2 example the result of using this method would be:</p>
+
+<pre><code>if [ is-loaded PrgEnv-gnu ] {
+  if [ is-loaded gcc/4.3.4 ] {
+    set BUILD gnu4.3.4
+  } elseif [ is-loaded gcc/4.7.2 ] {
+    set BUILD gnu4.7.2
+  } else {
+    set BUILD gnu4.7.2
+  }
+} elseif [ is-loaded PrgEnv-pgi ] {
+  set BUILD pgi13.4
+} elseif [ is-loaded PrgEnv-intel ] {
+  set BUILD intel12
+} elseif [ is-loaded PrgEnv-cray ] {
+  puts stderr "Not implemented for the cray compiler"
+}
+if {![info exists BUILD]} {
+  puts stderr "[module-info name] is only available for the following environments:"
+  puts stderr "gnu4.3.4"
+  puts stderr "gnu4.7.2"
+  puts stderr "intel12"
+  puts stderr "pgi13.4"
+  break
+}
+</code></pre>
+
+<h3 id="-if-"><code>&lt;% if ... %&gt;</code></h3>
+
+<p>This is standard erb ruby code. Delimiters like <code>&lt;% ... %&gt;</code> do NOT put their
+results in the final modulefile, they are only used for control flow. Delimiters
+with the extra = sign <code>&lt;%= ... %&gt;</code> will put their results in the final
+modulefile.</p>
+
+<p>This is best used to conditionally render content to the modulefile and takes
+the form:</p>
+
+<pre><code>&lt;% if @builds.size &gt; 1 %&gt;
+  ...
+&lt;% else %>
+  ...
+&lt;% end %>
+</code></pre>
+
+<p>Where <code>@builds.size &gt; 1</code> can be any expression which returns true or false. If
+the if condition is true then the lines between the if and else will be put in
+the modulefile, otherwise lines between the else and end will be used.</p>
+
+<h2 id="FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</h2>
+
+<p>These methods are designed to be used within the <code>install</code> method of a formula
+file or within a block passed to one <a href="#FORMULA-DSL-METHODS" title="FORMULA DSL METHODS" data-bare-link="true">FORMULA DSL METHODS</a>.</p>
+
+<h3 id="name">name</h3>
+
+<h3 id="version">version</h3>
+
+<h3 id="build_name">build_name</h3>
+
+<h3 id="prefix">prefix</h3>
+
+<h3 id="module_list">module_list</h3>
+
+<h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
+
+<h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
+
+<h3 id="patch">patch</h3>
+
+<pre><code>patch &lt;&lt;-EOF.strip_heredoc
+  diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
+  index e867fb2..22fb40c 100644
+  --- a/CMake/cdat_modules/cairo_external.cmake
+  +++ b/CMake/cdat_modules/cairo_external.cmake
+  @@ -1,7 +1,7 @@
+
+   set(Cairo_source "${CMAKE_CURRENT_BINARY_DIR}/build/Cairo")
+   set(Cairo_install "${cdat_EXTERNALS}")
+  -set(Cairo_conf_args --disable-static)
+  +set(Cairo_conf_args --enable-gobject=no --disable-static)
+
+   ExternalProject_Add(Cairo
+     DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
+EOF
+
+patch &lt;&lt;-EOF.strip_heredoc
+  diff --git a/Makefile.in b/Makefile.in
+  new file mode 100644
+  index 0000000..1235d4b
+  --- /dev/null
+  +++ b/Makefile.in
+  @@ -0,0 +1,12 @@
+  +SHELL = /bin/sh
+  +PLAT = LINUX
+  +BLLIB = #{acml_prefix}/gfortran64/lib/libacml.a
+  +CBLIB = #{prefix}/lib/libcblas.a
+  +CC = gcc
+  +FC = gfortran
+  +LOADER = $(FC)
+  +CFLAGS = -O3 -DADD_
+  +FFLAGS = -O3
+  +ARCH = ar
+  +ARCHFLAGS = r
+  +RANLIB = ranlib
+EOF
+</code></pre>
+
+<h3 id="system">system</h3>
+
+<h3 id="group_writable-">group_writable?</h3>
+
+<h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
+
+<h3 id="Change-Working-Directory">Change Working Directory</h3>
+
+<pre><code>Dir.chdir prefix
+Dir.chdir prefix+"/source"
+</code></pre>
+
+<h3 id="Running-Shell-Commands">Running Shell Commands</h3>
+
+<pre><code>`ln -svf file1 file2`
+system "ln -svf file1 file2"
+</code></pre>
+
+<h3 id="Setting-Environment-Variables">Setting Environment Variables</h3>
+
+<pre><code>ENV["CC"]  = "gcc"
+ENV["CXX"] = "g++"
+ENV["F77"] = "gfortran"
+ENV["F90"] = "gfortran"
+ENV["FC"]  = "gfortran"
+
+python_start_command = "NETCDF4_DIR=$NETCDF_DIR PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} "
+system "#{python_start_command} setup.py build"
+</code></pre>
+
+<h3 id="Creating-Files">Creating Files</h3>
+
+<pre><code>File.open("tools/build/v2/site-config.jam", "w+") do |f|
+  f.write &lt;&lt;-EOF.strip_heredoc
+    import os ;
+    local CRAY_MPICH2_DIR = [ os.environ CRAY_MPICH2_DIR ] ;
+    using gcc
+      : 4.7.2.xk7
+      : CC
+      : &lt;compileflags>-I#{bzip2.prefix}/include
+        &lt;compileflags>-I$(CRAY_MPICH2_DIR)/include
+        &lt;linkflags>-L$(CRAY_MPICH2_DIR)/lib
+    ;
+    using mpi
+      : CC
+      : &lt;find-shared-library>mpich
+      : aprun -n
+    ;
+  EOF
+end
+</code></pre>
+
+<h3 id="Putting-it-Together">Putting it Together</h3>
+
+<pre><code>Dir.chdir prefix
+openssl_files = %w{
+  include/openssl
+  lib/pkgconfig/libcrypto.pc
+  lib/pkgconfig/libssl.pc
+  lib/pkgconfig/openssl.pc
+  lib/engines
+  lib/libcrypto.a
+  lib/libcrypto.so
+  lib/libcrypto.so.1.0.0
+  lib/libssl.a
+  lib/libssl.so
+  lib/libssl.so.1.0.0
+}
+FileUtils.mkdir_p "Externals/include"
+FileUtils.mkdir_p "Externals/lib/pkgconfig"
+openssl_files.each do |file|
+  system "ln -sf #{openssl.prefix}/#{file} #{prefix}/Externals/#{file}"
+end
+</code></pre>
+
+<h2 id="SEE-ALSO">SEE ALSO</h2>
+
+<p><span class="man-ref">smithy<span class="s">(1)</span></span></p>
+
+
+  <ol class='man-decor man-foot man foot'>
+    <li class='tl'></li>
+    <li class='tc'>August 2013</li>
+    <li class='tr'>smithyformula(5)</li>
+  </ol>
+
+  </div>
+</body>
+</html>
