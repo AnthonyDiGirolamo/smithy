@@ -522,21 +522,124 @@ file or within a block passed to one <a href="#FORMULA-DSL-METHODS" title="FORMU
 
 <h3 id="module_list">module_list</h3>
 
+<h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
+
+<h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
+
 <h3 id="patch">patch</h3>
+
+<pre><code>patch &lt;&lt;-EOF.strip_heredoc
+  diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
+  index e867fb2..22fb40c 100644
+  --- a/CMake/cdat_modules/cairo_external.cmake
+  +++ b/CMake/cdat_modules/cairo_external.cmake
+  @@ -1,7 +1,7 @@
+
+   set(Cairo_source "${CMAKE_CURRENT_BINARY_DIR}/build/Cairo")
+   set(Cairo_install "${cdat_EXTERNALS}")
+  -set(Cairo_conf_args --disable-static)
+  +set(Cairo_conf_args --enable-gobject=no --disable-static)
+
+   ExternalProject_Add(Cairo
+     DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
+EOF
+
+patch &lt;&lt;-EOF.strip_heredoc
+  diff --git a/Makefile.in b/Makefile.in
+  new file mode 100644
+  index 0000000..1235d4b
+  --- /dev/null
+  +++ b/Makefile.in
+  @@ -0,0 +1,12 @@
+  +SHELL = /bin/sh
+  +PLAT = LINUX
+  +BLLIB = #{acml_prefix}/gfortran64/lib/libacml.a
+  +CBLIB = #{prefix}/lib/libcblas.a
+  +CC = gcc
+  +FC = gfortran
+  +LOADER = $(FC)
+  +CFLAGS = -O3 -DADD_
+  +FFLAGS = -O3
+  +ARCH = ar
+  +ARCHFLAGS = r
+  +RANLIB = ranlib
+EOF
+</code></pre>
 
 <h3 id="system">system</h3>
 
 <h3 id="group_writable-">group_writable?</h3>
 
-<h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
-
-<h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
-
 <h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
+
+<h3 id="Change-Working-Directory">Change Working Directory</h3>
+
+<pre><code>Dir.chdir prefix
+Dir.chdir prefix+"/source"
+</code></pre>
+
+<h3 id="Running-Shell-Commands">Running Shell Commands</h3>
+
+<pre><code>`ln -svf file1 file2`
+system "ln -svf file1 file2"
+</code></pre>
 
 <h3 id="Setting-Environment-Variables">Setting Environment Variables</h3>
 
+<pre><code>ENV["CC"]  = "gcc"
+ENV["CXX"] = "g++"
+ENV["F77"] = "gfortran"
+ENV["F90"] = "gfortran"
+ENV["FC"]  = "gfortran"
+
+python_start_command = "NETCDF4_DIR=$NETCDF_DIR PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} "
+system "#{python_start_command} setup.py build"
+</code></pre>
+
 <h3 id="Creating-Files">Creating Files</h3>
+
+<pre><code>File.open("tools/build/v2/site-config.jam", "w+") do |f|
+  f.write &lt;&lt;-EOF.strip_heredoc
+    import os ;
+    local CRAY_MPICH2_DIR = [ os.environ CRAY_MPICH2_DIR ] ;
+    using gcc
+      : 4.7.2.xk7
+      : CC
+      : &lt;compileflags>-I#{bzip2.prefix}/include
+        &lt;compileflags>-I$(CRAY_MPICH2_DIR)/include
+        &lt;linkflags>-L$(CRAY_MPICH2_DIR)/lib
+    ;
+    using mpi
+      : CC
+      : &lt;find-shared-library>mpich
+      : aprun -n
+    ;
+  EOF
+end
+</code></pre>
+
+<h3 id="Putting-it-Together">Putting it Together</h3>
+
+<pre><code>Dir.chdir prefix
+openssl_files = %w{
+  include/openssl
+  lib/pkgconfig/libcrypto.pc
+  lib/pkgconfig/libssl.pc
+  lib/pkgconfig/openssl.pc
+  lib/engines
+  lib/libcrypto.a
+  lib/libcrypto.so
+  lib/libcrypto.so.1.0.0
+  lib/libssl.a
+  lib/libssl.so
+  lib/libssl.so.1.0.0
+}
+FileUtils.mkdir_p "Externals/include"
+FileUtils.mkdir_p "Externals/lib/pkgconfig"
+openssl_files.each do |file|
+  system "ln -sf #{openssl.prefix}/#{file} #{prefix}/Externals/#{file}"
+end
+</code></pre>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 

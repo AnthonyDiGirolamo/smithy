@@ -480,21 +480,142 @@ These methods are designed to be used within the \fBinstall\fR method of a formu
 .
 .SS "module_list"
 .
+.SS "module_is_available?(\"modulename\")"
+.
+.SS "module_environment_variable(\"modulename\", \"VARIABLE_NAME\")"
+.
 .SS "patch"
+.
+.nf
+
+patch <<\-EOF\.strip_heredoc
+  diff \-\-git a/CMake/cdat_modules/cairo_external\.cmake b/CMake/cdat_modules/cairo_external\.cmake
+  index e867fb2\.\.22fb40c 100644
+  \-\-\- a/CMake/cdat_modules/cairo_external\.cmake
+  +++ b/CMake/cdat_modules/cairo_external\.cmake
+  @@ \-1,7 +1,7 @@
+
+   set(Cairo_source "${CMAKE_CURRENT_BINARY_DIR}/build/Cairo")
+   set(Cairo_install "${cdat_EXTERNALS}")
+  \-set(Cairo_conf_args \-\-disable\-static)
+  +set(Cairo_conf_args \-\-enable\-gobject=no \-\-disable\-static)
+
+   ExternalProject_Add(Cairo
+     DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
+EOF
+
+patch <<\-EOF\.strip_heredoc
+  diff \-\-git a/Makefile\.in b/Makefile\.in
+  new file mode 100644
+  index 0000000\.\.1235d4b
+  \-\-\- /dev/null
+  +++ b/Makefile\.in
+  @@ \-0,0 +1,12 @@
+  +SHELL = /bin/sh
+  +PLAT = LINUX
+  +BLLIB = #{acml_prefix}/gfortran64/lib/libacml\.a
+  +CBLIB = #{prefix}/lib/libcblas\.a
+  +CC = gcc
+  +FC = gfortran
+  +LOADER = $(FC)
+  +CFLAGS = \-O3 \-DADD_
+  +FFLAGS = \-O3
+  +ARCH = ar
+  +ARCHFLAGS = r
+  +RANLIB = ranlib
+EOF
+.
+.fi
 .
 .SS "system"
 .
 .SS "group_writable?"
 .
-.SS "module_is_available?(\"modulename\")"
-.
-.SS "module_environment_variable(\"modulename\", \"VARIABLE_NAME\")"
-.
 .SH "COMMON OPERATIONS"
+.
+.SS "Change Working Directory"
+.
+.nf
+
+Dir\.chdir prefix
+Dir\.chdir prefix+"/source"
+.
+.fi
+.
+.SS "Running Shell Commands"
+.
+.nf
+
+`ln \-svf file1 file2`
+system "ln \-svf file1 file2"
+.
+.fi
 .
 .SS "Setting Environment Variables"
 .
+.nf
+
+ENV["CC"]  = "gcc"
+ENV["CXX"] = "g++"
+ENV["F77"] = "gfortran"
+ENV["F90"] = "gfortran"
+ENV["FC"]  = "gfortran"
+
+python_start_command = "NETCDF4_DIR=$NETCDF_DIR PYTHONPATH=$PYTHONPATH:#{libdirs\.join(":")} #{python_binary} "
+system "#{python_start_command} setup\.py build"
+.
+.fi
+.
 .SS "Creating Files"
+.
+.nf
+
+File\.open("tools/build/v2/site\-config\.jam", "w+") do |f|
+  f\.write <<\-EOF\.strip_heredoc
+    import os ;
+    local CRAY_MPICH2_DIR = [ os\.environ CRAY_MPICH2_DIR ] ;
+    using gcc
+      : 4\.7\.2\.xk7
+      : CC
+      : <compileflags>\-I#{bzip2\.prefix}/include
+        <compileflags>\-I$(CRAY_MPICH2_DIR)/include
+        <linkflags>\-L$(CRAY_MPICH2_DIR)/lib
+    ;
+    using mpi
+      : CC
+      : <find\-shared\-library>mpich
+      : aprun \-n
+    ;
+  EOF
+end
+.
+.fi
+.
+.SS "Putting it Together"
+.
+.nf
+
+Dir\.chdir prefix
+openssl_files = %w{
+  include/openssl
+  lib/pkgconfig/libcrypto\.pc
+  lib/pkgconfig/libssl\.pc
+  lib/pkgconfig/openssl\.pc
+  lib/engines
+  lib/libcrypto\.a
+  lib/libcrypto\.so
+  lib/libcrypto\.so\.1\.0\.0
+  lib/libssl\.a
+  lib/libssl\.so
+  lib/libssl\.so\.1\.0\.0
+}
+FileUtils\.mkdir_p "Externals/include"
+FileUtils\.mkdir_p "Externals/lib/pkgconfig"
+openssl_files\.each do |file|
+  system "ln \-sf #{openssl\.prefix}/#{file} #{prefix}/Externals/#{file}"
+end
+.
+.fi
 .
 .SH "SEE ALSO"
 smithy(1)
