@@ -4,8 +4,8 @@ smithy(1) -- build, test, and install software with ease
 ## SYNOPSIS
 
 `smithy` `new` APPLICATION/VERSION/BUILD<br>
-`smithy` `edit` last<br>
-`smithy` `build` last<br>
+`smithy` `edit` APPLICATION/VERSION/BUILD<br>
+`smithy` `build` APPLICATION/VERSION/BUILD<br>
 `smithy` `formula install` APPLICATION/VERSION/BUILD<br>
 
 ## DESCRIPTION
