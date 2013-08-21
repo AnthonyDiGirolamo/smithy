@@ -1,13 +1,18 @@
-Smithy is a tool that aims to replicate and improve upon functionality of
-[SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+Software Smithy
+===============
 
 Overview
-========
+--------
 
-More information and a tutorial can be found on the [manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
+`smithy` is a command line software installation tool that borrows ideas heavily
+from the excellent [homebrew](http://brew.sh/) package management system for Mac OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+
+More information and a tutorial can be found on the [smithy manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
+
+Details on writing formulas can be found on the [smithyformula manpage](http://anthonydigirolamo.github.com/smithy/smithyformulas.5.html).
 
 Features
-========
+--------
 
 Smithys goal is to make following the SWTools conventions easier and less error
 prone. Improvements include:
@@ -23,15 +28,23 @@ prone. Improvements include:
 - Cleaner, shorter, and more maintainable code.
 
 Installation
-============
+------------
 
-Installing ruby
----------------
+smithy is available through [rubygems](http://rubygems.org/gems/software_smithy)
+so if you already have ruby 1.9.2 or higher available just run:
 
-Smithy requires ruby 1.9.2 or later. Most distrubutions only ship version 1.8.7
-and you may need build your own copy. The simplest way is using the excellent
-[ruby-build](https://github.com/sstephenson/ruby-build) script. As an example,
-this will install ruby with a prefix of `/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4`
+    gem install software_smithy
+
+Set `$SMITHY_CONFIG` to your smithy config file and you're good to go. If you
+need to install ruby or require a multiuser installation read on:
+
+### Installing ruby
+
+Smithy requires ruby 1.9.2 or later. Most enterprise Linux distributions only
+ship version 1.8.7 and you may need build your own copy. The simplest way is
+using the excellent [ruby-build](https://github.com/sstephenson/ruby-build)
+script. As an example, this will install ruby with a prefix of
+`/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4`
 
     curl -L https://github.com/sstephenson/ruby-build/archive/master.zip -o ruby-build.zip
     unzip ruby-build.zip
@@ -61,10 +74,9 @@ modulefile for ruby installed in the previous example.
 
 This file should be saved to `$MODULEPATH/ruby/1.9.3`
 
-Installing smithy
------------------
+### Installing smithy
 
-### Choosting an install location
+#### Choosting an install location
 
 There are two ways to install smithy. The simplest is by simply installing the
 `software_smithy` gem. This will install smithy and it's required gems in
@@ -76,7 +88,7 @@ If you are installing in production for all users you will want to install
 smithy somewhere everyone can access. There are two places you might want to do
 this:
 
-#### Ruby's default `GEM_PATH`
+##### Ruby's default `GEM_PATH`
 
 If you installed manually using the examples above, this will be something like
 `PREFIX/lib/ruby/gems/1.9.1` This will give access to smithy whenever
@@ -86,7 +98,7 @@ to ruby's default `GEM_PATH` (following the above example):
     export GEM_HOME=/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4/lib/ruby/gems/1.9.1
     gem install software_smithy --no-rdoc --no-ri
 
-#### A different location of your choosing.
+##### A different location of your choosing.
 
 This is useful if you want a single smithy install location for more than one
 install of ruby (typically on separate machines). This method is a bit more
@@ -144,14 +156,14 @@ and
 [environment.sh](https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh)
 
 License
-=======
+-------
 
 Smithy is based on the ideas created in SWTools and uses a BSD license. See
 [LICENSE](https://github.com/AnthonyDiGirolamo/smithy/blob/master/LICENSE) for
 the exact text.
 
 Contributing and Support
-========================
+------------------------
 
 The smithy [github repo](https://github.com/AnthonyDiGirolamo/smithy) contains
 all development files. Please fork and send me a pull request with any additions
