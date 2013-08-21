@@ -118,6 +118,7 @@ A hash of the downloaded file to verify the download performed correctly, e\.g\.
 Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\.
 .
 .SS "disable_group_writable"
+Calling this method within the formula will skip setting group file permissions after the build is complete\.
 .
 .SS "depends_on"
 This method expects either a single string or an array of strings that define dependencies for this formula\. e\.g\.
@@ -215,6 +216,9 @@ end
 .IP "" 0
 .
 .P
+In this example case statement switches on the \fBbuild_name\fR\. The \fBwhen /python3\.3/\fR will be true if the \fBbuild_name\fR contains the \fBpython3\.3\fR\. The \fB/python3\.3/\fR syntax is a regular expression\.
+.
+.P
 This allows the formula to set it\'s dependencies based off the type of build thats being performed\. Lets say this formula is \fBpython_matplotlib\fR\. You could run either of these commands to install it and expect the dependencies to be set correctly:
 .
 .IP "" 4
@@ -229,7 +233,85 @@ smithy formula install python_matplotlib/1\.2\.3/python2\.7\.3
 .IP "" 0
 .
 .SS "module_commands"
-something
+This method defines the module commands that must be run before \fIsystem\fR calls within the \fIdef install\fR part of the modulefile\. It expects an array of strings with each string being a module command\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+module_commands [ "load szip", "load hdf5" ]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+A more complicated example:
+.
+.IP "" 4
+.
+.nf
+
+module_commands [
+  "unload PE\-gnu PE\-pgi PE\-intel PE\-cray",
+  "load PE\-gnu",
+  "load cmake/2\.8\.11\.2",
+  "load git",
+  "swap gcc gcc/4\.7\.1",
+  "swap ompi ompi/1\.6\.3"
+]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+\fBmodule_commands\fR also accepts ruby blocks the syntax for this is:
+.
+.IP "" 4
+.
+.nf
+
+module_commands do
+  \.\.\.
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This can be used to dynamically set which modules to load based on the \fBbuild_name\fR\. Here is an example that loads the correct python version:
+.
+.IP "" 4
+.
+.nf
+
+module_commands do
+  commands = [ "unload python" ]
+
+  case build_name
+  when /python3\.3/
+    commands << "load python/3\.3\.0"
+  when /python2\.7/
+    commands << "load python/2\.7\.3"
+  end
+
+  commands << "load python_numpy"
+  commands << "load szip"
+  commands << "load hdf5/1\.8\.8"
+  commands
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This block starts by creating a variable named \fBcommands\fR as an array with a single item \fB"unload python"\fR\. Next a case statement is used to determine which version of python we are compiling for\. \fBcommands << "load python/3\.3\.0"\fR will append \fB"load python/3\.3\.0"\fR to the end of the array\. See the ruby documentation on the Array Class method \fIhttp://www\.ruby\-doc\.org/core\-2\.0/Array\.html#method\-i\-3C\-3C\fR for more info on the \fB<<\fR operator\. After that, it appends a few more modules to load\. The last line of the block must be the array itself so that when the block is evaluated by smithy, it recieves the expected value\.
+.
+.P
+Assuming this is a formula for \fBpython_h5py\fR running \fBsmithy formula install python_h5py/2\.1\.3/python3\.3\fR results in an array containing: \fB[ "unload python", "load python/3\.3\.0", "load python_numpy", "load szip", "load hdf5/1\.8\.8" ]\fR
 .
 .SS "modules"
 something
@@ -468,7 +550,7 @@ This is best used to conditionally render content to the modulefile and takes th
 Where \fB@builds\.size > 1\fR can be any expression which returns true or false\. If the if condition is true then the lines between the if and else will be put in the modulefile, otherwise lines between the else and end will be used\.
 .
 .SH "FORMULA HELPER METHODS"
-These methods are designed to be used within the \fBinstall\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
+These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
 .
 .SS "name"
 .
