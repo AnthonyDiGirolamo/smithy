@@ -471,12 +471,40 @@ These methods are designed to be used within the [def install][] method of a
 formula file or within a block passed to one [FORMULA DSL METHODS][].
 
 ### name
+This will return the name of the application being installed. It is the same as
+the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
+command.
+
 ### version
+Similar to the above, this returns the version number.
+
 ### build_name
+Same as the name and version methods, this will return the build name of the
+applcation.
+
 ### prefix
+This line will return the full prefix to an application. If we run smithy
+formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
+command will return /sw/xk6/bzip2/1.0.4/pgi13.4
+
+### system
+This method accepts a string or multiple strings separated by commas. It will
+run the given command in a subshell and setup the modules as defined by the
+[module_commands][] or [modules][] methods. Each call to system is independent
+from the last. Modules are reloaded and environment variables are reset.
+
 ### module_list
+This method will run `module list` and print it's output durring the install
+process. Useful for verifying the modules loaded are the ones you want.
+
 ### module_is_available?("modulename")
+This method will check if a given modulename is available on the system you are
+performing the installation on. It can be used within the [def install][],
+[depends_on][], [module_commands][], or [modules][] methods.
+
 ### module_environment_variable("modulename", "VARIABLE_NAME")
+
+
 ### patch
 
     patch <<-EOF.strip_heredoc
@@ -515,8 +543,6 @@ formula file or within a block passed to one [FORMULA DSL METHODS][].
       +ARCHFLAGS = r
       +RANLIB = ranlib
     EOF
-
-### system
 
 ## COMMON OPERATIONS
 

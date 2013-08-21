@@ -553,16 +553,22 @@ Where \fB@builds\.size > 1\fR can be any expression which returns true or false\
 These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
 .
 .SS "name"
+This will return the name of the application being installed\. It is the same as the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD command\.
 .
 .SS "version"
+Similar to the above, this returns the version number\.
 .
 .SS "build_name"
+Same as the name and version methods, this will return the build name of the applcation\.
 .
 .SS "prefix"
+This line will return the full prefix to an application\. If we run smithy formula install bzip2/1\.0\.4/pgi13\.4 and our software\-root is /sw/xk6 this command will return /sw/xk6/bzip2/1\.0\.4/pgi13\.4
 .
 .SS "module_list"
+This method will run \fBmodule list\fR and print it\'s output durring the install process\. Useful for verifying the modules loaded are the ones you want\.
 .
 .SS "module_is_available?(\"modulename\")"
+This method will check if a given modulename is available on the system you are performing the installation on\. It can be used within the \fIdef install\fR, \fIdepends_on\fR, \fImodule_commands\fR, or \fImodules\fR methods\.
 .
 .SS "module_environment_variable(\"modulename\", \"VARIABLE_NAME\")"
 .
@@ -611,8 +617,6 @@ EOF
 .
 .SS "system"
 .
-.SS "group_writable?"
-.
 .SH "COMMON OPERATIONS"
 .
 .SS "Change Working Directory"
@@ -643,8 +647,7 @@ ENV["F77"] = "gfortran"
 ENV["F90"] = "gfortran"
 ENV["FC"]  = "gfortran"
 
-python_start_command = "NETCDF4_DIR=$NETCDF_DIR PYTHONPATH=$PYTHONPATH:#{libdirs\.join(":")} #{python_binary} "
-system "#{python_start_command} setup\.py build"
+system "NETCDF4_DIR=$NETCDF_DIR python setup\.py build"
 .
 .fi
 .

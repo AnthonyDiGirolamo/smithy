@@ -579,15 +579,35 @@ formula file or within a block passed to one <a href="#FORMULA-DSL-METHODS" titl
 
 <h3 id="name">name</h3>
 
+<p>This will return the name of the application being installed. It is the same as
+the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
+command.</p>
+
 <h3 id="version">version</h3>
+
+<p>Similar to the above, this returns the version number.</p>
 
 <h3 id="build_name">build_name</h3>
 
+<p>Same as the name and version methods, this will return the build name of the
+applcation.</p>
+
 <h3 id="prefix">prefix</h3>
+
+<p>This line will return the full prefix to an application. If we run smithy
+formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
+command will return /sw/xk6/bzip2/1.0.4/pgi13.4</p>
 
 <h3 id="module_list">module_list</h3>
 
+<p>This method will run <code>module list</code> and print it's output durring the install
+process. Useful for verifying the modules loaded are the ones you want.</p>
+
 <h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
+
+<p>This method will check if a given modulename is available on the system you are
+performing the installation on. It can be used within the <a href="#def-install" title="def install" data-bare-link="true">def install</a>,
+<a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a>, <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a>, or <a href="#modules" title="modules" data-bare-link="true">modules</a> methods.</p>
 
 <h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
 
@@ -633,8 +653,6 @@ EOF
 
 <h3 id="system">system</h3>
 
-<h3 id="group_writable-">group_writable?</h3>
-
 <h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
 
 <h3 id="Change-Working-Directory">Change Working Directory</h3>
@@ -657,8 +675,7 @@ ENV["F77"] = "gfortran"
 ENV["F90"] = "gfortran"
 ENV["FC"]  = "gfortran"
 
-python_start_command = "NETCDF4_DIR=$NETCDF_DIR PYTHONPATH=$PYTHONPATH:#{libdirs.join(":")} #{python_binary} "
-system "#{python_start_command} setup.py build"
+system "NETCDF4_DIR=$NETCDF_DIR python setup.py build"
 </code></pre>
 
 <h3 id="Creating-Files">Creating Files</h3>
