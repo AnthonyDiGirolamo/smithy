@@ -118,7 +118,7 @@ A hash of the downloaded file to verify the download performed correctly, e\.g\.
 Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\.
 .
 .SS "disable_group_writable"
-Calling this method within the formula will skip setting group file permissions after the build is complete\.
+Calling this method within the formula will skip setting group writable file permissions after the build is complete\. It\'s equivalent to running smithy with the \fB\-\-disable\-group\-writable\fR option\. See \fBsmithy help\fR for more info on global command line options\.
 .
 .SS "depends_on"
 This method expects either a single string or an array of strings that define dependencies for this formula\. e\.g\.
@@ -314,7 +314,50 @@ This block starts by creating a variable named \fBcommands\fR as an array with a
 Assuming this is a formula for \fBpython_h5py\fR running \fBsmithy formula install python_h5py/2\.1\.3/python3\.3\fR results in an array containing: \fB[ "unload python", "load python/3\.3\.0", "load python_numpy", "load szip", "load hdf5/1\.8\.8" ]\fR
 .
 .SS "modules"
-something
+This command is similar to the \fImodule_commands\fR method\. It accepts an array of strings with the names of modulefiles that must be loaded\. It\'s different from \fImodule_commands\fR in that it expects only names of modules and loads them in the order specified\. Additionally it runs a \fBmodule purge\fR to unload all modules before loading the passed array of modules\. e\.g\.
+.
+.IP "" 4
+.
+.nf
+
+modules [ "java" ]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This line would run \fBmodule purge\fR and \fBmodule load java\fR before any \fIsystem\fR command\. \fImodules\fR also accepts ruby blocks similar to \fImodule_commands\fR and \fIdepends_on\fR\. Here is an example using ruby blocks:
+.
+.P
+modules do
+.
+.IP "" 4
+.
+.nf
+
+mods = [ ]
+case build_name
+when /gnu/
+  mods << "PrgEnv\-gnu"
+when /pgi/
+  mods << "PrgEnv\-pgi"
+when /intel/
+  mods << "PrgEnv\-intel"
+when /cray/
+  mods << "PrgEnv\-cray"
+end
+mods
+.
+.fi
+.
+.IP "" 0
+.
+.P
+end
+.
+.P
+This block would result in the formula running \fBmodule purge\fR followed by \fBmodule load PrgEnv\-gnu\fR if the \fBbuild_name\fR contains gnu and similarly for pgi, intel, and cray\.
 .
 .SS "modulefile"
 This method expects the a string that represents the modulefile\. Generally modulefiles in smithy take two forms ones that point to a single build and ones that use multiple builds and set the build based on a users environment (already loaded modules)\. It\'s recommended to have one modulefile per application version and set multiple builds dynamically inside the modulefile\.
@@ -347,6 +390,9 @@ MODULEFILE
 .fi
 .
 .IP "" 0
+.
+.P
+The \fB<<\-MODULEFILE\.strip_heredoc\fR syntax denotes the beginning for a multi\-line string\. The string ends with \fBMODULEFILE\fR\. You can substitute any word for \fBMODULEFILE\fR\. The \fB\.strip_heredoc\fR method removes leading whitespace from the string so the output isn\'t unecessarily indented\.
 .
 .P
 The modulefile definition uses the erb format \fIhttp://ruby\-doc\.org/stdlib\-2\.0/libdoc/erb/rdoc/ERB\.html\fR Anything between the \fB<%= \.\.\. %>\fR delimiters will be interpreted as ruby code\. There are a few helper methods that you can use inside these delimiters see the next section titled \fIMODULEFILE HELPER METHODS\fR for details\.
@@ -553,7 +599,7 @@ Where \fB@builds\.size > 1\fR can be any expression which returns true or false\
 These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
 .
 .SS "name"
-This will return the name of the application being installed\. It is the same as the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD command\.
+This will return the name of the application being installed\. It is the same as the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD command\. It can be used as a variable as well as inside of a string using the \fB#{ \.\.\. }\fR delimiters\. e\.g\. \fB"#{name}"\fR
 .
 .SS "version"
 Similar to the above, this returns the version number\.
@@ -564,15 +610,62 @@ Same as the name and version methods, this will return the build name of the app
 .SS "prefix"
 This line will return the full prefix to an application\. If we run smithy formula install bzip2/1\.0\.4/pgi13\.4 and our software\-root is /sw/xk6 this command will return /sw/xk6/bzip2/1\.0\.4/pgi13\.4
 .
+.SS "system"
+This method accepts a string or multiple strings separated by commas\. It will run the given command in a subshell and setup the modules as defined by the \fImodule_commands\fR or \fImodules\fR methods\. Each call to system is independent from the last\. Modules are reloaded and environment variables are reset\.
+.
 .SS "module_list"
 This method will run \fBmodule list\fR and print it\'s output durring the install process\. Useful for verifying the modules loaded are the ones you want\.
 .
-.SS "module_is_available?(\"modulename\")"
-This method will check if a given modulename is available on the system you are performing the installation on\. It can be used within the \fIdef install\fR, \fIdepends_on\fR, \fImodule_commands\fR, or \fImodules\fR methods\.
+.SS "module_is_available?"
+This method will check if a given modulename is available on the system you are performing the installation on\. It takes one string argument, the module name\. It can be used within the \fIdef install\fR, \fIdepends_on\fR, \fImodule_commands\fR, or \fImodules\fR methods\.
 .
-.SS "module_environment_variable(\"modulename\", \"VARIABLE_NAME\")"
+.IP "" 4
+.
+.nf
+
+if module_is_available?("hdf5/1\.8\.8")
+  \.\.\.
+end
+.
+.fi
+.
+.IP "" 0
+.
+.SS "module_environment_variable"
+Using this method will return the contents of an environment varible set by a modulefile\. It takes two string arguments, the module name and the environment variable name\. For example, if you wished to get the value of the \fB$HDF5_DIR\fR variable set within the \fBhdf5/1\.8\.8\fR module you could run:
+.
+.IP "" 4
+.
+.nf
+
+hdf5_prefix = module_environment_variable("hdf5/1\.8\.8", "HDF5_DIR")
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Using this method to get environment variable set by modules is necessary since the modules are only set before running a \fIsystem\fR command\. See \fISetting Environment Variables\fR for more info\. It can be used within the \fIdef install\fR, \fIdepends_on\fR, \fImodule_commands\fR, or \fImodules\fR methods\.
+.
+.P
+By combining the [module_is_available?][] and \fImodule_environment_variable\fR methods you can conditionally retrieve the contents of environment variables set within a given module\.
+.
+.IP "" 4
+.
+.nf
+
+if module_is_available?("hdf5/1\.8\.8")
+  hdf5_prefix = module_environment_variable("hdf5/1\.8\.8", "HDF5_DIR")
+end
+.
+.fi
+.
+.IP "" 0
 .
 .SS "patch"
+The patch method is a convinience method to apply patches to code\. Behind the scenes it creates a file named \fBpatch\.diff\fR with the passed content and runs \fBpatch \-p1 <patch\.diff\fR\. Using the heredoc syntax works best to strip leading whitespace\. For example:
+.
+.IP "" 4
 .
 .nf
 
@@ -591,6 +684,17 @@ patch <<\-EOF\.strip_heredoc
    ExternalProject_Add(Cairo
      DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
 EOF
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Any input you provide must be compatible with the patch command\. You can use interpolated strings \fB#{ \.\.\. }\fR to modify the content of patches as well:
+.
+.IP "" 4
+.
+.nf
 
 patch <<\-EOF\.strip_heredoc
   diff \-\-git a/Makefile\.in b/Makefile\.in
@@ -615,11 +719,14 @@ EOF
 .
 .fi
 .
-.SS "system"
+.IP "" 0
 .
 .SH "COMMON OPERATIONS"
 .
 .SS "Change Working Directory"
+Changing the working directory accomplished by the Dir\.chdir \fIhttp://ruby\-doc\.org/core\-1\.9\.3/Dir\.html#method\-c\-chdir\fR method\. It takes one argument as a string\. It\'s best to always work from the prefix of the installation\. You can concatenate strings using a \fB+\fR sign\.
+.
+.IP "" 4
 .
 .nf
 
@@ -628,16 +735,53 @@ Dir\.chdir prefix+"/source"
 .
 .fi
 .
+.IP "" 0
+.
 .SS "Running Shell Commands"
+In ruby you can execute any shell command using backtick delimiters\. Commands run using this method will NOT load any required modulefiles\. It will however return the standard output as a string
+.
+.IP "" 4
 .
 .nf
 
 `ln \-svf file1 file2`
+results = `ln \-svf file1 file2`
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If you need modulefiles loaded use the \fIsystem\fR command instead\.
+.
+.IP "" 4
+.
+.nf
+
 system "ln \-svf file1 file2"
 .
 .fi
 .
+.IP "" 0
+.
+.P
+There are many ruby methods available that are the equivalent of running the shell counterparts\. See the these pages for more info:
+.
+.IP "\(bu" 4
+FileUtils Class \fIhttp://www\.ruby\-doc\.org/stdlib\-2\.0/libdoc/fileutils/rdoc/FileUtils\.html\fR
+.
+.IP "\(bu" 4
+Dir Class \fIhttp://ruby\-doc\.org/core\-1\.9\.3/Dir\.html\fR
+.
+.IP "\(bu" 4
+File Class \fIhttp://www\.ruby\-doc\.org/core\-2\.0/File\.html\fR
+.
+.IP "" 0
+.
 .SS "Setting Environment Variables"
+Ruby provides the ENV \fIhttp://www\.ruby\-doc\.org/core\-2\.0/ENV\.html\fR hash for accessing and setting environment variables\. Here is an example of setting environment variables:
+.
+.IP "" 4
 .
 .nf
 
@@ -646,37 +790,113 @@ ENV["CXX"] = "g++"
 ENV["F77"] = "gfortran"
 ENV["F90"] = "gfortran"
 ENV["FC"]  = "gfortran"
-
-system "NETCDF4_DIR=$NETCDF_DIR python setup\.py build"
 .
 .fi
 .
-.SS "Creating Files"
+.IP "" 0
+.
+.P
+And getting their values back:
+.
+.IP "" 4
 .
 .nf
 
-File\.open("tools/build/v2/site\-config\.jam", "w+") do |f|
+cppflags = ENV["CPPFLAGS"]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This works with one caveat, you cannot access or modify variables set by modules loaded by the formula\. Modules are loaded and reset before each \fIsystem\fR command\.
+.
+.P
+If you need to access the contents of an evironment variable set by a module use the \fImodule_environment_variable\fR helper method\.
+.
+.P
+If you need to change the contents of an environment variable set by a loaded module you will need to make it part of the system command\. For example, say you loaded the \fBnetcdf\fR module and needed to change the \fB$NETCDF_DIR\fR variable\. You could run any of these:
+.
+.IP "" 4
+.
+.nf
+
+system "NETCDF_DIR=/opt/cray/netcdf/4\.2\.0/generic \./configure"
+system "export NETCDF_DIR=/opt/cray/netcdf/4\.2\.0/generic ;",
+  "\./configure"
+system "export NETCDF_DIR=/opt/cray/netcdf/4\.2\.0/generic
+  \./configure"
+.
+.fi
+.
+.IP "" 0
+.
+.SS "Creating Files"
+Using ruby to create files is simple\. With this and the \fB#{ \.\.\. }\fR delimiters you can add dynamic content to the files you write\. The basic syntax for writing files is:
+.
+.IP "" 4
+.
+.nf
+
+File\.open("path/to/file", "w+") do |file|
+  file\.write "\.\.\."
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+This syntax uses a ruby block with an argument\. \fBFile\.open("\.\.\.", "w+")\fR passes the file handle to the block as a variable named \fBfile\fR\. Between the \fBdo |file|\fR and \fBend\fR lines is the block\. When ruby reaches the end of the block the file is closed\.
+.
+.P
+The \fB"w+"\fR argument tells ruby to open the file with read\-write and truncate the existing file to zero length or create a new file for reading and writing\. See this page \fIhttp://www\.ruby\-doc\.org/core\-2\.0/IO\.html#method\-c\-new\-label\-IO+Open+Mode\fR for more info on the different modes\.
+.
+.P
+Here is a good example from the mpi4py formula \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_mpi4py_cray_formula\.rb\fR
+.
+.IP "" 4
+.
+.nf
+
+File\.open("mpi\.cfg", "w+") do |f|
   f\.write <<\-EOF\.strip_heredoc
-    import os ;
-    local CRAY_MPICH2_DIR = [ os\.environ CRAY_MPICH2_DIR ] ;
-    using gcc
-      : 4\.7\.2\.xk7
-      : CC
-      : <compileflags>\-I#{bzip2\.prefix}/include
-        <compileflags>\-I$(CRAY_MPICH2_DIR)/include
-        <linkflags>\-L$(CRAY_MPICH2_DIR)/lib
-    ;
-    using mpi
-      : CC
-      : <find\-shared\-library>mpich
-      : aprun \-n
-    ;
+    [cray]
+    mpi_dir = /opt/cray/mpt/5\.6\.3/gni/mpich2\-gnu/47
+    mpicc   = cc
+    mpicxx  = CC
   EOF
 end
 .
 .fi
 .
+.IP "" 0
+.
+.P
+This will create a new file named "mpi\.cfg" in the current working directory\. If you wanted to make it a bit more dynamic you might wish to set the contents based on an environment variable like this:
+.
+.IP "" 4
+.
+.nf
+
+mpidir = module_environment_variable("cray\-mpich2", "CRAY_MPICH2_DIR")
+File\.open("mpi\.cfg", "w+") do |f|
+  f\.write <<\-EOF\.strip_heredoc
+    [cray]
+    mpi_dir = #{mpidir}
+    mpicc   = cc
+    mpicxx  = CC
+  EOF
+end
+.
+.fi
+.
+.IP "" 0
+.
 .SS "Putting it Together"
+You can combine these methods in many ways\. This bit of code is from the uvcdat formula \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula\.rb\fR and creates symlinks from an openssl installaion into a directory under the uvcdat prefix\.
+.
+.IP "" 4
 .
 .nf
 
@@ -701,6 +921,11 @@ openssl_files\.each do |file|
 end
 .
 .fi
+.
+.IP "" 0
+.
+.P
+It begins by changing the working directory to the installation prefix\. Then, creates an array of strings named \fBopenssl_files\fR containing relative paths to files needing to be symlinked\. It then creates directories that might not exist yet using FileUtils\.mkdir_p \fIhttp://www\.ruby\-doc\.org/stdlib\-2\.0/libdoc/fileutils/rdoc/FileUtils\.html#method\-c\-mkdir_p\fR\. Then it iterates through the \fBopenssl_files\fR array and runs one \fIsystem\fR command per array element\. That system command uses an \fBopenssl\.prefix\fR method that is made available by the \fIdepends_on\fR defined earlier in the formula to get the location of the openssl installation\.
 .
 .SH "SEE ALSO"
 smithy(1)

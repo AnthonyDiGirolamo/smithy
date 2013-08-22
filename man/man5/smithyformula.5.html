@@ -195,8 +195,10 @@ name-version.tar... format.</p>
 
 <h3 id="disable_group_writable">disable_group_writable</h3>
 
-<p>Calling this method within the formula will skip setting group file permissions
-after the build is complete.</p>
+<p>Calling this method within the formula will skip setting group writable file
+permissions after the build is complete. It's equivalent to running smithy with
+the <code>--disable-group-writable</code> option. See <code>smithy help</code> for more info on global
+command line options.</p>
 
 <h3 id="depends_on">depends_on</h3>
 
@@ -343,7 +345,40 @@ python_h5py/2.1.3/python3.3</code> results in an array containing: <code>[ "unlo
 
 <h3 id="modules">modules</h3>
 
-<p>  something</p>
+<p>This command is similar to the <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a> method. It accepts an array
+of strings with the names of modulefiles that must be loaded. It's different
+from <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a> in that it expects only names of modules and loads them
+in the order specified. Additionally it runs a <code>module purge</code> to unload all
+modules before loading the passed array of modules. e.g.</p>
+
+<pre><code>modules [ "java" ]
+</code></pre>
+
+<p>This line would run <code>module purge</code> and <code>module load java</code> before any <a href="#system" title="system" data-bare-link="true">system</a>
+command. <a href="#modules" title="modules" data-bare-link="true">modules</a> also accepts ruby blocks similar to <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a> and
+<a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a>. Here is an example using ruby blocks:</p>
+
+<p>  modules do</p>
+
+<pre><code>mods = [ ]
+case build_name
+when /gnu/
+  mods &lt;&lt; "PrgEnv-gnu"
+when /pgi/
+  mods &lt;&lt; "PrgEnv-pgi"
+when /intel/
+  mods &lt;&lt; "PrgEnv-intel"
+when /cray/
+  mods &lt;&lt; "PrgEnv-cray"
+end
+mods
+</code></pre>
+
+<p>  end</p>
+
+<p>This block would result in the formula running <code>module purge</code> followed by
+<code>module load PrgEnv-gnu</code> if the <code>build_name</code> contains gnu and similarly for pgi,
+intel, and cray.</p>
 
 <h3 id="modulefile">modulefile</h3>
 
@@ -377,6 +412,11 @@ multiple lines. e.g.</p>
   prepend-path MANPATH         $PREFIX/share/man
 MODULEFILE
 </code></pre>
+
+<p>The <code>&lt;&lt;-MODULEFILE.strip_heredoc</code> syntax denotes the beginning for a multi-line
+string. The string ends with <code>MODULEFILE</code>. You can substitute any word for
+<code>MODULEFILE</code>. The <code>.strip_heredoc</code> method removes leading whitespace from the
+string so the output isn't unecessarily indented.</p>
 
 <p>The modulefile definition uses the <a href="http://ruby-doc.org/stdlib-2.0/libdoc/erb/rdoc/ERB.html">erb
 format</a> Anything
@@ -581,7 +621,8 @@ formula file or within a block passed to one <a href="#FORMULA-DSL-METHODS" titl
 
 <p>This will return the name of the application being installed. It is the same as
 the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
-command.</p>
+command. It can be used as a variable as well as inside of a string using the
+<code>#{ ... }</code> delimiters. e.g. <code>"#{name}"</code></p>
 
 <h3 id="version">version</h3>
 
@@ -598,20 +639,60 @@ applcation.</p>
 formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
 command will return /sw/xk6/bzip2/1.0.4/pgi13.4</p>
 
+<h3 id="system">system</h3>
+
+<p>This method accepts a string or multiple strings separated by commas. It will
+run the given command in a subshell and setup the modules as defined by the
+<a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a> or <a href="#modules" title="modules" data-bare-link="true">modules</a> methods. Each call to system is independent
+from the last. Modules are reloaded and environment variables are reset.</p>
+
 <h3 id="module_list">module_list</h3>
 
 <p>This method will run <code>module list</code> and print it's output durring the install
 process. Useful for verifying the modules loaded are the ones you want.</p>
 
-<h3 id="module_is_available-modulename-">module_is_available?("modulename")</h3>
+<h3 id="module_is_available-">module_is_available?</h3>
 
 <p>This method will check if a given modulename is available on the system you are
-performing the installation on. It can be used within the <a href="#def-install" title="def install" data-bare-link="true">def install</a>,
-<a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a>, <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a>, or <a href="#modules" title="modules" data-bare-link="true">modules</a> methods.</p>
+performing the installation on. It takes one string argument, the module name.
+It can be used within the <a href="#def-install" title="def install" data-bare-link="true">def install</a>, <a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a>, <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a>,
+or <a href="#modules" title="modules" data-bare-link="true">modules</a> methods.</p>
 
-<h3 id="module_environment_variable-modulename-VARIABLE_NAME-">module_environment_variable("modulename", "VARIABLE_NAME")</h3>
+<pre><code>if module_is_available?("hdf5/1.8.8")
+  ...
+end
+</code></pre>
+
+<h3 id="module_environment_variable">module_environment_variable</h3>
+
+<p>Using this method will return the contents of an environment varible set by a
+modulefile. It takes two string arguments, the module name and the environment
+variable name. For example, if you wished to get the value of the <code>$HDF5_DIR</code>
+variable set within the <code>hdf5/1.8.8</code> module you could run:</p>
+
+<pre><code>hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+</code></pre>
+
+<p>Using this method to get environment variable set by modules is necessary since
+the modules are only set before running a <a href="#system" title="system" data-bare-link="true">system</a> command. See <a href="#Setting-Environment-Variables" title="Setting Environment Variables" data-bare-link="true">Setting
+Environment Variables</a> for more info.  It can be used within the <a href="#def-install" title="def install" data-bare-link="true">def
+install</a>, <a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a>, <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a>, or <a href="#modules" title="modules" data-bare-link="true">modules</a> methods.</p>
+
+<p>By combining the [module_is_available?][] and <a href="#module_environment_variable" title="module_environment_variable" data-bare-link="true">module_environment_variable</a>
+methods you can conditionally retrieve the contents of environment variables set
+within a given module.</p>
+
+<pre><code>if module_is_available?("hdf5/1.8.8")
+  hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+end
+</code></pre>
 
 <h3 id="patch">patch</h3>
+
+<p>The patch method is a convinience method to apply patches to code. Behind the
+scenes it creates a file named <code>patch.diff</code> with the passed content and runs
+<code>patch -p1 &lt;patch.diff</code>. Using the heredoc syntax works best to strip leading
+whitespace. For example:</p>
 
 <pre><code>patch &lt;&lt;-EOF.strip_heredoc
   diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
@@ -628,8 +709,12 @@ performing the installation on. It can be used within the <a href="#def-install"
    ExternalProject_Add(Cairo
      DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
 EOF
+</code></pre>
 
-patch &lt;&lt;-EOF.strip_heredoc
+<p>Any input you provide must be compatible with the patch command. You can use
+interpolated strings <code>#{ ... }</code> to modify the content of patches as well:</p>
+
+<pre><code>patch &lt;&lt;-EOF.strip_heredoc
   diff --git a/Makefile.in b/Makefile.in
   new file mode 100644
   index 0000000..1235d4b
@@ -651,11 +736,14 @@ patch &lt;&lt;-EOF.strip_heredoc
 EOF
 </code></pre>
 
-<h3 id="system">system</h3>
-
 <h2 id="COMMON-OPERATIONS">COMMON OPERATIONS</h2>
 
 <h3 id="Change-Working-Directory">Change Working Directory</h3>
+
+<p>Changing the working directory accomplished by the
+<a href="http://ruby-doc.org/core-1.9.3/Dir.html#method-c-chdir">Dir.chdir</a> method. It
+takes one argument as a string. It's best to always work from the prefix of the
+installation. You can concatenate strings using a <code>+</code> sign.</p>
 
 <pre><code>Dir.chdir prefix
 Dir.chdir prefix+"/source"
@@ -663,44 +751,121 @@ Dir.chdir prefix+"/source"
 
 <h3 id="Running-Shell-Commands">Running Shell Commands</h3>
 
+<p>In ruby you can execute any shell command using backtick delimiters. Commands
+run using this method will NOT load any required modulefiles. It will however
+return the standard output as a string</p>
+
 <pre><code>`ln -svf file1 file2`
-system "ln -svf file1 file2"
+results = `ln -svf file1 file2`
 </code></pre>
 
+<p>If you need modulefiles loaded use the <a href="#system" title="system" data-bare-link="true">system</a> command instead.</p>
+
+<pre><code>system "ln -svf file1 file2"
+</code></pre>
+
+<p>There are many ruby methods available that are the equivalent of running the
+shell counterparts. See the these pages for more info:</p>
+
+<ul>
+<li><a href="http://www.ruby-doc.org/stdlib-2.0/libdoc/fileutils/rdoc/FileUtils.html">FileUtils Class</a></li>
+<li><a href="http://ruby-doc.org/core-1.9.3/Dir.html">Dir Class</a></li>
+<li><a href="http://www.ruby-doc.org/core-2.0/File.html">File Class</a></li>
+</ul>
+
+
 <h3 id="Setting-Environment-Variables">Setting Environment Variables</h3>
+
+<p>Ruby provides the <a href="http://www.ruby-doc.org/core-2.0/ENV.html">ENV</a> hash for
+accessing and setting environment variables. Here is an example of setting
+environment variables:</p>
 
 <pre><code>ENV["CC"]  = "gcc"
 ENV["CXX"] = "g++"
 ENV["F77"] = "gfortran"
 ENV["F90"] = "gfortran"
 ENV["FC"]  = "gfortran"
+</code></pre>
 
-system "NETCDF4_DIR=$NETCDF_DIR python setup.py build"
+<p>And getting their values back:</p>
+
+<pre><code>cppflags = ENV["CPPFLAGS"]
+</code></pre>
+
+<p>This works with one caveat, you cannot access or modify variables set by modules
+loaded by the formula. Modules are loaded and reset before each
+<a href="#system" title="system" data-bare-link="true">system</a> command.</p>
+
+<p>If you need to access the contents of an evironment variable set by a module use
+the <a href="#module_environment_variable" title="module_environment_variable" data-bare-link="true">module_environment_variable</a> helper method.</p>
+
+<p>If you need to change the contents of an environment variable set by a loaded
+module you will need to make it part of the system command. For example, say you
+loaded the <code>netcdf</code> module and needed to change the <code>$NETCDF_DIR</code> variable. You
+could run any of these:</p>
+
+<pre><code>system "NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic ./configure"
+system "export NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic ;",
+  "./configure"
+system "export NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic
+  ./configure"
 </code></pre>
 
 <h3 id="Creating-Files">Creating Files</h3>
 
-<pre><code>File.open("tools/build/v2/site-config.jam", "w+") do |f|
+<p>Using ruby to create files is simple. With this and the <code>#{ ... }</code> delimiters
+you can add dynamic content to the files you write. The basic syntax for writing
+files is:</p>
+
+<pre><code>File.open("path/to/file", "w+") do |file|
+  file.write "..."
+end
+</code></pre>
+
+<p>This syntax uses a ruby block with an argument. <code>File.open("...", "w+")</code> passes
+the file handle to the block as a variable named <code>file</code>. Between the <code>do |file|</code>
+and <code>end</code> lines is the block. When ruby reaches the end of the block the file is
+closed.</p>
+
+<p>The <code>"w+"</code> argument tells ruby to open the file with read-write and truncate the
+existing file to zero length or create a new file for reading and writing. See
+<a href="http://www.ruby-doc.org/core-2.0/IO.html#method-c-new-label-IO+Open+Mode">this page</a>
+for more info on the different modes.</p>
+
+<p>Here is a good example from the
+<a href="https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_mpi4py_cray_formula.rb">mpi4py formula</a></p>
+
+<pre><code>File.open("mpi.cfg", "w+") do |f|
   f.write &lt;&lt;-EOF.strip_heredoc
-    import os ;
-    local CRAY_MPICH2_DIR = [ os.environ CRAY_MPICH2_DIR ] ;
-    using gcc
-      : 4.7.2.xk7
-      : CC
-      : &lt;compileflags>-I#{bzip2.prefix}/include
-        &lt;compileflags>-I$(CRAY_MPICH2_DIR)/include
-        &lt;linkflags>-L$(CRAY_MPICH2_DIR)/lib
-    ;
-    using mpi
-      : CC
-      : &lt;find-shared-library>mpich
-      : aprun -n
-    ;
+    [cray]
+    mpi_dir = /opt/cray/mpt/5.6.3/gni/mpich2-gnu/47
+    mpicc   = cc
+    mpicxx  = CC
+  EOF
+end
+</code></pre>
+
+<p>This will create a new file named "mpi.cfg" in the current working directory. If
+you wanted to make it a bit more dynamic you might wish to set the contents
+based on an environment variable like this:</p>
+
+<pre><code>mpidir = module_environment_variable("cray-mpich2", "CRAY_MPICH2_DIR")
+File.open("mpi.cfg", "w+") do |f|
+  f.write &lt;&lt;-EOF.strip_heredoc
+    [cray]
+    mpi_dir = #{mpidir}
+    mpicc   = cc
+    mpicxx  = CC
   EOF
 end
 </code></pre>
 
 <h3 id="Putting-it-Together">Putting it Together</h3>
+
+<p>You can combine these methods in many ways. This bit of code is from the
+<a href="https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula.rb">uvcdat formula</a>
+and creates symlinks from an openssl installaion into a directory under the
+uvcdat prefix.</p>
 
 <pre><code>Dir.chdir prefix
 openssl_files = %w{
@@ -722,6 +887,16 @@ openssl_files.each do |file|
   system "ln -sf #{openssl.prefix}/#{file} #{prefix}/Externals/#{file}"
 end
 </code></pre>
+
+<p>It begins by changing the working directory to the installation prefix. Then,
+creates an array of strings named <code>openssl_files</code> containing relative paths to files
+needing to be symlinked. It then creates directories that might not exist yet
+using
+<a href="http://www.ruby-doc.org/stdlib-2.0/libdoc/fileutils/rdoc/FileUtils.html#method-c-mkdir_p">FileUtils.mkdir_p</a>.
+Then it iterates through the <code>openssl_files</code> array and runs one <a href="#system" title="system" data-bare-link="true">system</a>
+command per array element. That system command uses an <code>openssl.prefix</code> method
+that is made available by the <a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a> defined earlier in the formula to
+get the location of the openssl installation.</p>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>
 

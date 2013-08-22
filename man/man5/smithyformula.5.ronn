@@ -107,8 +107,10 @@ number from the url. This works best when the filename in a url follows the
 name-version.tar... format.
 
 ### disable_group_writable
-Calling this method within the formula will skip setting group file permissions
-after the build is complete.
+Calling this method within the formula will skip setting group writable file
+permissions after the build is complete. It's equivalent to running smithy with
+the `--disable-group-writable` option. See `smithy help` for more info on global
+command line options.
 
 ### depends_on
 
@@ -244,7 +246,36 @@ python_h5py/2.1.3/python3.3` results in an array containing: `[ "unload python",
 
 ### modules
 
-  something
+This command is similar to the [module_commands][] method. It accepts an array
+of strings with the names of modulefiles that must be loaded. It's different
+from [module_commands][] in that it expects only names of modules and loads them
+in the order specified. Additionally it runs a `module purge` to unload all
+modules before loading the passed array of modules. e.g.
+
+    modules [ "java" ]
+
+This line would run `module purge` and `module load java` before any [system][]
+command. [modules][] also accepts ruby blocks similar to [module_commands][] and
+[depends_on][]. Here is an example using ruby blocks:
+
+  modules do
+    mods = [ ]
+    case build_name
+    when /gnu/
+      mods << "PrgEnv-gnu"
+    when /pgi/
+      mods << "PrgEnv-pgi"
+    when /intel/
+      mods << "PrgEnv-intel"
+    when /cray/
+      mods << "PrgEnv-cray"
+    end
+    mods
+  end
+
+This block would result in the formula running `module purge` followed by
+`module load PrgEnv-gnu` if the `build_name` contains gnu and similarly for pgi,
+intel, and cray.
 
 ### modulefile
 
@@ -277,6 +308,11 @@ multiple lines. e.g.
       prepend-path LD_LIBRARY_PATH $PREFIX/lib
       prepend-path MANPATH         $PREFIX/share/man
     MODULEFILE
+
+The `<<-MODULEFILE.strip_heredoc` syntax denotes the beginning for a multi-line
+string. The string ends with `MODULEFILE`. You can substitute any word for
+`MODULEFILE`. The `.strip_heredoc` method removes leading whitespace from the
+string so the output isn't unecessarily indented.
 
 The modulefile definition uses the [erb
 format](http://ruby-doc.org/stdlib-2.0/libdoc/erb/rdoc/ERB.html) Anything
@@ -473,7 +509,8 @@ formula file or within a block passed to one [FORMULA DSL METHODS][].
 ### name
 This will return the name of the application being installed. It is the same as
 the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
-command.
+command. It can be used as a variable as well as inside of a string using the
+`#{ ... }` delimiters. e.g. `"#{name}"`
 
 ### version
 Similar to the above, this returns the version number.
@@ -497,15 +534,43 @@ from the last. Modules are reloaded and environment variables are reset.
 This method will run `module list` and print it's output durring the install
 process. Useful for verifying the modules loaded are the ones you want.
 
-### module_is_available?("modulename")
+### module_is_available?
 This method will check if a given modulename is available on the system you are
-performing the installation on. It can be used within the [def install][],
-[depends_on][], [module_commands][], or [modules][] methods.
+performing the installation on. It takes one string argument, the module name.
+It can be used within the [def install][], [depends_on][], [module_commands][],
+or [modules][] methods.
 
-### module_environment_variable("modulename", "VARIABLE_NAME")
+    if module_is_available?("hdf5/1.8.8")
+      ...
+    end
 
+### module_environment_variable
+Using this method will return the contents of an environment varible set by a
+modulefile. It takes two string arguments, the module name and the environment
+variable name. For example, if you wished to get the value of the `$HDF5_DIR`
+variable set within the `hdf5/1.8.8` module you could run:
+
+    hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+
+Using this method to get environment variable set by modules is necessary since
+the modules are only set before running a [system][] command. See [Setting
+Environment Variables][] for more info.  It can be used within the [def
+install][], [depends_on][], [module_commands][], or [modules][] methods.
+
+By combining the [module_is_available?][] and [module_environment_variable][]
+methods you can conditionally retrieve the contents of environment variables set
+within a given module.
+
+    if module_is_available?("hdf5/1.8.8")
+      hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+    end
 
 ### patch
+
+The patch method is a convinience method to apply patches to code. Behind the
+scenes it creates a file named `patch.diff` with the passed content and runs
+`patch -p1 <patch.diff`. Using the heredoc syntax works best to strip leading
+whitespace. For example:
 
     patch <<-EOF.strip_heredoc
       diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
@@ -522,6 +587,9 @@ performing the installation on. It can be used within the [def install][],
        ExternalProject_Add(Cairo
          DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
     EOF
+
+Any input you provide must be compatible with the patch command. You can use
+interpolated strings `#{ ... }` to modify the content of patches as well:
 
     patch <<-EOF.strip_heredoc
       diff --git a/Makefile.in b/Makefile.in
@@ -548,15 +616,39 @@ performing the installation on. It can be used within the [def install][],
 
 ### Change Working Directory
 
+Changing the working directory accomplished by the
+[Dir.chdir](http://ruby-doc.org/core-1.9.3/Dir.html#method-c-chdir) method. It
+takes one argument as a string. It's best to always work from the prefix of the
+installation. You can concatenate strings using a `+` sign.
+
     Dir.chdir prefix
     Dir.chdir prefix+"/source"
 
 ### Running Shell Commands
 
+In ruby you can execute any shell command using backtick delimiters. Commands
+run using this method will NOT load any required modulefiles. It will however
+return the standard output as a string
+
     `ln -svf file1 file2`
+    results = `ln -svf file1 file2`
+
+If you need modulefiles loaded use the [system][] command instead.
+
     system "ln -svf file1 file2"
 
+There are many ruby methods available that are the equivalent of running the
+shell counterparts. See the these pages for more info:
+
+* [FileUtils Class](http://www.ruby-doc.org/stdlib-2.0/libdoc/fileutils/rdoc/FileUtils.html)
+* [Dir Class](http://ruby-doc.org/core-1.9.3/Dir.html)
+* [File Class](http://www.ruby-doc.org/core-2.0/File.html)
+
 ### Setting Environment Variables
+
+Ruby provides the [ENV](http://www.ruby-doc.org/core-2.0/ENV.html) hash for
+accessing and setting environment variables. Here is an example of setting
+environment variables:
 
     ENV["CC"]  = "gcc"
     ENV["CXX"] = "g++"
@@ -564,30 +656,80 @@ performing the installation on. It can be used within the [def install][],
     ENV["F90"] = "gfortran"
     ENV["FC"]  = "gfortran"
 
-    system "NETCDF4_DIR=$NETCDF_DIR python setup.py build"
+And getting their values back:
+
+    cppflags = ENV["CPPFLAGS"]
+
+This works with one caveat, you cannot access or modify variables set by modules
+loaded by the formula. Modules are loaded and reset before each
+[system][] command.
+
+If you need to access the contents of an evironment variable set by a module use
+the [module_environment_variable][] helper method.
+
+If you need to change the contents of an environment variable set by a loaded
+module you will need to make it part of the system command. For example, say you
+loaded the `netcdf` module and needed to change the `$NETCDF_DIR` variable. You
+could run any of these:
+
+    system "NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic ./configure"
+    system "export NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic ;",
+      "./configure"
+    system "export NETCDF_DIR=/opt/cray/netcdf/4.2.0/generic
+      ./configure"
 
 ### Creating Files
 
-    File.open("tools/build/v2/site-config.jam", "w+") do |f|
+Using ruby to create files is simple. With this and the `#{ ... }` delimiters
+you can add dynamic content to the files you write. The basic syntax for writing
+files is:
+
+    File.open("path/to/file", "w+") do |file|
+      file.write "..."
+    end
+
+This syntax uses a ruby block with an argument. `File.open("...", "w+")` passes
+the file handle to the block as a variable named `file`. Between the `do |file|`
+and `end` lines is the block. When ruby reaches the end of the block the file is
+closed.
+
+The `"w+"` argument tells ruby to open the file with read-write and truncate the
+existing file to zero length or create a new file for reading and writing. See
+[this page](http://www.ruby-doc.org/core-2.0/IO.html#method-c-new-label-IO+Open+Mode)
+for more info on the different modes.
+
+Here is a good example from the
+[mpi4py formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_mpi4py_cray_formula.rb)
+
+    File.open("mpi.cfg", "w+") do |f|
       f.write <<-EOF.strip_heredoc
-        import os ;
-        local CRAY_MPICH2_DIR = [ os.environ CRAY_MPICH2_DIR ] ;
-        using gcc
-          : 4.7.2.xk7
-          : CC
-          : <compileflags>-I#{bzip2.prefix}/include
-            <compileflags>-I$(CRAY_MPICH2_DIR)/include
-            <linkflags>-L$(CRAY_MPICH2_DIR)/lib
-        ;
-        using mpi
-          : CC
-          : <find-shared-library>mpich
-          : aprun -n
-        ;
+        [cray]
+        mpi_dir = /opt/cray/mpt/5.6.3/gni/mpich2-gnu/47
+        mpicc   = cc
+        mpicxx  = CC
+      EOF
+    end
+
+This will create a new file named "mpi.cfg" in the current working directory. If
+you wanted to make it a bit more dynamic you might wish to set the contents
+based on an environment variable like this:
+
+    mpidir = module_environment_variable("cray-mpich2", "CRAY_MPICH2_DIR")
+    File.open("mpi.cfg", "w+") do |f|
+      f.write <<-EOF.strip_heredoc
+        [cray]
+        mpi_dir = #{mpidir}
+        mpicc   = cc
+        mpicxx  = CC
       EOF
     end
 
 ### Putting it Together
+
+You can combine these methods in many ways. This bit of code is from the
+[uvcdat formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula.rb)
+and creates symlinks from an openssl installaion into a directory under the
+uvcdat prefix.
 
     Dir.chdir prefix
     openssl_files = %w{
@@ -608,6 +750,16 @@ performing the installation on. It can be used within the [def install][],
     openssl_files.each do |file|
       system "ln -sf #{openssl.prefix}/#{file} #{prefix}/Externals/#{file}"
     end
+
+It begins by changing the working directory to the installation prefix. Then,
+creates an array of strings named `openssl_files` containing relative paths to files
+needing to be symlinked. It then creates directories that might not exist yet
+using
+[FileUtils.mkdir_p](http://www.ruby-doc.org/stdlib-2.0/libdoc/fileutils/rdoc/FileUtils.html#method-c-mkdir_p).
+Then it iterates through the `openssl_files` array and runs one [system][]
+command per array element. That system command uses an `openssl.prefix` method
+that is made available by the [depends_on][] defined earlier in the formula to
+get the location of the openssl installation.
 
 ## SEE ALSO
 
