@@ -109,10 +109,14 @@ module Smithy
         end
       end
 
-      def architectures
-        notice_command "Current Hostname: ", @hostname, 30
-        notice_command "Current Architecture: ", @arch, 30
-        notice_command "All Architectures: ", @config_file_hash["hostname-architectures"].values.uniq.sort.join(", "), 30
+      def architectures(options)
+        if options[:all]
+          puts @config_file_hash["hostname-architectures"].values.uniq.sort.join(" ")
+        else
+          notice_command "Current Hostname: ", @hostname, 30
+          notice_command "Current Architecture: ", @arch, 30
+          notice_command "All Architectures: ", @config_file_hash["hostname-architectures"].values.uniq.sort.join(", "), 30
+        end
       end
 
       def compilers

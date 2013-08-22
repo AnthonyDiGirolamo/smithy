@@ -551,8 +551,10 @@ command ['show'] do |c|
 
   c.desc "List all architectures know to smithy."
   c.command :arch do |arch|
-    arch.action do
-      Smithy::Config.architectures
+    arch.desc "list all architectures"
+    arch.switch [:a, "all"], :negatable => false
+    arch.action do |global_options,options,args|
+      Smithy::Config.architectures(options)
     end
   end
 
