@@ -146,7 +146,7 @@ command ['search'] do |c|
     formatter = output_formats[options[:format]]
     raise "Unknow format \"#{options[:format]}\" valid formats include: #{output_formats.keys.join(',')}" if formatter.nil?
 
-    notice "Searching in #{swroot}" unless formatter.class == Format::Doku
+    notice "Searching in #{swroot}" unless formatter.class == Format::Doku || formatter.class == Format::Name
 
     software = Package.all
 
@@ -164,7 +164,7 @@ command ['search'] do |c|
     end
     formatter.after
 
-    notice "#{count} Found" unless formatter.class == Format::Doku
+    notice "#{count} Found" unless formatter.class == Format::Doku || formatter.class == Format::Name
   end
 end
 
