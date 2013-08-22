@@ -4,30 +4,46 @@ _smithy_packages() {
 	packages=(`smithy search --format=name`)
 }
 
+_smithy_formulas() {
+	formulas=(`smithy formula list`)
+}
+
+_smithy_architectures() {
+	arches=(`smithy show arch --all`)
+  _wanted packages expl 'architectures' compadd -a arches
+}
+
 local -a _1st_arguments
 _1st_arguments=(
-	'build:Build software'
-  'deploy:Deploy a package'
+  'build:Build software'
   'edit:Edit package support files'
-  'help:Shows list of commands or help for one command'
+  'formula:Install software from predefined formulas'
+  'help:Shows a list of commands or help for one command'
   'module:Manage modulefiles for a package'
-	'new:Generate a new build and all necessary files'
-	'repair:Repair a package'
-	'search:Search currently installed software'
-	'test:Test software'
+  'new:Generate a new build and all necessary files'
+  'publish:Publish packages to web'
+  'repair:Repair a package'
+  'search:Search currently installed software'
+  'show:Display internal smithy values'
+  'test:Test software'
 )
 
 local expl
 local -a formulae
 
 _arguments \
-  '(--arch=)--arch=[Machine architecture to operate on]' \
+  '(--arch=)--arch=[Machine architecture to operate on]:architecture:_smithy_architectures' \
+  '(--no-color)--no-color[Disable colored output]' \
+  '(--color)--color[Enable colored output]' \
   '(--config-file=)--config-file=[Alternate config file]:file:_files' \
+  '(--descriptions-root=)--descriptions-root=[The root level directory for global description files]:directory:_files -/' \
   '(--disable-group-writeable)--disable-group-writeable[Disable group writable file creation]' \
+  '(-f --force)'{-f,--force}'[Always overwrite existing files]' \
   '(--file-group-name=)--file-group-name=[Group name for files created by smithy]' \
   '(--help)--help[Show help]' \
-  '(--no-color)--no-color[Hide coloring]' \
+  '(--prgenv-prefix=)--prgenv-prefix=[The prefix of programming environments for this machine]' \
   '(--software-root=)--software-root=[The root level directory for software]:directory:_files -/' \
+  '(-v --verbose)'{-v,--verbose}'[Be more verbose]' \
   '(--web-root=)--web-root=[The root level directory for web files]:directory:_files -/' \
   '*:: :->subcmds' && return 0
 #[[ "$PREFIX" = --* ]] && _arguments -- \
@@ -41,10 +57,15 @@ if (( CURRENT == 1 )); then
 	return
 fi
 
+echo $words >/dev/ttys004
+echo $CURRENT >/dev/ttys004
+
 # completion for each sub command
 case "$words[1]" in
   help)
-    _describe -t commands "smithy subcommand" _1st_arguments ;;
+    _describe -t commands "smithy subcommand" _1st_arguments
+    ;;
+
   build|test)
     _arguments \
       '(--disable-log)--disable-log[Disable logging]' \
@@ -57,21 +78,14 @@ case "$words[1]" in
     if [[ "$state" == forms ]]; then
       _smithy_packages
       _wanted packages expl 'packages' compadd -a packages
-    fi ;;
-  deploy)
-    _arguments \
-      '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
-      '1: :->forms' &&  return 0
+    fi
+    ;;
 
-    if [[ "$state" == forms ]]; then
-      _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
-    fi ;;
   edit)
     _subsub_commands=(
       'build:Edit a build script'
       'test:Edit a test script'
-      'environment:Edit modules loaded for the build script'
+      'env:Edit modules loaded for the build script'
       'modulefile:Edit modulefile'
     )
     # Match subsub-command
@@ -88,12 +102,15 @@ case "$words[1]" in
     if [[ "$state" == forms ]]; then
       _smithy_packages
       _wanted packages expl 'packages' compadd -a packages
-    fi ;;
+    fi
+    ;;
+
   module)
     _subsub_commands=(
       'create:Generate a modulefile for a given package'
-      'use:Add a modulefile to the MODULEPATH'
       'deploy:Copy a modulefile to the system MODULEPATH'
+      'edit:Alias for "smithy edit modulefile"'
+      'use:Add a modulefile to the MODULEPATH'
     )
     # Match subsub-command
     if (( CURRENT == 2 )); then
@@ -103,18 +120,23 @@ case "$words[1]" in
 
     _arguments \
       '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
-      '2: :->forms' &&  return 0
+      '1: :->forms' &&  return 0
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
       _wanted packages expl 'packages' compadd -a packages
-    fi ;;
+    fi
+    ;;
+
   new)
     _arguments \
+      '(--existing-scripts)--existing-scripts[Use an existing softwares build scripts]' \
       '(--skip-modulefile)--skip-modulefile[Skip modulefile generation]' \
       '(--web-description)--web-description[Create description file for website]' \
       '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
-      '(-t --tarball=)'{-t,--tarball=}'[Provide a source tarball to unpack (optional)]:file:_files' ;;
+      '(-t --tarball=)'{-t,--tarball=}'[Provide a source tarball to unpack (optional)]:file:_files'
+    ;;
+
   repair)
     _arguments \
       '(-n --dry-run)'{-n,--dry-run}'[Verify permissions only]' \
@@ -123,8 +145,80 @@ case "$words[1]" in
     if [[ "$state" == forms ]]; then
       _smithy_packages
       _wanted packages expl 'packages' compadd -a packages
-    fi ;;
+    fi
+    ;;
+
   search)
     _arguments \
-      '(--format=)--format=[Format of the output]:format:(path name table csv)' ;;
+      '(--format=)--format=[Format of the output]:format:(path name table csv dokuwiki)'
+    ;;
+
+  show)
+    _subsub_commands=(
+      'arch:List all architectures know to smithy.'
+      'example_config:Display an example config file.'
+      'last:Display the package name used in the last smithy command. This is stored in the ~/.smithyrc file.'
+    )
+    # Match subsub-command
+    if (( CURRENT == 2 )); then
+      _describe -t subcommands "show subcommand" _subsub_commands
+      return
+    fi
+    ;;
+
+  publish)
+    _arguments \
+      '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
+      '1: :->forms' &&  return 0
+
+    if [[ "$state" == forms ]]; then
+      _smithy_packages
+      _wanted packages expl 'packages' compadd -a packages
+    fi
+    ;;
+
+  formula)
+    echo $words[$CURRENT] > /dev/ttys004
+
+    _subsub_commands=(
+      'create_modulefile:Create a modulefile for a given package'
+      'display:Display a formula'
+      'install:Install a package using a formula'
+      'list:List known formulas'
+      'new:Create a new formula'
+      'which:Display a formula location'
+    )
+
+    # not sure how to make this work right
+    # _arguments \
+    #   '(-d --directories=)'{-d,--directories=}'[Specify one or more additional formula directories separated with commas]:directory:_files -/' \
+    #   '1: :->forms' &&  return 0
+
+    # Match subsub-command
+    if (( CURRENT == 2 )); then
+      _describe -t subcommands "formula subcommand" _subsub_commands
+      return
+    fi
+
+    # Match subsub-command arguments
+    if (( CURRENT == 3 )); then
+      case "$words[2]" in
+        install)
+          _arguments \
+            '(--clean)--clean[clean existing install prefix]' \
+            '(--no-clean)--no-clean[leave existing install prefix files intact]' \
+            '(-f --formula-name)'{-f,--formula-name}'[Formula name]' \
+            '(-m --modulefile)'{-m,--modulefile}'[Create modulefiles as well]' \
+            '1: :->forms' &&  return 0
+          if [[ "$state" == forms ]]; then
+            _smithy_formulas
+            _wanted packages expl 'formulas' compadd -a formulas
+          fi
+          ;;
+      esac
+
+      return
+    fi
+
+    ;;
 esac
