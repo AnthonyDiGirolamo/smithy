@@ -83,25 +83,32 @@ _smithy ()
       -*)
         __smithycomp "
         --arch=
+        --no-colors
+        --colors
         --config-file=
+        --descriptions-root=
         --disable-group-writable
+        --force
         --file-group-name=
         --help
-        --no-color
+        --prgenv-prefix=
         --software-root=
+        --verbose
         --web-root="
         return
         ;;
       *)
         __smithycomp "
         build
-        deploy
         edit
+        formula
         help
         module
         new
+        publish
         repair
         search
+        show
         test"
         return
         ;;
@@ -113,11 +120,14 @@ _smithy ()
 	case "$cmd" in
 	build|test)    _smithy_build  ;;
 	edit)          _smithy_edit   ;;
+	formula)       _smithy_formula ;;
 	help)          _smithy_help   ;;
 	module)        _smithy_module ;;
 	new)           _smithy_new    ;;
-	repair|deploy) _smithy_repair ;;
+	publish)       _smithy_publish ;;
+	repair)        _smithy_repair ;;
 	search)        _smithy_search ;;
+	show)          _smithy_show   ;;
 	*)        ;;
 	esac
 }
@@ -126,6 +136,13 @@ __smithy_complete_packages ()
 {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local packages=$(smithy search --format=name ${cur})
+	COMPREPLY=($(compgen -W "$packages" -- "$cur"))
+}
+
+__smithy_complete_formulas ()
+{
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local packages=$(smithy formula list ${cur})
 	COMPREPLY=($(compgen -W "$packages" -- "$cur"))
 }
 
@@ -151,12 +168,25 @@ _smithy_build () {
   __smithy_complete_packages
 }
 
+_smithy_publish () {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+	case "$cur" in
+	-*)
+		__smithycomp "
+      --dry-run"
+		return
+		;;
+	esac
+  __smithy_complete_packages
+}
+
 _smithy_module () {
 	local cur="${COMP_WORDS[COMP_CWORD]}"
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
   module)
-    __smithycomp "create use deploy"
+    __smithycomp "create deploy edit use"
     return
     ;;
   esac
@@ -176,7 +206,7 @@ _smithy_edit () {
 	local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
   edit)
-    __smithycomp "build test modules modulefile"
+    __smithycomp "build test env modulefile"
     return
     ;;
   -e)
@@ -192,11 +222,75 @@ _smithy_edit () {
     ;;
 	-*)
 		__smithycomp "
+      --split
       --editor="
 		return
 		;;
 	esac
   __smithy_complete_packages
+}
+
+_smithy_formula () {
+	local cur="${COMP_WORDS[COMP_CWORD]}"
+	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$prv" in
+  formula)
+    case "$cur" in
+    --directories=*)
+      local t=`echo "$cur" | sed -e 's/--directories=//g'`
+      COMPREPLY=($(compgen -f "$t"))
+      return
+      ;;
+    -*)
+      __smithycomp "
+        --directories="
+      return
+      ;;
+    esac
+    __smithycomp "create_modulefile display install list new which"
+    return
+    ;;
+  new)
+    case "$cur" in
+    -*)
+      __smithycomp "
+        --name=
+        --homepage="
+      return
+      ;;
+    esac
+    return
+    ;;
+  install)
+    case "$cur" in
+    -*)
+      __smithycomp "
+        --no-clean
+        --clean
+        --formula-name=
+        --modulefile"
+      return
+      ;;
+    esac
+    __smithy_complete_formulas
+    return
+    ;;
+  create_modulefile)
+    case "$cur" in
+    -*)
+      __smithycomp "
+        --formula-name="
+      return
+      ;;
+    esac
+    __smithy_complete_formulas
+    return
+    ;;
+  -d)
+    COMPREPLY=($(compgen -f "$cur"))
+    return
+    ;;
+  esac
 }
 
 _smithy_search () {
@@ -205,7 +299,7 @@ _smithy_search () {
 
   case "$prv" in
   --format=*)
-    __smithycomp "path name table csv"
+    __smithycomp "path name table csv dokuwiki"
     return
     ;;
   esac
@@ -236,6 +330,7 @@ _smithy_new () {
     ;;
 	-*)
 		__smithycomp "
+      --existing-scripts=
       --dry-run
       --tarball=
       --web-description
@@ -247,7 +342,11 @@ _smithy_new () {
 }
 
 _smithy_help () {
-  __smithycomp "build search new edit repair deploy"
+  __smithycomp "build edit formula help module new publish repair search show test"
+}
+
+_smithy_show () {
+  __smithycomp "arch example_config last"
 }
 
 _smithy_repair () {
