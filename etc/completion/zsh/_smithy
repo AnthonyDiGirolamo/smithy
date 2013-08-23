@@ -57,8 +57,8 @@ if (( CURRENT == 1 )); then
 	return
 fi
 
-echo $words >/dev/ttys004
-echo $CURRENT >/dev/ttys004
+# echo $words >/dev/ttys004
+# echo $CURRENT >/dev/ttys004
 
 # completion for each sub command
 case "$words[1]" in
@@ -178,7 +178,7 @@ case "$words[1]" in
     ;;
 
   formula)
-    echo $words[$CURRENT] > /dev/ttys004
+    # echo $words[$CURRENT] > /dev/ttys004
 
     _subsub_commands=(
       'create_modulefile:Create a modulefile for a given package'
