@@ -333,6 +333,12 @@ Display internal smithy values
 List all architectures know to smithy.
 
 
+======= Options
+======= -a|--all
+list all architectures
+
+
+
 ====== Command: <tt>example_config </tt>
 Display an example config file.
 
