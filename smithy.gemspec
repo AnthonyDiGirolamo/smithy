@@ -8,6 +8,7 @@ spec = Gem::Specification.new do |s|
   s.homepage = 'https://github.com/AnthonyDiGirolamo/smithy'
   s.platform = Gem::Platform::RUBY
   s.summary = %q{Smithy can help maintain a collection of software installed from source. Typically, many different versions built with different compilers.}
+  s.license = "BSD"
   s.files = %w(
 bin/smithy
 etc/completion/smithy-completion.bash
