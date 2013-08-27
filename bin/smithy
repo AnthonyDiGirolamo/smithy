@@ -250,6 +250,7 @@ command ['build'] do |c|
           :suppress_stdout => options[:"suppress-stdout"],
                     :force => options[:"force"]
     end
+    Smithy::Config.reindex_completion_caches
   end
 end
 
@@ -319,6 +320,7 @@ command ['new'] do |c|
       notice_command " smithy module deploy last"   , "Install modulefile"
       notice_command " smithy publish last"         , "Publish web description"
     end
+    Smithy::Config.reindex_completion_caches
   end
 end
 
@@ -511,6 +513,7 @@ command ['module'] do |c|
         notice_command " smithy edit modulefile last" , "Edit generated modulefile"
         notice_command " smithy module deploy last"   , "Install modulefile"
       end
+      Smithy::Config.reindex_completion_caches
     end
   end
 
@@ -627,6 +630,7 @@ command ['formula'] do |c|
 
     subcommand.action do |global_options,options,args|
       FormulaCommand.install_command(options,args)
+      Smithy::Config.reindex_completion_caches
     end
   end
 
@@ -639,7 +643,15 @@ command ['formula'] do |c|
 
     subcommand.action do |global_options,options,args|
       FormulaCommand.create_module_command(options,args)
+      Smithy::Config.reindex_completion_caches
     end
+  end
+end
+
+desc "reindex auto-completion cache"
+command ['reindex'] do |c|
+  c.action do |global_options,options,args|
+    Smithy::Config.reindex_completion_caches
   end
 end
 

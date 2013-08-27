@@ -179,6 +179,25 @@ module Smithy
         end
       end
 
+      def reindex_completion_caches
+        notice "Reindexing packages"
+        FormulaCommand.initialize_directories
+        formulas = FormulaCommand.formula_names
+        packages = Package.all.collect{|s| s.gsub(/#{full_root}\//, '')}
+
+        FileUtils.mkdir_p(File.join(ENV["HOME"], ".smithy"))
+
+        File.open(File.join(ENV["HOME"], ".smithy", "completion_formulas"), "w+") do |f|
+          f.puts formulas
+        end
+        File.open(File.join(ENV["HOME"], ".smithy", "completion_packages"), "w+") do |f|
+          f.puts packages
+        end
+        File.open(File.join(ENV["HOME"], ".smithy", "completion_arches"), "w+") do |f|
+          f.puts @config_file_hash["hostname-architectures"].values.uniq.sort
+        end
+      end
+
       def example_config
         example = {}
         example["software-root"]       = "/sw"

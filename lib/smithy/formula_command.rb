@@ -53,7 +53,7 @@ module Smithy
       File.read(formula_file_path(name))
     end
 
-    def self.initialize_directories(options)
+    def self.initialize_directories(options = {})
       prepend_formula_directory(options[:d]) if options[:d]
     end
 

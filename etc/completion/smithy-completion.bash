@@ -4,45 +4,45 @@ fi
 
 __smithycomp_words_include ()
 {
-	local i=1
-	while [[ $i -lt $COMP_CWORD ]]; do
-		if [[ "${COMP_WORDS[i]}" = "$1" ]]; then
-			return 0
-		fi
-		i=$((++i))
-	done
-	return 1
+  local i=1
+  while [[ $i -lt $COMP_CWORD ]]; do
+    if [[ "${COMP_WORDS[i]}" = "$1" ]]; then
+      return 0
+    fi
+    i=$((++i))
+  done
+  return 1
 }
 
 # Find the previous non-switch word
 __smithycomp_prev ()
 {
-	local idx=$((COMP_CWORD - 1))
-	local prv="${COMP_WORDS[idx]}"
-	while [[ $prv == -* ]]; do
-		idx=$((--idx))
-		prv="${COMP_WORDS[idx]}"
-	done
+  local idx=$((COMP_CWORD - 1))
+  local prv="${COMP_WORDS[idx]}"
+  while [[ $prv == -* ]]; do
+    idx=$((--idx))
+    prv="${COMP_WORDS[idx]}"
+  done
 }
 
 
 __smithycomp ()
 {
-	# break $1 on space, tab, and newline characters,
-	# and turn it into a newline separated list of words
-	local list s sep=$'\n' IFS=$' '$'\t'$'\n'
-	local cur="${COMP_WORDS[COMP_CWORD]}"
+  # break $1 on space, tab, and newline characters,
+  # and turn it into a newline separated list of words
+  local list s sep=$'\n' IFS=$' '$'\t'$'\n'
+  local cur="${COMP_WORDS[COMP_CWORD]}"
 
-	for s in $1; do
-		__smithycomp_words_include "$s" && continue
-		list="$list$s$sep"
-	done
+  for s in $1; do
+    __smithycomp_words_include "$s" && continue
+    list="$list$s$sep"
+  done
 
-	case "$cur" in
-	--*=)
-		COMPREPLY=()
-		;;
-	*)
+  case "$cur" in
+  --*=)
+    COMPREPLY=()
+    ;;
+  *)
     IFS=$sep
     COMPREPLY=( $(compgen -W "$list" -- "$cur" | sed -e 's/[^=]$/& /g') )
     ;;
@@ -53,31 +53,31 @@ _smithy ()
 {
   #echo "cur: $cur, prev: $prev" > /dev/pts/33
 
-	local i=1 cmd
+  local i=1 cmd
 
-	if [[ -n ${ZSH_VERSION-} ]]; then
-		emulate -L bash
-		setopt KSH_TYPESET
+  if [[ -n ${ZSH_VERSION-} ]]; then
+    emulate -L bash
+    setopt KSH_TYPESET
 
-		# workaround zsh's bug that leaves 'words' as a special
-		# variable in versions < 4.3.12
-		typeset -h words
-	fi
+    # workaround zsh's bug that leaves 'words' as a special
+    # variable in versions < 4.3.12
+    typeset -h words
+  fi
 
-	# find the subcommand
-	while [[ $i -lt $COMP_CWORD ]]; do
-		local s="${COMP_WORDS[i]}"
-		case "$s" in
+  # find the subcommand
+  while [[ $i -lt $COMP_CWORD ]]; do
+    local s="${COMP_WORDS[i]}"
+    case "$s" in
     --*) ;;
-		-*) ;;
-		*) 	cmd="$s"
-			break
-			;;
-		esac
-		i=$((++i))
-	done
+    -*) ;;
+    *)  cmd="$s"
+      break
+      ;;
+    esac
+    i=$((++i))
+  done
 
-	if [[ $i -eq $COMP_CWORD ]]; then
+  if [[ $i -eq $COMP_CWORD ]]; then
     local cur="${COMP_WORDS[COMP_CWORD]}"
     case "$cur" in
       -*)
@@ -113,97 +113,109 @@ _smithy ()
         return
         ;;
     esac
-		return
-	fi
+    return
+  fi
 
-	# subcommands have their own completion functions
-	case "$cmd" in
-	build|test)    _smithy_build  ;;
-	edit)          _smithy_edit   ;;
-	formula)       _smithy_formula ;;
-	help)          _smithy_help   ;;
-	module)        _smithy_module ;;
-	new)           _smithy_new    ;;
-	publish)       _smithy_publish ;;
-	repair)        _smithy_repair ;;
-	search)        _smithy_search ;;
-	show)          _smithy_show   ;;
-	*)        ;;
-	esac
+  # subcommands have their own completion functions
+  case "$cmd" in
+  build|test)    _smithy_build  ;;
+  edit)          _smithy_edit   ;;
+  formula)       _smithy_formula ;;
+  help)          _smithy_help   ;;
+  module)        _smithy_module ;;
+  new)           _smithy_new    ;;
+  publish)       _smithy_publish ;;
+  repair)        _smithy_repair ;;
+  search)        _smithy_search ;;
+  show)          _smithy_show   ;;
+  *)        ;;
+  esac
 }
 
 __smithy_complete_packages ()
 {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local packages=$(smithy search --format=name ${cur})
-	COMPREPLY=($(compgen -W "$packages" -- "$cur"))
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local cache_file=$HOME/.smithy/completion_packages
+  if [[ -e $cache_file ]] 
+  then
+    local packages=$(cat $cache_file)
+  else
+    local packages=$(smithy search --format=name ${cur})
+  fi
+  COMPREPLY=($(compgen -W "$packages" -- "$cur"))
 }
 
 __smithy_complete_formulas ()
 {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local packages=$(smithy formula list ${cur})
-	COMPREPLY=($(compgen -W "$packages" -- "$cur"))
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local cache_file=$HOME/.smithy/completion_formulas
+  if [[ -e $cache_file ]] 
+  then
+    local packages=$(cat $cache_file)
+  else
+    local packages=$(smithy formula list ${cur})
+  fi
+  COMPREPLY=($(compgen -W "$packages" -- "$cur"))
 }
 
 _smithy_build () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
-	case "$cur" in
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$cur" in
   --log-name=*)
     local t=`echo "$cur" | sed -e 's/--log-name=//g'`
     COMPREPLY=($(compgen -f "$t"))
     return
     ;;
-	-*)
-		__smithycomp "
+  -*)
+    __smithycomp "
       --disable-log
       --force
       --log-name=
       --dry-run
       --suppress-stdout"
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
 _smithy_publish () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
-	case "$cur" in
-	-*)
-		__smithycomp "
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$cur" in
+  -*)
+    __smithycomp "
       --dry-run"
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
 _smithy_module () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
   module)
     __smithycomp "create deploy edit use"
     return
     ;;
   esac
-	case "$cur" in
-	-*)
+  case "$cur" in
+  -*)
 
-		__smithycomp "
+    __smithycomp "
       --dry-run"
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
 _smithy_edit () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
   edit)
     __smithycomp "build test env modulefile"
@@ -214,25 +226,25 @@ _smithy_edit () {
     return
     ;;
   esac
-	case "$cur" in
+  case "$cur" in
   --editor=*)
     local t=`echo "$cur" | sed -e 's/--editor=//g'`
     COMPREPLY=($(compgen -c "$t"))
     return
     ;;
-	-*)
-		__smithycomp "
+  -*)
+    __smithycomp "
       --split
       --editor="
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
 _smithy_formula () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
   case "$prv" in
   formula)
     case "$cur" in
@@ -294,8 +306,8 @@ _smithy_formula () {
 }
 
 _smithy_search () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
 
   case "$prv" in
   --format=*)
@@ -303,18 +315,18 @@ _smithy_search () {
     return
     ;;
   esac
-	case "$cur" in
-	-*)
-		__smithycomp "--format="
-		return
-		;;
-	esac
+  case "$cur" in
+  -*)
+    __smithycomp "--format="
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
 _smithy_new () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
-	local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
 
   case "$prv" in
   -t)
@@ -322,22 +334,22 @@ _smithy_new () {
     return
     ;;
   esac
-	case "$cur" in
+  case "$cur" in
   --tarball=*)
     local t=`echo "$cur" | sed -e 's/--tarball=//g'`
     COMPREPLY=($(compgen -f "$t"))
     return
     ;;
-	-*)
-		__smithycomp "
+  -*)
+    __smithycomp "
       --existing-scripts=
       --dry-run
       --tarball=
       --web-description
       --skip-modulefile"
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 
@@ -350,15 +362,15 @@ _smithy_show () {
 }
 
 _smithy_repair () {
-	local cur="${COMP_WORDS[COMP_CWORD]}"
+  local cur="${COMP_WORDS[COMP_CWORD]}"
 
-	case "$cur" in
-	-*)
-		__smithycomp "
+  case "$cur" in
+  -*)
+    __smithycomp "
       --dry-run"
-		return
-		;;
-	esac
+    return
+    ;;
+  esac
   __smithy_complete_packages
 }
 

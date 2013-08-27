@@ -1,17 +1,35 @@
 #compdef smithy
 
 _smithy_packages() {
-	packages=(`smithy search --format=name`)
+  cache_file=$HOME/.smithy/completion_packages 
+  if [[ -e $cache_file ]] 
+  then
+    packages=(`cat $cache_file`)
+  else
+    packages=(`smithy search --format=name`)
+  fi
   _wanted packages expl 'packages' compadd -a packages
 }
 
 _smithy_formulas() {
-	formulas=(`smithy formula list`)
+  cache_file=$HOME/.smithy/completion_formulas
+  if [[ -e $cache_file ]] 
+  then
+    formulas=(`cat $cache_file`)
+  else
+    formulas=(`smithy formula list`)
+  fi
   _wanted packages expl 'formulas' compadd -a formulas
 }
 
 _smithy_architectures() {
-	arches=(`smithy show arch --all`)
+  cache_file=$HOME/.smithy/completion_arches
+  if [[ -e $cache_file ]] 
+  then
+    arches=(`cat $cache_file`)
+  else
+    arches=(`smithy show arch --all`)
+  fi
   _wanted packages expl 'architectures' compadd -a arches
 }
 
