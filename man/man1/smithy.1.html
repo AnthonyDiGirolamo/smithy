@@ -69,6 +69,7 @@
     <a href="#NAMING-SOFTWARE-BUILDS">NAMING SOFTWARE BUILDS</a>
     <a href="#INSTALLATIONS-WITH-FORMULAS">INSTALLATIONS WITH FORMULAS</a>
     <a href="#INSTALLATIONS-WITH-BUILD-SCRIPTS">INSTALLATIONS WITH BUILD SCRIPTS</a>
+    <a href="#SMITHY-CONFIG-FILE">SMITHY CONFIG FILE</a>
     <a href="#SEE-ALSO">SEE ALSO</a>
   </div>
 
@@ -122,16 +123,16 @@ something like this:</p>
 
 <pre><code>/sw/xk6/subversion/1.6.17
 `--- sles11.1_gnu4.3.4
-   `--- bin
-   `--- build-notes
-   `--- dependencies
-   `--- include
-   `--- lib
-   `--- rebuild
-   `--- relink
-   `--- remodule
-   `--- retest
-   `--- share
+   |--- bin
+   |--- build-notes
+   |--- dependencies
+   |--- include
+   |--- lib
+   |--- rebuild
+   |--- relink
+   |--- remodule
+   |--- retest
+   |--- share
    `--- subversion-1.6.17
 </code></pre>
 
@@ -160,10 +161,10 @@ The only addition is the source files under the source directory.</p>
 
 <pre><code>/sw/xk6/subversion/1.7.8
 `--- sles11.1_gnu4.3.4
-   `--- bin
-   `--- include
-   `--- lib
-   `--- source
+   |--- bin
+   |--- include
+   |--- lib
+   |--- source
    `--- share
 </code></pre>
 
@@ -244,14 +245,14 @@ version of gcc available. If in doubt, specify the full destination.</dd>
 is <code>/sw/xk6/</code> the finished directory structure would look like:</p>
 
 <pre><code>/sw/xk6/subversion/1.7.8
-`--- modulefile
+|--- modulefile
 |  `--- subversion
 |     `--- 1.7.8
 `--- sles11.1_gnu4.3.4
-   `--- bin
-   `--- include
-   `--- lib
-   `--- source
+   |--- bin
+   |--- include
+   |--- lib
+   |--- source
    `--- share
 </code></pre>
 
@@ -420,6 +421,181 @@ takes precedence.</p>
 <p>To publish to the website run:</p>
 
 <pre><code>smithy publish petsc
+</code></pre>
+
+<h2 id="SMITHY-CONFIG-FILE">SMITHY CONFIG FILE</h2>
+
+<p>To see an up to date example of what a smithy config file should look like run
+<code>smithy show example_config</code>. Most of the options specified in a config file can
+be overridden by global command line  options. See <code>smithy help</code> for info on
+global command line options. The smithy config file uses the
+<a href="http://www.yaml.org/">yaml</a> syntax and looks something like this:</p>
+
+<pre><code>---
+software-root: /sw
+download-cache: /sw/sources
+formula-directories:
+- /sw/tools/smithy/formulas
+- /sw/tools/smithy/another_formula_directory
+global-error-log: /sw/tools/smithy/exceptions.log
+file-group-name: ccsstaff
+descriptions-root: /sw/descriptions
+web-root: /sw/descriptions_in_html
+web-architecture-names:
+  xk6: titan
+  xk7: titan
+  analysis-x64: lens
+  smoky: smoky
+programming-environment-prefix:
+  default: PrgEnv-
+  smoky: PE-
+  sith: PE-
+hostname-architectures:
+  everest-login: redhat6
+  everest: redhat6
+  lens: analysis-x64
+  sith-login: redhat6
+  sith: redhat6
+  smoky-login: smoky
+  titan-login: xk6
+  titan-ext: xk6
+  yona-login: yona
+  yona: yona
+</code></pre>
+
+<h3 id="software-root">software-root</h3>
+
+<p>This option defines the top level directory used as the location of architecture
+directories. Good choices might be <code>/opt/smithy</code> or <code>/usr/local/smithy</code>.
+Someplace under your home directory would work too.</p>
+
+<h3 id="file-group-name">file-group-name</h3>
+
+<p>Software compiled with smithy is intended to be group writable so that more that
+one user may install software in the same location. This option defines the
+group name used for installing software.</p>
+
+<h3 id="hostname-architectures">hostname-architectures</h3>
+
+<p>This option defines what hostnames map to which architecture directories. Smithy
+will use the mapped directories whenever it is run on machines with hostnames
+specified by this option. Smithy will ignore trailing digits on hostnames. For
+example:</p>
+
+<pre><code>hostname-architectures:
+  everest: redhat6
+  titan-login: xk6
+  titan-ext: xk6
+  yona-login: yona
+  yona: yona
+</code></pre>
+
+<p>Would produce the following matches:</p>
+
+<ul>
+<li>everest > redhat6</li>
+<li>titan-login1 > xk6</li>
+<li>titan-ext12 > xk6</li>
+<li>yona-login2 > yona</li>
+</ul>
+
+
+<h3 id="download-cache">download-cache</h3>
+
+<p>This directory is used when software archives are downloaded via formulas or
+through the <code>smithy new --tarfile=</code> option.</p>
+
+<h3 id="formula-directories">formula-directories</h3>
+
+<p>This option specifies one or more directories where formulas are stored.
+If multiple directories are used then smithy will use the first formula it
+finds in the order directories are specified.</p>
+
+<h3 id="global-error-log">global-error-log</h3>
+
+<p>This file will log internal errors smithy encounters. It is usually used for
+development. You can also get extra error output by setting <code>GLI_DEBUG=true</code> in
+your shell.</p>
+
+<h3 id="web-architecture-names">web-architecture-names</h3>
+
+<p>The <code>smithy publish</code> command outputs architecture names at the top of
+description files. If you wish to use a different name this option allows for
+that. For example:</p>
+
+<pre><code>web-architecture-names:
+  xk6: titan
+  xk7: titan
+  analysis-x64: lens
+</code></pre>
+
+<h3 id="web-root">web-root</h3>
+
+<p>This directory is the target output directory when running <code>smithy publish</code></p>
+
+<h3 id="descriptions-root">descriptions-root</h3>
+
+<p>Setting this option changes the way smithy handles description files. When NOT
+set smithy will expect descriptions to live inside each application folder
+inside each architecture folder. For example, assuming a software-root of <code>/sw</code>
+and an architecture of <code>xk6</code> smithy would expect the description files in these
+locations:</p>
+
+<pre><code>/sw
+`--- xk6
+   |--- subversion
+   |  |--- 1.6.17
+   |  |--- 1.7.8
+   |  `--- description.markdown
+   `--- git
+      |--- 1.7.9.5
+      |--- 1.8.2.1
+      `--- description.markdown
+</code></pre>
+
+<p>If we set <code>descriptions-root</code> to <code>/sw/descriptions</code> smithy would expect the
+descriptions in:</p>
+
+<pre><code>/sw
+|--- xk6
+|  |--- subversion
+|  |  |--- 1.6.17
+|  |  `--- 1.7.8
+|  `--- git
+|     |--- 1.7.9.5
+|     `--- 1.8.2.1
+`--- descriptions
+   |--- subversion
+   |  `--- description.markdown
+   `--- git
+      `--- description.markdown
+</code></pre>
+
+<h3 id="programming-environment-prefix">programming-environment-prefix</h3>
+
+<h3 id="compilers">compilers</h3>
+
+<pre><code>compilers:
+- :prg_env: PrgEnv-gnu
+  :compiler_name: gcc
+  :human_name: gnu
+  :regex: !ruby/regexp /(gnu|gcc)(.*)/
+  :build_name_regex: !ruby/regexp /(gnu|gcc)([\d\.]+)/
+- :prg_env: PrgEnv-pgi
+  :compiler_name: pgi
+  :human_name: pgi
+  :regex: !ruby/regexp /(pgi)(.*)/
+  :build_name_regex: !ruby/regexp /(pgi)([\d\.]+)/
+- :prg_env: PrgEnv-intel
+  :compiler_name: intel
+  :human_name: intel
+  :regex: !ruby/regexp /(intel)(.*)/
+  :build_name_regex: !ruby/regexp /(intel)([\d\.]+)/
+- :prg_env: PrgEnv-cray
+  :compiler_name: cce
+  :human_name: cray
+  :regex: !ruby/regexp /(cce|cray)(.*)/
+  :build_name_regex: !ruby/regexp /(cce|cray)([\d\.]+)/
 </code></pre>
 
 <h2 id="SEE-ALSO">SEE ALSO</h2>

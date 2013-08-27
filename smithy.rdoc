@@ -302,6 +302,10 @@ See what files will be created without creating them
 
 
 
+==== Command: <tt>reindex </tt>
+reindex auto-completion cache
+
+
 ==== Command: <tt>repair  NAME</tt>
 Repair a package
 

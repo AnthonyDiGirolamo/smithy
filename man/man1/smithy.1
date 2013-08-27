@@ -52,16 +52,16 @@ Build scripts are shell scripts that live inside of a package\'s PREFIX and exec
 
 /sw/xk6/subversion/1\.6\.17
 `\-\-\- sles11\.1_gnu4\.3\.4
-   `\-\-\- bin
-   `\-\-\- build\-notes
-   `\-\-\- dependencies
-   `\-\-\- include
-   `\-\-\- lib
-   `\-\-\- rebuild
-   `\-\-\- relink
-   `\-\-\- remodule
-   `\-\-\- retest
-   `\-\-\- share
+   |\-\-\- bin
+   |\-\-\- build\-notes
+   |\-\-\- dependencies
+   |\-\-\- include
+   |\-\-\- lib
+   |\-\-\- rebuild
+   |\-\-\- relink
+   |\-\-\- remodule
+   |\-\-\- retest
+   |\-\-\- share
    `\-\-\- subversion\-1\.6\.17
 .
 .fi
@@ -86,10 +86,10 @@ A package installed with a formula has a simpler prefix directory structure\. Th
 
 /sw/xk6/subversion/1\.7\.8
 `\-\-\- sles11\.1_gnu4\.3\.4
-   `\-\-\- bin
-   `\-\-\- include
-   `\-\-\- lib
-   `\-\-\- source
+   |\-\-\- bin
+   |\-\-\- include
+   |\-\-\- lib
+   |\-\-\- source
    `\-\-\- share
 .
 .fi
@@ -183,14 +183,14 @@ Assuming we install subversion with the previous command and our software\-root 
 .nf
 
 /sw/xk6/subversion/1\.7\.8
-`\-\-\- modulefile
+|\-\-\- modulefile
 |  `\-\-\- subversion
 |     `\-\-\- 1\.7\.8
 `\-\-\- sles11\.1_gnu4\.3\.4
-   `\-\-\- bin
-   `\-\-\- include
-   `\-\-\- lib
-   `\-\-\- source
+   |\-\-\- bin
+   |\-\-\- include
+   |\-\-\- lib
+   |\-\-\- source
    `\-\-\- share
 .
 .fi
@@ -444,6 +444,194 @@ smithy publish petsc
 .fi
 .
 .IP "" 0
+.
+.SH "SMITHY CONFIG FILE"
+To see an up to date example of what a smithy config file should look like run \fBsmithy show example_config\fR\. Most of the options specified in a config file can be overridden by global command line options\. See \fBsmithy help\fR for info on global command line options\. The smithy config file uses the yaml \fIhttp://www\.yaml\.org/\fR syntax and looks something like this:
+.
+.IP "" 4
+.
+.nf
+
+\-\-\-
+software\-root: /sw
+download\-cache: /sw/sources
+formula\-directories:
+\- /sw/tools/smithy/formulas
+\- /sw/tools/smithy/another_formula_directory
+global\-error\-log: /sw/tools/smithy/exceptions\.log
+file\-group\-name: ccsstaff
+descriptions\-root: /sw/descriptions
+web\-root: /sw/descriptions_in_html
+web\-architecture\-names:
+  xk6: titan
+  xk7: titan
+  analysis\-x64: lens
+  smoky: smoky
+programming\-environment\-prefix:
+  default: PrgEnv\-
+  smoky: PE\-
+  sith: PE\-
+hostname\-architectures:
+  everest\-login: redhat6
+  everest: redhat6
+  lens: analysis\-x64
+  sith\-login: redhat6
+  sith: redhat6
+  smoky\-login: smoky
+  titan\-login: xk6
+  titan\-ext: xk6
+  yona\-login: yona
+  yona: yona
+.
+.fi
+.
+.IP "" 0
+.
+.SS "software\-root"
+This option defines the top level directory used as the location of architecture directories\. Good choices might be \fB/opt/smithy\fR or \fB/usr/local/smithy\fR\. Someplace under your home directory would work too\.
+.
+.SS "file\-group\-name"
+Software compiled with smithy is intended to be group writable so that more that one user may install software in the same location\. This option defines the group name used for installing software\.
+.
+.SS "hostname\-architectures"
+This option defines what hostnames map to which architecture directories\. Smithy will use the mapped directories whenever it is run on machines with hostnames specified by this option\. Smithy will ignore trailing digits on hostnames\. For example:
+.
+.IP "" 4
+.
+.nf
+
+hostname\-architectures:
+  everest: redhat6
+  titan\-login: xk6
+  titan\-ext: xk6
+  yona\-login: yona
+  yona: yona
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Would produce the following matches:
+.
+.IP "\(bu" 4
+everest > redhat6
+.
+.IP "\(bu" 4
+titan\-login1 > xk6
+.
+.IP "\(bu" 4
+titan\-ext12 > xk6
+.
+.IP "\(bu" 4
+yona\-login2 > yona
+.
+.IP "" 0
+.
+.SS "download\-cache"
+This directory is used when software archives are downloaded via formulas or through the \fBsmithy new \-\-tarfile=\fR option\.
+.
+.SS "formula\-directories"
+This option specifies one or more directories where formulas are stored\. If multiple directories are used then smithy will use the first formula it finds in the order directories are specified\.
+.
+.SS "global\-error\-log"
+This file will log internal errors smithy encounters\. It is usually used for development\. You can also get extra error output by setting \fBGLI_DEBUG=true\fR in your shell\.
+.
+.SS "web\-architecture\-names"
+The \fBsmithy publish\fR command outputs architecture names at the top of description files\. If you wish to use a different name this option allows for that\. For example:
+.
+.IP "" 4
+.
+.nf
+
+web\-architecture\-names:
+  xk6: titan
+  xk7: titan
+  analysis\-x64: lens
+.
+.fi
+.
+.IP "" 0
+.
+.SS "web\-root"
+This directory is the target output directory when running \fBsmithy publish\fR
+.
+.SS "descriptions\-root"
+Setting this option changes the way smithy handles description files\. When NOT set smithy will expect descriptions to live inside each application folder inside each architecture folder\. For example, assuming a software\-root of \fB/sw\fR and an architecture of \fBxk6\fR smithy would expect the description files in these locations:
+.
+.IP "" 4
+.
+.nf
+
+/sw
+`\-\-\- xk6
+   |\-\-\- subversion
+   |  |\-\-\- 1\.6\.17
+   |  |\-\-\- 1\.7\.8
+   |  `\-\-\- description\.markdown
+   `\-\-\- git
+      |\-\-\- 1\.7\.9\.5
+      |\-\-\- 1\.8\.2\.1
+      `\-\-\- description\.markdown
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If we set \fBdescriptions\-root\fR to \fB/sw/descriptions\fR smithy would expect the descriptions in:
+.
+.IP "" 4
+.
+.nf
+
+/sw
+|\-\-\- xk6
+|  |\-\-\- subversion
+|  |  |\-\-\- 1\.6\.17
+|  |  `\-\-\- 1\.7\.8
+|  `\-\-\- git
+|     |\-\-\- 1\.7\.9\.5
+|     `\-\-\- 1\.8\.2\.1
+`\-\-\- descriptions
+   |\-\-\- subversion
+   |  `\-\-\- description\.markdown
+   `\-\-\- git
+      `\-\-\- description\.markdown
+.
+.fi
+.
+.IP "" 0
+.
+.SS "programming\-environment\-prefix"
+.
+.SS "compilers"
+.
+.nf
+
+compilers:
+\- :prg_env: PrgEnv\-gnu
+  :compiler_name: gcc
+  :human_name: gnu
+  :regex: !ruby/regexp /(gnu|gcc)(\.*)/
+  :build_name_regex: !ruby/regexp /(gnu|gcc)([\ed\e\.]+)/
+\- :prg_env: PrgEnv\-pgi
+  :compiler_name: pgi
+  :human_name: pgi
+  :regex: !ruby/regexp /(pgi)(\.*)/
+  :build_name_regex: !ruby/regexp /(pgi)([\ed\e\.]+)/
+\- :prg_env: PrgEnv\-intel
+  :compiler_name: intel
+  :human_name: intel
+  :regex: !ruby/regexp /(intel)(\.*)/
+  :build_name_regex: !ruby/regexp /(intel)([\ed\e\.]+)/
+\- :prg_env: PrgEnv\-cray
+  :compiler_name: cce
+  :human_name: cray
+  :regex: !ruby/regexp /(cce|cray)(\.*)/
+  :build_name_regex: !ruby/regexp /(cce|cray)([\ed\e\.]+)/
+.
+.fi
 .
 .SH "SEE ALSO"
 smithyformula(5)
