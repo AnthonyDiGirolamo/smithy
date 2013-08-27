@@ -564,6 +564,15 @@ Setting this option changes the way smithy handles description files\. When NOT 
 .nf
 
 /sw
+|\-\-\- redhat6
+|  |\-\-\- subversion
+|  |  |\-\-\- 1\.6\.17
+|  |  |\-\-\- 1\.7\.8
+|  |  `\-\-\- description\.markdown
+|  `\-\-\- git
+|     |\-\-\- 1\.7\.9\.5
+|     |\-\-\- 1\.8\.2\.1
+|     `\-\-\- description\.markdown
 `\-\-\- xk6
    |\-\-\- subversion
    |  |\-\-\- 1\.6\.17
@@ -579,13 +588,20 @@ Setting this option changes the way smithy handles description files\. When NOT 
 .IP "" 0
 .
 .P
-If we set \fBdescriptions\-root\fR to \fB/sw/descriptions\fR smithy would expect the descriptions in:
+This setup has multiple description files per application\. This might make sense if your documentation is highly dependent on the architecture\. If we set \fBdescriptions\-root\fR to \fB/sw/descriptions\fR smithy would expect the descriptions in:
 .
 .IP "" 4
 .
 .nf
 
 /sw
+|\-\-\- redhat6
+|  |\-\-\- subversion
+|  |  |\-\-\- 1\.6\.17
+|  |  `\-\-\- 1\.7\.8
+|  `\-\-\- git
+|     |\-\-\- 1\.7\.9\.5
+|     `\-\-\- 1\.8\.2\.1
 |\-\-\- xk6
 |  |\-\-\- subversion
 |  |  |\-\-\- 1\.6\.17
@@ -602,6 +618,9 @@ If we set \fBdescriptions\-root\fR to \fB/sw/descriptions\fR smithy would expect
 .fi
 .
 .IP "" 0
+.
+.P
+With this we have only one description file per application\.
 .
 .SS "programming\-environment\-prefix"
 .

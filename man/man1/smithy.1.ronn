@@ -430,6 +430,15 @@ and an architecture of `xk6` smithy would expect the description files in these
 locations:
 
     /sw
+    |--- redhat6
+    |  |--- subversion
+    |  |  |--- 1.6.17
+    |  |  |--- 1.7.8
+    |  |  `--- description.markdown
+    |  `--- git
+    |     |--- 1.7.9.5
+    |     |--- 1.8.2.1
+    |     `--- description.markdown
     `--- xk6
        |--- subversion
        |  |--- 1.6.17
@@ -440,10 +449,19 @@ locations:
           |--- 1.8.2.1
           `--- description.markdown
 
-If we set `descriptions-root` to `/sw/descriptions` smithy would expect the
-descriptions in:
+This setup has multiple description files per application. This might make sense
+if your documentation is highly dependent on the architecture. If we set
+`descriptions-root` to `/sw/descriptions` smithy would expect the descriptions
+in:
 
     /sw
+    |--- redhat6
+    |  |--- subversion
+    |  |  |--- 1.6.17
+    |  |  `--- 1.7.8
+    |  `--- git
+    |     |--- 1.7.9.5
+    |     `--- 1.8.2.1
     |--- xk6
     |  |--- subversion
     |  |  |--- 1.6.17
@@ -456,6 +474,8 @@ descriptions in:
        |  `--- description.markdown
        `--- git
           `--- description.markdown
+
+With this we have only one description file per application.
 
 ### programming-environment-prefix
 
