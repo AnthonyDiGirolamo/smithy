@@ -90,9 +90,9 @@ desc "The root level directory for software"
 arg_name "PATH"
 flag ["software-root"]
 
-desc "The prefix of programming environments for this machine"
-arg_name "NAME"
-flag ["prgenv-prefix"]
+# desc "The prefix of programming environments for this machine"
+# arg_name "NAME"
+# flag ["prgenv-prefix"]
 
 desc "The root level directory for published web files"
 arg_name "PATH"

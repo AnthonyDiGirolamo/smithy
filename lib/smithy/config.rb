@@ -65,7 +65,7 @@ module Smithy
 
         set_hostname_and_arch
         options_to_merge[:arch] = @arch
-        options_to_merge[:"prgenv-prefix"] = get_prgenv_prefix
+        # options_to_merge[:"prgenv-prefix"] = get_prgenv_prefix
 
         # Merge the config file values with command line values,
         # options on the command line take precedence.
@@ -123,18 +123,18 @@ module Smithy
         config_file_hash.try(:[], "compilers")
       end
 
-      def get_prgenv_prefix
-        default_prefix = "PrgEnv-"
+      # def get_prgenv_prefix
+      #   default_prefix = "PrgEnv-"
 
-        default_prefix_from_config = @config_file_hash.try(:[], "programming-environment-prefix").try(:[], "default")
-        default_prefix = default_prefix_from_config unless default_prefix_from_config.blank?
+      #   default_prefix_from_config = @config_file_hash.try(:[], "programming-environment-prefix").try(:[], "default")
+      #   default_prefix = default_prefix_from_config unless default_prefix_from_config.blank?
 
-        prefix_from_config = @config_file_hash.try(:[], "programming-environment-prefix").try(:[], @arch)
+      #   prefix_from_config = @config_file_hash.try(:[], "programming-environment-prefix").try(:[], @arch)
 
-        return prefix_from_config unless prefix_from_config.blank?
+      #   return prefix_from_config unless prefix_from_config.blank?
 
-        return default_prefix
-      end
+      #   return default_prefix
+      # end
 
       def set_hostname_and_arch
         @hostname ||= ENV.try(:[], 'HOSTNAME').try(:dup)
@@ -216,11 +216,11 @@ module Smithy
           "analysis-x64" => "lens",
           "smoky"        => "smoky"
         }
-        example["programming-environment-prefix"] = {
-          "default" => "PrgEnv-",
-          "smoky"   => "PE-",
-          "sith"    => "PE-"
-        }
+        # example["programming-environment-prefix"] = {
+        #   "default" => "PrgEnv-",
+        #   "smoky"   => "PE-",
+        #   "sith"    => "PE-"
+        # }
         example["hostname-architectures"] = {
           "everest-login" => "redhat6",
           "everest"       => "redhat6",
