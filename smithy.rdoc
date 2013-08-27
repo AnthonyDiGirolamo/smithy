@@ -31,13 +31,6 @@ Group name for files created by smithy
 [Default Value] None
 
 
-=== --prgenv-prefix NAME
-
-The prefix of programming environments for this machine
-
-[Default Value] None
-
-
 === --software-root PATH
 
 The root level directory for software

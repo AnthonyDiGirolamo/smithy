@@ -622,9 +622,10 @@ This setup has multiple description files per application\. This might make sens
 .P
 With this we have only one description file per application\.
 .
-.SS "programming\-environment\-prefix"
-.
 .SS "compilers"
+This option allows you to override the complier definition for creating modulefiles\. The syntax is yaml and the default values are:
+.
+.IP "" 4
 .
 .nf
 
@@ -651,6 +652,8 @@ compilers:
   :build_name_regex: !ruby/regexp /(cce|cray)([\ed\e\.]+)/
 .
 .fi
+.
+.IP "" 0
 .
 .SH "SEE ALSO"
 smithyformula(5)

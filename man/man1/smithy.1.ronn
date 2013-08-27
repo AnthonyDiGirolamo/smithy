@@ -477,9 +477,10 @@ in:
 
 With this we have only one description file per application.
 
-### programming-environment-prefix
-
 ### compilers
+
+This option allows you to override the complier definition for creating
+modulefiles. The syntax is yaml and the default values are:
 
     compilers:
     - :prg_env: PrgEnv-gnu
