@@ -340,10 +340,6 @@ global command line options. The smithy config file uses the
       xk7: titan
       analysis-x64: lens
       smoky: smoky
-    programming-environment-prefix:
-      default: PrgEnv-
-      smoky: PE-
-      sith: PE-
     hostname-architectures:
       everest-login: redhat6
       everest: redhat6

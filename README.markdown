@@ -134,10 +134,6 @@ Here is an example config file:
       sith-login: redhat6
       smoky: smoky
       smoky-login: smoky
-    programming-environment-prefix:
-      default: PrgEnv-
-      smoky: PE-
-      sith: PE-
     web-root: /ccs/proj/ccsstaff/swdesc/data
     descriptions-root: /sw/descriptions
     web-architecture-names:
