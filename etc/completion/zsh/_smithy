@@ -190,9 +190,9 @@ case "$words[1]" in
     )
 
     # not sure how to make this work right
-    # _arguments \
+    # [[ "$PREFIX" = -* ]] && _arguments \
     #   '(-d --directories=)'{-d,--directories=}'[Specify one or more additional formula directories separated with commas]:directory:_files -/' \
-    #   '1: :->forms' &&  return 0
+    #   '1: :->subcmds' &&  return 0
 
     # Match subsub-command
     if (( CURRENT == 2 )); then
@@ -200,20 +200,24 @@ case "$words[1]" in
       return
     fi
 
+    # echo $state > /dev/ttys004
+
     # Match subsub-command arguments
-    if (( CURRENT == 3 )); then
+    if (( CURRENT >= 3 )); then
       case "$words[2]" in
         install)
-          _arguments \
+          [[ "$PREFIX" = -* ]] && _arguments \
             '(--clean)--clean[clean existing install prefix]' \
             '(--no-clean)--no-clean[leave existing install prefix files intact]' \
             '(-f --formula-name)'{-f,--formula-name}'[Formula name]' \
             '(-m --modulefile)'{-m,--modulefile}'[Create modulefiles as well]' \
-            '1: :->forms' &&  return 0
-          if [[ "$state" == forms ]]; then
-            _smithy_formulas
-            _wanted packages expl 'formulas' compadd -a formulas
-          fi
+            '1: :->subcmds' &&  return 0
+          _smithy_formulas
+          _wanted packages expl 'formulas' compadd -a formulas
+          ;;
+        create_modulefile)
+          _smithy_formulas
+          _wanted packages expl 'formulas' compadd -a formulas
           ;;
       esac
 
