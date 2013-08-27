@@ -2,10 +2,12 @@
 
 _smithy_packages() {
 	packages=(`smithy search --format=name`)
+  _wanted packages expl 'packages' compadd -a packages
 }
 
 _smithy_formulas() {
 	formulas=(`smithy formula list`)
+  _wanted packages expl 'formulas' compadd -a formulas
 }
 
 _smithy_architectures() {
@@ -29,7 +31,6 @@ _1st_arguments=(
 )
 
 local expl
-local -a formulae
 
 _arguments \
   '(--arch=)--arch=[Machine architecture to operate on]:architecture:_smithy_architectures' \
@@ -46,10 +47,6 @@ _arguments \
   '(-v --verbose)'{-v,--verbose}'[Be more verbose]' \
   '(--web-root=)--web-root=[The root level directory for web files]:directory:_files -/' \
   '*:: :->subcmds' && return 0
-#[[ "$PREFIX" = --* ]] && _arguments -- \
-  #'*=FILE*:file:_files' \
-  #'*=PATH*:directory:_files -/' \
-  #'*=NAME*:directory:_files -/' && return 0
 
 # Match Sub-command
 if (( CURRENT == 1 )); then
@@ -77,7 +74,6 @@ case "$words[1]" in
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
     fi
     ;;
 
@@ -101,7 +97,6 @@ case "$words[1]" in
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
     fi
     ;;
 
@@ -124,7 +119,6 @@ case "$words[1]" in
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
     fi
     ;;
 
@@ -144,7 +138,6 @@ case "$words[1]" in
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
     fi
     ;;
 
@@ -173,7 +166,6 @@ case "$words[1]" in
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
-      _wanted packages expl 'packages' compadd -a packages
     fi
     ;;
 
@@ -213,11 +205,12 @@ case "$words[1]" in
             '(-m --modulefile)'{-m,--modulefile}'[Create modulefiles as well]' \
             '1: :->subcmds' &&  return 0
           _smithy_formulas
-          _wanted packages expl 'formulas' compadd -a formulas
           ;;
         create_modulefile)
           _smithy_formulas
-          _wanted packages expl 'formulas' compadd -a formulas
+          ;;
+        display)
+          _smithy_formulas
           ;;
       esac
 
