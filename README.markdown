@@ -23,60 +23,43 @@ Software builds are created with a few conventions:
 As an example:
 
     /opt                         Software Root
-    |--- redhat6                    OS directory
-    |  |
-    |  |--- modulefiles                Modules live here
-    |  |  |--- git                         Application
-    |  |  |  |--- 1.7.8.5                     Versions
-    |  |  |  `--- 1.8.2.1
-    |  |  `--- petsc
-    |  |     |--- 3.2
-    |  |     `--- 3.3
-    |  |
-    |  |--- git                        Application Name
-    |  |  |--- 1.7.8.5                    Version
-    |  |  |  `--- rhel6.4_gnu4.4.7           Build Name
-    |  |  `--- 1.8.2.1
-    |  |     `--- rhel6.4_gnu4.4.7
-    |  |
-    |  `--- petsc
-    |     |--- 3.2
-    |     |  |--- rhel6.4_pgi12.8            Build using PGI 12.8 compiler
-    |     |  `--- rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
-    |     `--- 3.3
-    |        |--- rhel6.4_pgi12.8
-    |        |--- rhel6.4_pgi13.4
-    |        `--- rhel6.4_gnu4.7.1
+    ├-- redhat6                    OS directory
+    |   |
+    |   ├-- modulefiles                Modules live here
+    |   |   ├-- git                         Application
+    |   |   |   ├-- 1.7.8.5                     Versions
+    |   |   |   └-- 1.8.2.1
+    |   |   └-- petsc
+    |   |       ├-- 3.2
+    |   |       └-- 3.3
+    |   |
+    |   ├-- git                        Application Name
+    |   |   ├-- 1.7.8.5                    Version
+    |   |   |   └-- rhel6.4_gnu4.4.7           Build Name
+    |   |   └-- 1.8.2.1
+    |   |       └-- rhel6.4_gnu4.4.7
+    |   |
+    |   └-- petsc
+    |       ├-- 3.2
+    |       |   ├-- rhel6.4_pgi12.8            Build using PGI 12.8 compiler
+    |       |   └-- rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
+    |       └-- 3.3
+    |           ├-- rhel6.4_pgi12.8
+    |           ├-- rhel6.4_pgi13.4
+    |           └-- rhel6.4_gnu4.7.1
     |
-    `--- sles11                     Another OS directory
+    └-- sles11                     Another OS directory
        |
-       |--- modulefiles
-       |  `--- git
-       |     |--- 1.7.8.5
-       |     `--- 1.8.2.1
+       ├-- modulefiles
+       |   └-- git
+       |       ├-- 1.7.8.5
+       |       └-- 1.8.2.1
        |
-       `--- git
-          |--- 1.7.9.5
-          |  `--- sles11.1_gnu4.3.4
-          `--- 1.8.2.1
-             `--- sles11.1_gnu4.3.4
-
-Test
-
-    lib
-    ├── smithy
-    │   ├── config.rb
-    │   ├── description.rb
-    │   ├── download_cache.rb
-    │   ├── file_operations.rb
-    │   ├── format.rb
-    │   ├── formula_command.rb
-    │   ├── formula.rb
-    │   ├── helpers.rb
-    │   ├── module_file.rb
-    │   └── package.rb
-    ├── smithy.rb
-    └── smithy_version.rb
+       └-- git
+           ├-- 1.7.9.5
+           |   └-- sles11.1_gnu4.3.4
+           └-- 1.8.2.1
+               └-- sles11.1_gnu4.3.4
 
 Documentation
 -------------
