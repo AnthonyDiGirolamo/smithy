@@ -27,33 +27,80 @@
         </ul>
       </header>
       <section>
-        <h2>
+        <h1>
+<a name="software-smithy" class="anchor" href="#software-smithy"><span class="octicon octicon-link"></span></a>Software Smithy</h1>
+
+<h2>
 <a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
 
-<p><code>smithy</code> is a command line software installation tool that borrows ideas heavily
-from the excellent <a href="http://brew.sh/">homebrew</a> package management system for Mac OS X and <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.</p>
+<p><code>smithy</code> is a command line software installation/compilation tool that borrows
+ideas heavily from the excellent <a href="http://brew.sh/">homebrew</a> package management
+system for Mac OS X and <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.</p>
 
-<p>More information can be found on the manpages:</p>
+<p>Smithy is designed to sanely manage many software builds within a
+shared <a href="http://en.wikipedia.org/wiki/High-performance_computing">HPC</a>
+Linux environment using <a href="http://modules.sourceforge.net/">modulefiles</a> to load
+software into a user's shell.</p>
 
-<ul>
-<li><a href="http://anthonydigirolamo.github.com/smithy/smithy.1.html">smithy manpage</a></li>
-<li><a href="http://anthonydigirolamo.github.com/smithy/smithyformula.5.html">smithyformula manpage</a></li>
-</ul><h2>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
-
-<p>Smithys goal is to make following the SWTools conventions easier and less error
-prone. Improvements include:</p>
+<p>Software builds are created with a few conventions:</p>
 
 <ul>
-<li>Simpler command line interface. You can compile a new piece of software with
-two commands.</li>
-<li>Simpler rebuild scripts (8 lines instead of 49).</li>
-<li>Automatic generation of modulefiles.</li>
-<li>Automatic generation of build scripts depending on the environment or
-compiler.</li>
-<li>Write software descriptions without html.</li>
-<li>Search for software, report who built it, and when.</li>
-<li>Cleaner, shorter, and more maintainable code.</li>
+<li>Everything is organized into architecture or OS directores, e.g. redhat6 or sles11</li>
+<li>Prefixes are defined by their name, version, and build name</li>
+<li>Software is loaded into the shell using <a href="http://modules.sourceforge.net/">modulefiles</a>
+</li>
+<li>Builds are performed by <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#BUILD-SCRIPTS">build scripts</a> or <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#FORMULAS">formulas</a>
+</li>
+</ul><p>As an example:</p>
+
+<pre><code>/opt                         Software Root
+|--- redhat6                    OS directory
+|  |
+|  |--- modulefiles                Modules live here
+|  |  |--- git                         Application
+|  |  |  |--- 1.7.8.5                     Versions
+|  |  |  `--- 1.8.2.1
+|  |  `--- petsc
+|  |     |--- 3.2
+|  |     `--- 3.3
+|  |
+|  |--- git                        Application Name
+|  |  |--- 1.7.8.5                    Version
+|  |  |  `--- rhel6.4_gnu4.4.7           Build Name
+|  |  `--- 1.8.2.1
+|  |     `--- rhel6.4_gnu4.4.7
+|  |
+|  `--- petsc
+|     |--- 3.2
+|     |  |--- rhel6.4_pgi12.8            Build using PGI 12.8 compiler
+|     |  `--- rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
+|     `--- 3.3
+|        |--- rhel6.4_pgi12.8
+|        |--- rhel6.4_pgi13.4
+|        `--- rhel6.4_gnu4.7.1
+|
+`--- sles11                     Another OS directory
+   |
+   |--- modulefiles
+   |  `--- git
+   |     |--- 1.7.8.5
+   |     `--- 1.8.2.1
+   |
+   `--- git
+      |--- 1.7.9.5
+      |  `--- sles11.1_gnu4.3.4
+      `--- 1.8.2.1
+         `--- sles11.1_gnu4.3.4
+</code></pre>
+
+<h2>
+<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+
+<p>Lots of information and a tutorial can be found on the manpages:</p>
+
+<ul>
+<li><p><a href="http://anthonydigirolamo.github.com/smithy/smithy.1.html">smithy</a></p></li>
+<li><p><a href="http://anthonydigirolamo.github.com/smithy/smithyformula.5.html">smithyformula</a></p></li>
 </ul><h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
@@ -188,7 +235,7 @@ global-error-log: /sw/tools/smithy/exceptions.log
 
 <p>You may wish to set this using a modulefile or a shell script. Examples are
 provided in
-<a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.1">modulefiles/smithy/1.1</a>
+<a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.6.1">modulefiles/smithy/1.6</a>
 and
 <a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh">environment.sh</a></p>
 
