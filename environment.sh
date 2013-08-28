@@ -12,12 +12,12 @@ smithy () {
 }
 
 if [[ -n ${ZSH_VERSION-} ]]; then
-  fpath=(/sw/tools/smithy/gems/software_smithy-1.6.1/etc/completion/zsh $fpath)
+  fpath=(/sw/tools/smithy/gems/software_smithy-1.6.2/etc/completion/zsh $fpath)
   compinit
 fi
 
 if [[ -n ${BASH_VERSION-} ]]; then
-  source /sw/tools/smithy/gems/software_smithy-1.6.1/etc/completion/smithy-completion.bash
+  source /sw/tools/smithy/gems/software_smithy-1.6.2/etc/completion/smithy-completion.bash
 fi
 
 smithy reindex
