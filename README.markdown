@@ -61,6 +61,23 @@ As an example:
           `--- 1.8.2.1
              `--- sles11.1_gnu4.3.4
 
+Test
+
+    lib
+    ├── smithy
+    │   ├── config.rb
+    │   ├── description.rb
+    │   ├── download_cache.rb
+    │   ├── file_operations.rb
+    │   ├── format.rb
+    │   ├── formula_command.rb
+    │   ├── formula.rb
+    │   ├── helpers.rb
+    │   ├── module_file.rb
+    │   └── package.rb
+    ├── smithy.rb
+    └── smithy_version.rb
+
 Documentation
 -------------
 
