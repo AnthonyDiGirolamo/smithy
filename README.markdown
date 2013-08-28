@@ -4,28 +4,71 @@ Software Smithy
 Overview
 --------
 
-`smithy` is a command line software installation tool that borrows ideas heavily
-from the excellent [homebrew](http://brew.sh/) package management system for Mac OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+`smithy` is a command line software installation/compilation tool that borrows
+ideas heavily from the excellent [homebrew](http://brew.sh/) package management
+system for Mac OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
 
-More information and a tutorial can be found on the [smithy manpage](http://anthonydigirolamo.github.com/smithy/smithy.1.html).
+Smithy is designed to sanely manage many software builds within a
+shared [HPC](http://en.wikipedia.org/wiki/High-performance_computing)
+Linux environment using [modulefiles](http://modules.sourceforge.net/) to load
+software into a user's shell.
 
-Details on writing formulas can be found on the [smithyformula manpage](http://anthonydigirolamo.github.com/smithy/smithyformula.5.html).
+Software builds are created with a few conventions:
 
-Features
---------
+- Everything is organized into architecture or OS directores, e.g. redhat6 or sles11
+- Prefixes are defined by their name, version, and build name
+- Software is loaded into the shell using [modulefiles](http://modules.sourceforge.net/)
+- Builds are performed by [build scripts](http://anthonydigirolamo.github.io/smithy/smithy.1.html#BUILD-SCRIPTS) or [formulas](http://anthonydigirolamo.github.io/smithy/smithy.1.html#FORMULAS)
 
-Smithys goal is to make following the SWTools conventions easier and less error
-prone. Improvements include:
+As an example:
 
-- Simpler command line interface. You can compile a new piece of software with
-  two commands.
-- Simpler rebuild scripts (8 lines instead of 49).
-- Automatic generation of modulefiles.
-- Automatic generation of build scripts depending on the environment or
-  compiler.
-- Write software descriptions without html.
-- Search for software, report who built it, and when.
-- Cleaner, shorter, and more maintainable code.
+    /opt                         Software Root
+    |--- redhat6                    OS directory
+    |  |
+    |  |--- modulefiles                Modules live here
+    |  |  |--- git                         Application
+    |  |  |  |--- 1.7.8.5                     Versions
+    |  |  |  `--- 1.8.2.1
+    |  |  `--- petsc
+    |  |     |--- 3.2
+    |  |     `--- 3.3
+    |  |
+    |  |--- git                        Application Name
+    |  |  |--- 1.7.8.5                    Version
+    |  |  |  `--- rhel6.4_gnu4.4.7           Build Name
+    |  |  `--- 1.8.2.1
+    |  |     `--- rhel6.4_gnu4.4.7
+    |  |
+    |  `--- petsc
+    |     |--- 3.2
+    |     |  |--- rhel6.4_pgi12.8            Build using PGI 12.8 compiler
+    |     |  `--- rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
+    |     `--- 3.3
+    |        |--- rhel6.4_pgi12.8
+    |        |--- rhel6.4_pgi13.4
+    |        `--- rhel6.4_gnu4.7.1
+    |
+    `--- sles11                     Another OS directory
+       |
+       |--- modulefiles
+       |  `--- git
+       |     |--- 1.7.8.5
+       |     `--- 1.8.2.1
+       |
+       `--- git
+          |--- 1.7.9.5
+          |  `--- sles11.1_gnu4.3.4
+          `--- 1.8.2.1
+             `--- sles11.1_gnu4.3.4
+
+Documentation
+-------------
+
+Lots of information and a tutorial can be found on the manpages:
+
+* [smithy](http://anthonydigirolamo.github.com/smithy/smithy.1.html)
+
+* [smithyformula](http://anthonydigirolamo.github.com/smithy/smithyformula.5.html)
 
 Installation
 ------------
