@@ -108,8 +108,8 @@ module Smithy
       m = ModuleFile.new :package => package
       FileUtils.mkdir_p(File.dirname(m.module_file))
       FileOperations.render_erb(:erb_string => modulefile, :binding => m.get_binding, :destination => m.module_file)
-      FileOperations.make_group_writable(m.module_file)
-      FileOperations.set_group(m.module_file, package.group)
+      FileOperations.make_group_writable(m.module_path, :recursive => true)
+      FileOperations.set_group(m.module_path, package.group, :recursive => true)
       return true
     end
 
