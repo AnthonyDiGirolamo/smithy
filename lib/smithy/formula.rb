@@ -30,6 +30,7 @@ module Smithy
       @module_commands = nil # re-evaluate module_commands block
       @module_setup = ""
       raise "please specify modules OR modules_command, not both" if modules.present? && module_commands.present?
+      raise "module_commands method must return an array" if module_commands.present? && module_commands.class != Array
       if ENV["MODULESHOME"]
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
