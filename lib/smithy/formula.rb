@@ -132,7 +132,7 @@ module Smithy
     end
 
     def module_environment_variable(mod, var)
-      module_display = `#{@modulecmd} display #{mod} 2>&1`
+      module_display = `#{module_setup} #{@modulecmd} display #{mod} 2>&1`
       if module_display =~ /(\S+)\s+#{var}\s+(.*)$/
         return $2.strip
       else
