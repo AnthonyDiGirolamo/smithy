@@ -22,7 +22,7 @@ module Smithy
 
     def download_cache_dir
       dir = Smithy::Config.global[:"download-cache"]
-      dir = File.join(ENV['HOME'], '.smithy/cache') if dir.blank?
+      dir = File.join(Smithy::Config.homedir, '.smithy/cache') if dir.blank?
       dir
     end
 

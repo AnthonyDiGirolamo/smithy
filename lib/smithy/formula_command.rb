@@ -7,7 +7,7 @@ module Smithy
     # 3. smithy's built in formulas
     def self.formula_directories
       unless @formula_directories
-        @formula_directories = [ File.join(ENV["HOME"], ".smithy/formulas") ]
+        @formula_directories = [ File.join(Smithy::Config.homedir, ".smithy/formulas") ]
         if Smithy::Config.global[:"formula-directories"]
           Smithy::Config.global[:"formula-directories"].reverse.each do |dir|
             @formula_directories << dir
@@ -165,7 +165,7 @@ module Smithy
       @formula_homepage = options[:homepage]
       @formula_homepage = "#{URI(@formula_url).scheme}://#{URI(@formula_url).host}/" unless options[:homepage]
 
-      destination = File.join(ENV["HOME"], ".smithy/formulas")
+      destination = File.join(Smithy::Config.homedir, ".smithy/formulas")
       destination = Smithy::Config.global[:"formula-directories"].first if Smithy::Config.global[:"formula-directories"]
       FileUtils::mkdir_p(destination)
 

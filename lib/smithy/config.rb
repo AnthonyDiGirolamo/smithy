@@ -161,8 +161,13 @@ module Smithy
         return s
       end
 
+      def homedir
+        @homedir ||= File.join(Dir.home(Etc.getlogin))
+        @homedir
+      end
+
       def last_prefix
-        rc_file = File.join(ENV['HOME'], '.smithyrc')
+        rc_file = File.join(homedir, '.smithyrc')
         if File.exists?(rc_file)
           h = YAML.load_file(rc_file).stringify_keys rescue nil
           return h["last"]
@@ -172,7 +177,7 @@ module Smithy
       end
 
       def save_last_prefix(prefix)
-        rc_file = File.join(ENV['HOME'], '.smithyrc')
+        rc_file = File.join(homedir, '.smithyrc')
         h = {:last => prefix.encode('UTF-8')}
         File.open(rc_file, "w+") do |f|
           f.write(h.to_yaml)
@@ -185,15 +190,15 @@ module Smithy
         formulas = FormulaCommand.formula_names
         packages = Package.all.collect{|s| s.gsub(/#{full_root}\//, '')}
 
-        FileUtils.mkdir_p(File.join(ENV["HOME"], ".smithy"))
+        FileUtils.mkdir_p(File.join(homedir, ".smithy"))
 
-        File.open(File.join(ENV["HOME"], ".smithy", "completion_formulas"), "w+") do |f|
+        File.open(File.join(homedir, ".smithy", "completion_formulas"), "w+") do |f|
           f.puts formulas
         end
-        File.open(File.join(ENV["HOME"], ".smithy", "completion_packages"), "w+") do |f|
+        File.open(File.join(homedir, ".smithy", "completion_packages"), "w+") do |f|
           f.puts packages
         end
-        File.open(File.join(ENV["HOME"], ".smithy", "completion_arches"), "w+") do |f|
+        File.open(File.join(homedir, ".smithy", "completion_arches"), "w+") do |f|
           f.puts @config_file_hash["hostname-architectures"].values.uniq.sort
         end
       end

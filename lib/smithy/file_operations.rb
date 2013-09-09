@@ -197,7 +197,7 @@ module Smithy
 
       def install_from_string(content, dest, options = {})
         if options[:noop]
-          updated_file = File.join(ENV["HOME"]+"/.smithy_#{File.basename(dest)}_#{Time.now.to_i}")
+          updated_file = File.join(Smithy::Config.homedir+"/.smithy_#{File.basename(dest)}_#{Time.now.to_i}")
         else
           updated_file = File.join(File.dirname(dest), ".#{File.basename(dest)}_#{Time.now.to_i}")
         end
@@ -218,7 +218,7 @@ module Smithy
         dest          = args[:destination]
 
         if options[:noop]
-          rendered_file = ENV["HOME"]+"/.#{File.basename(dest)}_#{Time.now.to_i}"
+          rendered_file = Smithy::Config.homedir+"/.#{File.basename(dest)}_#{Time.now.to_i}"
         else
           rendered_file = "#{File.dirname(dest)}/.#{File.basename(dest)}_#{Time.now.to_i}"
         end

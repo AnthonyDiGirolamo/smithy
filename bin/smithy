@@ -43,6 +43,7 @@ $: << File.expand_path(@@smithy_bin_root + '/lib')
 
 require 'English'
 require 'fileutils'
+require 'etc'
 
 require 'rubygems'
 require 'open4'
