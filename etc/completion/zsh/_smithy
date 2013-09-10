@@ -1,8 +1,8 @@
 #compdef smithy
 
 _smithy_packages() {
-  cache_file=$HOME/.smithy/completion_packages 
-  if [[ -e $cache_file ]] 
+  cache_file=$HOME/.smithy/completion_packages
+  if [[ -e $cache_file ]]
   then
     packages=(`cat $cache_file`)
   else
@@ -13,7 +13,7 @@ _smithy_packages() {
 
 _smithy_formulas() {
   cache_file=$HOME/.smithy/completion_formulas
-  if [[ -e $cache_file ]] 
+  if [[ -e $cache_file ]]
   then
     formulas=(`cat $cache_file`)
   else
@@ -24,7 +24,7 @@ _smithy_formulas() {
 
 _smithy_architectures() {
   cache_file=$HOME/.smithy/completion_arches
-  if [[ -e $cache_file ]] 
+  if [[ -e $cache_file ]]
   then
     arches=(`cat $cache_file`)
   else
@@ -219,7 +219,7 @@ case "$words[1]" in
           [[ "$PREFIX" = -* ]] && _arguments \
             '(--clean)--clean[clean existing install prefix]' \
             '(--no-clean)--no-clean[leave existing install prefix files intact]' \
-            '(-f --formula-name)'{-f,--formula-name}'[Formula name]' \
+            '(-f --formula-name=)'{-f,--formula-name=}'[Formula name]:formula:_smithy_formulas' \
             '(-m --modulefile)'{-m,--modulefile}'[Create modulefiles as well]' \
             '1: :->subcmds' &&  return 0
           _smithy_formulas
@@ -229,6 +229,12 @@ case "$words[1]" in
           ;;
         display)
           _smithy_formulas
+          ;;
+        new)
+          [[ "$PREFIX" = -* ]] && _arguments \
+            '(-h --homepage=)'{-h,--homepage=}'[Formula homepage]' \
+            '(-n --name=)'{-n,--name=}'[Formula name]' \
+            '1: :->subcmds' &&  return 0
           ;;
       esac
 

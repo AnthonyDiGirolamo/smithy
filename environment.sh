@@ -1,4 +1,4 @@
-module load ruby
+module load ruby/1.9.3-p448
 module use /sw/tools/smithy/modulefiles
 module load smithy
 
