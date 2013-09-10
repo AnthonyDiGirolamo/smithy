@@ -53,13 +53,13 @@ Feature: Interact with formulas
   Scenario: Install a formula using the formula name only
     When I successfully run `smithy formula install zlib`
     # Then show me the files
-    Then the stdout should contain "==> ./configure --prefix=/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4"
+    Then the stdout should contain "==> ./configure --prefix=/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4"
     Then the stdout should contain "==> make"
     Then the stdout should contain "==> make install"
-    Then the stdout should contain "==> SUCCESS /tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4"
-    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4" should exist
-    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4/source" should exist
-    And a file named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4/source/configure" should exist
-    And a directory named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4/lib" should exist
-    And a file named "/tmp/swsmithy/x86/zlib/1.2.7/sles11.1_gnu4.3.4/lib/libz.a" should exist
+    Then the stdout should contain "==> SUCCESS /tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4"
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4" should exist
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4/source" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4/source/configure" should exist
+    And a directory named "/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4/lib" should exist
+    And a file named "/tmp/swsmithy/x86/zlib/1.2.8/sles11.1_gnu4.3.4/lib/libz.a" should exist
 
