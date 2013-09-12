@@ -133,10 +133,13 @@ module Smithy
     def module_build_list(package, builds, args = {})
       output = ""
 
-
       notice "Multiple Builds Found" if Smithy::Config.global[:verbose]
       notice_info "Build Name".rjust(25)+"   Required Modules" if Smithy::Config.global[:verbose]
       ModuleFile::compilers.each_with_index do |e,i|
+
+        prgenv =  e[:prg_env]
+        prgenv.gsub!(/PrgEnv-/, args.fetch(:prgenv_prefix)) if args[:prgenv_prefix]
+
         if i == 0
           output << "if "
         else
