@@ -81,14 +81,15 @@ module Smithy
       raise "unknown formula #{formula_name}" unless formula_names.include?(formula_name)
 
       require formula_file_path(formula_name)
-      f = "#{formula_name.underscore.camelize}Formula".constantize.new
+
+      formula_class = "#{formula_name.underscore.camelize}Formula".constantize
+      version = formula_class.version if version.blank?
+      build = operating_system        if build.blank?
+      p = Package.new :path => [name, version, build].join("/"), :group_writable => !formula_class.disable_group_writable
+
+      f = "#{formula_name.underscore.camelize}Formula".constantize.new(p)
       # Set the actual formula file path, otherwise it's just formula.rb
       f.formula_file = formula_file_path(formula_name)
-
-      version = f.version      if version.blank?
-      build = operating_system if build.blank?
-      p = Package.new :path => [name, version, build].join("/"), :group_writable => f.group_writable?
-      f.set_package(p) if p.valid?
 
       return f
     end
