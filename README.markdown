@@ -23,43 +23,43 @@ Software builds are created with a few conventions:
 As an example:
 
     /opt                         Software Root
-    ├-- redhat6                    OS directory
+    ├── redhat6                    OS directory
     |   |
-    |   ├-- modulefiles                Modules live here
-    |   |   ├-- git                         Application
-    |   |   |   ├-- 1.7.8.5                     Versions
-    |   |   |   └-- 1.8.2.1
-    |   |   └-- petsc
-    |   |       ├-- 3.2
-    |   |       └-- 3.3
+    |   ├── modulefiles                Modules live here
+    |   |   ├── git                         Application
+    |   |   |   ├── 1.7.8.5                     Versions
+    |   |   |   └── 1.8.2.1
+    |   |   └── petsc
+    |   |       ├── 3.2
+    |   |       └── 3.3
     |   |
-    |   ├-- git                        Application Name
-    |   |   ├-- 1.7.8.5                    Version
-    |   |   |   └-- rhel6.4_gnu4.4.7           Build Name
-    |   |   └-- 1.8.2.1
-    |   |       └-- rhel6.4_gnu4.4.7
+    |   ├── git                        Application Name
+    |   |   ├── 1.7.8.5                    Version
+    |   |   |   └── rhel6.4_gnu4.4.7           Build Name
+    |   |   └── 1.8.2.1
+    |   |       └── rhel6.4_gnu4.4.7
     |   |
-    |   └-- petsc
-    |       ├-- 3.2
-    |       |   ├-- rhel6.4_pgi12.8            Build using PGI 12.8 compiler
-    |       |   └-- rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
-    |       └-- 3.3
-    |           ├-- rhel6.4_pgi12.8
-    |           ├-- rhel6.4_pgi13.4
-    |           └-- rhel6.4_gnu4.7.1
+    |   └── petsc
+    |       ├── 3.2
+    |       |   ├── rhel6.4_pgi12.8            Build using PGI 12.8 compiler
+    |       |   └── rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
+    |       └── 3.3
+    |           ├── rhel6.4_pgi12.8
+    |           ├── rhel6.4_pgi13.4
+    |           └── rhel6.4_gnu4.7.1
     |
-    └-- sles11                     Another OS directory
-       |
-       ├-- modulefiles
-       |   └-- git
-       |       ├-- 1.7.8.5
-       |       └-- 1.8.2.1
-       |
-       └-- git
-           ├-- 1.7.9.5
-           |   └-- sles11.1_gnu4.3.4
-           └-- 1.8.2.1
-               └-- sles11.1_gnu4.3.4
+    └── sles11                     Another OS directory
+        |
+        ├── modulefiles
+        |   └── git
+        |       ├── 1.7.8.5
+        |       └── 1.8.2.1
+        |
+        └── git
+            ├── 1.7.9.5
+            |   └── sles11.1_gnu4.3.4
+            └── 1.8.2.1
+                └── sles11.1_gnu4.3.4
 
 Documentation
 -------------
