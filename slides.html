@@ -525,6 +525,98 @@ Everything that defines the formula will happen between these two lines.
 ]
 
 ---
+
+## The Basics
+```ruby
+class Python27Formula < Formula
+  homepage "www.python.org/"
+  url "http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2"
+  md5 "c57477edd6d18bd9eeca2f21add73919"
+
+  def install
+    module_list
+    system "./configure --prefix=#{prefix} --enable-shared"
+    system "make"
+    system "make install"
+  end
+end
+```
+
+Required methods: `homepage`, `url`, `def install`
+
+`def install ... end` defines the method that is run to perform the install
+
+`prefix` is the path to the installation, `"--configure=#{prefix}
+--enable-shared"` is an example of string interpolation in ruby.
+
+You could also say "--configure=" + prefix + " --enable-shared"
+
+`system` executes a shell command
+
+---
+
+## Adding dependencies
+```ruby
+class Python27Formula < Formula
+  homepage "www.python.org/"
+  url "http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2"
+  md5 "c57477edd6d18bd9eeca2f21add73919"
+
+  depends_on [ "sqlite" ]
+
+  def install
+    module_list
+
+    ENV["CPPFLAGS"] = "-I#{sqlite.prefix}/include"
+    ENV["LDFLAGS"]  = "-L#{sqlite.prefix}/lib"
+
+    system "./configure --prefix=#{prefix} --enable-shared"
+    system "make"
+    system "make install"
+  end
+end
+```
+
+`depends_on` accepts an array of strings that represent dependencies
+
+smithy will search the filesystem for an installed sqlite package and load it's
+information. the `sqlite` variable will become available and you can use
+`sqlite.prefix` `sqlite.version` or `sqlite.build_name` inside the `install`
+method.
+
+`ENV["CPPFLAGS"] = ...` will set the `$CPPFLAGS` environment variable
+
+---
+
+## Loading modules
+```ruby
+class Python27Formula < Formula
+  homepage "www.python.org/"
+  url "http://www.python.org/ftp/python/2.7.3/Python-2.7.3.tar.bz2"
+  md5 "c57477edd6d18bd9eeca2f21add73919"
+
+  depends_on [ "sqlite" ]
+
+  module_commands [ "unload gcc", "load gcc/4.7.2" ]
+
+  def install
+    module_list
+
+    ENV["CPPFLAGS"] = "-I#{sqlite.prefix}/include"
+    ENV["LDFLAGS"]  = "-L#{sqlite.prefix}/lib"
+
+    system "./configure --prefix=#{prefix} --enable-shared"
+    system "make"
+    system "make install"
+  end
+end
+```
+
+`module_commands` accepts an array of strings of module commands that should be
+run before any shell commands
+
+---
+
 name: last-page
 template: inverse
 
