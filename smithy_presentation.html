@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Remark</title>
+    <style type="text/css">
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+
+      body {
+        font-family: 'Droid Serif';
+        font-size: 20px;
+      }
+      h1, h2, h3 {
+        font-family: 'Yanone Kaffeesatz';
+        font-weight: 400;
+        margin-bottom: 0;
+      }
+      h1 { font-size: 4em; }
+      h2 { font-size: 2em; }
+      h3 { font-size: 1.6em; }
+      .footnote {
+        position: absolute;
+        bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .large { font-size: 2em; }
+      a, a > code {
+        color: #268bd2;
+        text-decoration: none;
+      }
+      code {
+        -moz-border-radius: 5px;
+        -web-border-radius: 5px;
+        background: #e7e8e2;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      .pull-left {
+        float: left;
+        width: 47%;
+      }
+      .pull-right {
+        float: right;
+        width: 47%;
+      }
+      .pull-right ~ p {
+        clear: both;
+      }
+      #slideshow .slide .content code {
+        font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+        font-size: 0.9em;
+        padding: 15px;
+      }
+      .inverse {
+        background: #272822;
+        color: #777872;
+        text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+        color: #f3f3f3;
+        line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+        bottom: 12px;
+        left: 20px;
+      }
+      #slide-how .slides {
+        font-size: 0.9em;
+        position: absolute;
+        top:  151px;
+        right: 140px;
+      }
+      #slide-how .slides h3 {
+        margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+        padding: 1px 20px;
+        height: 90px;
+        width: 120px;
+        -moz-box-shadow: 0 0 10px #777;
+        -webkit-box-shadow: 0 0 10px #777;
+        box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+        background: #fff;
+        position: absolute;
+        top: 20%;
+        left: 20%;
+        z-index: 1;
+      }
+      #slide-how .slides .second {
+        position: relative;
+        background: #fff;
+        z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+        color: #777;
+        width: 20%;
+        height: 92%;
+        float: left;
+      }
+        .left-column h2:last-of-type, .left-column h3:last-child {
+          color: #000;
+        }
+      .right-column {
+        width: 75%;
+        float: right;
+        padding-top: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+
+---
+
+#Installing Software
+#with Smithy
+.footnote[Go to directly to [project site](http://anthonydigirolamo.github.io/smithy/)]
+
+---
+
+## Time to reinstall our code...
+
+--
+
+## The one with the horrible build process?
+
+--
+
+## Let the grad student do it.
+
+---
+
+layout: false
+.left-column[
+  ## What is it?
+]
+.right-column[
+
+Smithy is a command line software installation tool that borrows ideas heavily
+from the excellent [homebrew](http://brew.sh/) package management system for Mac
+OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+
+]
+
+---
+
+.left-column[
+  ## What is it?
+  ## Why use it?
+]
+.right-column[
+
+Smithy is a command line software installation tool that borrows ideas heavily
+from the excellent [homebrew](http://brew.sh/) package management system for Mac
+OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+
+Smithy is designed to sanely manage many software builds within a
+shared [HPC](http://en.wikipedia.org/wiki/High-performance_computing)
+Linux environment using [modulefiles](http://modules.sourceforge.net/) to load
+software into a user's shell.
+Software builds are created with a few conventions:
+
+- Everything is organized into architecture or OS directores, e.g. redhat6 or sles11
+
+- Prefixes are defined by their name, version, and build name
+
+- Software is loaded into the shell using [modulefiles](http://modules.sourceforge.net/)
+
+- Builds are performed by [build scripts](http://anthonydigirolamo.github.io/smithy/smithy.1.html#BUILD-SCRIPTS) or [formulas](http://anthonydigirolamo.github.io/smithy/smithy.1.html#FORMULAS)
+
+]
+
+---
+
+template: inverse
+
+## How does it work, then?
+
+---
+
+.left-column[
+## Installation Methods
+### - Build scripts
+]
+.right-column[
+Shell scripts that live inside of a package's PREFIX and execute the steps
+required to perform the compilation.
+
+#### rebuild
+```bash
+#!/bin/bash
+# Load environment and modules
+source $SMITHY_PREFIX/remodule
+
+cd $SMITHY_SOURCE
+make clean
+run ./configure --prefix=$SMITHY_PREFIX
+run make
+run make install
+```
+#### remodule
+```bash
+#!/bin/bash
+# Load module environment
+source ${MODULESHOME}/init/bash
+# Set source directory
+export SMITHY_SOURCE=$SMITHY_PREFIX/source
+module unload PrgEnv-gnu PrgEnv-pgi PrgEnv-cray PrgEnv-intel PrgEnv-pathscale
+module load PrgEnv-gnu
+```
+
+]
+
+---
+
+.left-column[
+## Installation Methods
+### - Build scripts
+]
+.right-column[
+Separate scripts for each build must be maintained.
+```bash
+/sw/xk6/petsc/
+├── 3.3
+│   ├── cle4.0_gnu4.7.1
+│   │   ├── rebuild
+│   │   ├── remodule
+│   │   └── retest
+│   ├── cle4.0_gnu4.7.1_64indices
+│   │   ├── rebuild
+│   │   ├── remodule
+│   │   └── retest
+│   └── modulefile
+│       └── petsc
+│           └── 3.3
+└── 3.3-debug
+    ├── cle4.0_gnu4.7.1
+    │   ├── rebuild
+    │   ├── remodule
+    │   └── retest
+    ├── cle4.0_gnu4.7.1_64indices
+    │   ├── rebuild
+    │   ├── remodule
+    │   └── retest
+    └── modulefile
+        └── petsc
+            └── 3.3-debug
+```
+]
+
+---
+
+.left-column[
+## Installation Methods
+### - Build scripts
+### - Formulas
+]
+.right-column[
+Formulas are a single file written in ruby that define how to install a piece of
+software. They can be more dynamic than build scripts and contain everything
+required to build an application.
+
+```ruby
+class GitFormula < Formula
+  homepage "https://git-core.googlecode.com/"
+  url "https://git-core.googlecode.com/files/git-1.8.3.4.tar.gz"
+  sha1 "fe633d02f7d964842d7ea804278b75120fc60c11"
+
+  depends_on "curl"
+
+  module_commands [ "purge" ]
+
+  def install
+    module_list
+    system "./configure", "--prefix=#{prefix}",
+      "--with-curl=#{curl.prefix}"
+    system "make"
+    system "make install"
+  end
+
+  modulefile <<-MODULEFILE.strip_heredoc
+    #%Module
+    proc ModulesHelp { } {
+       puts stderr "<%= @package.name %> <%= @package.version %>"
+    }
+    module-whatis "<%= @package.name %> <%= @package.version %>"
+    set PREFIX <%= @package.prefix %>
+    prepend-path PATH      $PREFIX/bin
+    prepend-path MANPATH   $PREFIX/share/man
+  MODULEFILE
+end
+```
+]
+
+---
+
+# Why bother with formulas?
+
+### Consolidate Knowledge
+
+- The knowledge of how to build software is spread out over many people. Everyone
+is an expert in just a few builds.
+
+- Build steps are not always obvious from reading build scripts. Patches to
+Makefiles or new configuration files aren't always captured.
+
+- Build scripts are spread out all over the file system. Formulas are a single
+file located in one place.
+
+### Maintainability
+
+- The number of software installs only increases. It's rare that we can ever delete
+a supported package.
+
+- Formulas can be [stored under version control](https://github.com/AnthonyDiGirolamo/smithy_formulas)
+
+---
+
+# Why bother with formulas?
+
+### Ease of re-installation
+
+Properly written formulas can make accommodations to the host operating system
+and compilers. Installing the [hdf5
+formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/hdf5_formula.rb)
+on our cray and clustered systems can be accomplished by running a formula
+install command and changing the build name to include the desired compiler.
+
+### Better Productivity
+
+Since I began writing software installs using formulas I've been able to
+increase the number of installations I've performed over the last two years.
+
+```bash
+Period              Installs by me   Total Installs
+2011/09 - 2012/02   47               200
+2012/03 - 2012/08   62               140
+2012/09 - 2013/02   80               246
+2013/03 - 2013/09   129              284
+```
+
+---
+
+template: inverse
+# Build Script Installation
+### a quick review
+
+---
+
+## Build Scripts
+
+### Create The Build
+
+```bash
+smithy new -t \
+  http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz \
+  petsc/3.2/cle4.0_cray8.0.1
+```
+
+### Edit and Build the Software (repeat as necessary)
+
+```bash
+smithy edit build petsc/3.2/cle4.0_cray8.0.1
+smithy build petsc/3.2/cle4.0_cray8.0.1
+```
+
+### Create and edit a modulefile
+
+```bash
+smithy module create last
+smithy module use last
+module avail      petsc
+module display    petsc/3.2
+module load       petsc/3.2
+smithy module deploy last
+```
+
+---
+
+template: inverse
+# Formulas
+
+---
+
+## Formulas
+
+### Create The Build
+
+```bash
+smithy formula new \
+  --name=subversion \
+  --homepage=http://subversion.apache.org/ \
+  http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+```
+
+### Build the Software
+
+```bash
+smithy formula install subversion/1.7.8/sles11.1_gnu4.3.4
+```
+
+### Create and edit a modulefile
+
+```bash
+smithy module use subversion/1.7.8/sles11.1_gnu4.3.4
+module avail      subversion
+module display    subversion/1.7.8
+module load       subversion/1.7.8
+smithy module deploy last
+```
+
+---
+name: last-page
+template: inverse
+
+## That's all folks!
+
+Slideshow created using [remark](http://github.com/gnab/remark).
+    </textarea>
+    <script src="http://gnab.github.com/remark/downloads/remark-0.5.5.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var hljs = remark.highlighter.engine;
+    </script>
+    <script src="js/remark.language.js" type="text/javascript"></script>
+    <script type="text/javascript">
+      var slideshow = remark.create({
+          highlightStyle: 'monokai',
+          highlightLanguage: 'remark'
+        }) ;
+    </script>
+  </body>
+</html>
+
