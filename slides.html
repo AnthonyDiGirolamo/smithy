@@ -115,6 +115,8 @@
         float: right;
         padding-top: 2em;
       }
+      .column { width: 50%; float:left; }
+
     </style>
   </head>
   <body>
@@ -127,7 +129,8 @@ class: center, middle, inverse
 
 #Installing Software
 #with Smithy
-.footnote[Go to directly to [project site](http://anthonydigirolamo.github.io/smithy/)]
+
+Follow along at [http://anthonydigirolamo.github.io/smithy/slides.html](http://anthonydigirolamo.github.io/smithy/slides.html)
 
 ---
 
@@ -360,6 +363,29 @@ template: inverse
 
 ---
 
+## Naming Software Builds
+
+Software builds following name format: **APPLICATION/VERSION/BUILD**
+
+### APPLICATION
+
+The name using lowercase characters
+
+### VERSION
+
+Numbers with periods or dates, use 2013-02-14 instead of Feb14-2013.
+
+### BUILD
+
+Build features separated by underscores `_`. Typically operating system and
+compiler.
+
+  - `sles11.1_gnu4.6.2` SuSE 11.1, GNU gcc compiler 4.6.2
+  - `cle4.0_pgi12.1.0` Cray Linux Environment 4.0, PGI 12.1.0 compiler
+  - `python2.7` a module compiled for python 2.7
+
+---
+
 ## Build Scripts
 
 ### Create The Build
@@ -374,6 +400,7 @@ smithy new -t \
 
 ```bash
 smithy edit build petsc/3.2/cle4.0_cray8.0.1
+# or vim /sw/xk6/petsc/3.2/cle4.0_cray8.0.1/rebuild
 smithy build petsc/3.2/cle4.0_cray8.0.1
 ```
 
@@ -388,10 +415,9 @@ module load       petsc/3.2
 smithy module deploy last
 ```
 
----
+???
 
-template: inverse
-# Formulas
+Show a quick demo
 
 ---
 
@@ -401,7 +427,6 @@ template: inverse
 
 ```bash
 smithy formula new \
-  --name=subversion \
   --homepage=http://subversion.apache.org/ \
   http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
 ```
@@ -409,6 +434,7 @@ smithy formula new \
 ### Build the Software
 
 ```bash
+vim subversion_formula.rb
 smithy formula install subversion/1.7.8/sles11.1_gnu4.3.4
 ```
 
@@ -422,13 +448,89 @@ module load       subversion/1.7.8
 smithy module deploy last
 ```
 
+???
+
+Show a quick demo
+
+---
+
+template: inverse
+# Formula Files
+
+---
+
+# Getting Help
+
+The [smithy manpage](http://anthonydigirolamo.github.io/smithy/smithy.1.html) contains
+info on how to invoke smithy.
+
+The [smithyformula manpage](http://anthonydigirolamo.github.io/smithy/smithyformula.5.html)
+contains documentation on all Formula DSL methods.
+
+Running `smithy help` will show all subcommands. You can also run `smithy help
+formula` and `smithy help formula install` to get help on sub and sub-sub
+commands.
+
+## Ruby Basics
+
+We will cover most of the basics you need for formula writing here but if you
+would like more info on ruby you might read through:
+
+[Ruby in Twenty Minutes](http://www.ruby-lang.org/en/documentation/quickstart/)
+
+[Ruby Documentation](http://www.ruby-lang.org/en/documentation/)
+
+---
+# Formula Files
+
+Formulas attempt to create a domain specific language with the support of a full
+programming language, ruby. The structure of a formula is the same as a ruby class.
+For example:
+
+    class SubversionFormula < Formula
+
+    end
+
+Everything that defines the formula will happen between these two lines.
+---
+
+# What can I put in a formula?
+
+.column[
+### define dependencies
+`depends_on`
+
+### load or swap modules
+`module_commands`
+
+### set environment variables
+`ENV["CC"] = "..."`
+
+### apply patches
+`patch`
+
+]
+.column[
+### create or change makefiles
+`File.open("path/to/file"`
+
+### run the compilation
+`system "make"`
+
+### run tests
+`system "make check"`
+
+### define a modulefile
+`modulefile`
+]
+
 ---
 name: last-page
 template: inverse
 
 ## That's all folks!
 
-Slideshow created using [remark](http://github.com/gnab/remark).
+.footnote[Slideshow created using [remark](http://github.com/gnab/remark).]
     </textarea>
     <script src="http://gnab.github.com/remark/downloads/remark-0.5.5.min.js" type="text/javascript"></script>
     <script type="text/javascript">
