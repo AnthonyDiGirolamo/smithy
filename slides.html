@@ -807,6 +807,35 @@ The [modulefile helper methods](http://anthonydigirolamo.github.io/smithy/smithy
 
 ---
 
+## Add a Modulefile
+
+Support Multiple Builds with `module_build_list`
+
+```ruby
+modulefile <<-MODULEFILE.strip_heredoc
+  #%Module
+  proc ModulesHelp { } {
+     puts stderr "<%= @package.name %> <%= @package.version %>"
+     puts stderr ""
+  }
+  module-whatis "<%= @package.name %> <%= @package.version %>"
+
+  <% if @builds.size > 1 %>
+  <%= module_build_list @package, @builds %>
+
+  set PREFIX <%= @package.version_directory %>/$BUILD
+  <% else %>
+  set PREFIX <%= @package.prefix %>
+  <% end %>
+
+  prepend-path PATH            $PREFIX/bin
+  prepend-path LD_LIBRARY_PATH $PREFIX/lib
+  prepend-path MANPATH         $PREFIX/share/man
+MODULEFILE
+```
+
+---
+
 # Modulefile Resources
 
 * [Module Command Manpage](http://modules.sourceforge.net/man/module.html)
