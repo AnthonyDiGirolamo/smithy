@@ -654,12 +654,15 @@ end
 
 `depends_on` accepts an array of strings that represent dependencies
 
-smithy will search the filesystem for an installed sqlite package and load it's
-information. the `sqlite` variable will become available and you can use
-`sqlite.prefix` `sqlite.version` or `sqlite.build_name` inside the `install`
-method.
+The `sqlite.prefix`, `sqlite.version`, and `sqlite.build_name` are available inside
+the `install` method.
 
 `ENV["CPPFLAGS"] = ...` will set the `$CPPFLAGS` environment variable
+
+???
+
+smithy will search the filesystem for an installed sqlite package and load it's
+information. the `sqlite` variable will become available and you can use
 
 ---
 
@@ -689,6 +692,10 @@ end
 
 `module_commands` accepts an array of strings of module commands that should be
 run before any shell commands
+
+---
+
+
 
 ---
 
