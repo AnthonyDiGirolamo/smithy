@@ -35,7 +35,7 @@
         -web-border-radius: 5px;
         background: #e7e8e2;
         border-radius: 5px;
-        font-size: 16px;
+        font-size: 18px;
       }
       .pull-left {
         float: left;
@@ -113,9 +113,9 @@
       .right-column {
         width: 75%;
         float: right;
-        padding-top: 2em;
+        padding-top: 1em;
       }
-      .column { width: 50%; float:left; }
+      .column { padding-right: 2%; width: 48%; float:left; }
 
     </style>
   </head>
@@ -272,10 +272,6 @@ Separate scripts for each build must be maintained.
 ### - Formulas
 ]
 .right-column[
-Formulas are a single file written in ruby that define how to install a piece of
-software. They can be more dynamic than build scripts and contain everything
-required to build an application.
-
 ```ruby
 class GitFormula < Formula
   homepage "https://git-core.googlecode.com/"
@@ -307,6 +303,12 @@ class GitFormula < Formula
 end
 ```
 ]
+
+???
+
+Formulas are a single file written in ruby that define how to install a piece of
+software. They can be more dynamic than build scripts and contain everything
+required to build an application.
 
 ---
 
@@ -365,7 +367,7 @@ template: inverse
 
 ## Naming Software Builds
 
-Software builds following name format: **APPLICATION/VERSION/BUILD**
+Software builds following name format: **APPLICATION / VERSION / BUILD**
 
 ### APPLICATION
 
@@ -377,8 +379,8 @@ Numbers with periods or dates, use 2013-02-14 instead of Feb14-2013.
 
 ### BUILD
 
-Build features separated by underscores `_`. Typically operating system and
-compiler.
+Build features are separated by underscores `_`. They typically denote operating
+system and compiler.
 
   - `sles11.1_gnu4.6.2` SuSE 11.1, GNU gcc compiler 4.6.2
   - `cle4.0_pgi12.1.0` Cray Linux Environment 4.0, PGI 12.1.0 compiler
@@ -391,17 +393,15 @@ compiler.
 ### Create The Build
 
 ```bash
-smithy new -t \
-  http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.2-p7.tar.gz \
-  petsc/3.2/cle4.0_cray8.0.1
+smithy new -t http://zlib.net/zlib-1.2.8.tar.gz zlib/1.2.8/sles11.1_gnu4.3.4
 ```
 
 ### Edit and Build the Software (repeat as necessary)
 
 ```bash
-smithy edit build petsc/3.2/cle4.0_cray8.0.1
-# or vim /sw/xk6/petsc/3.2/cle4.0_cray8.0.1/rebuild
-smithy build petsc/3.2/cle4.0_cray8.0.1
+smithy edit build zlib/1.2.8/sles11.1_gnu4.3.4
+# or vim /sw/xk6/zlib/1.2.8/sles11.1_gnu4.3.4/rebuild
+smithy build zlib/1.2.8/sles11.1_gnu4.3.4
 ```
 
 ### Create and edit a modulefile
@@ -409,15 +409,25 @@ smithy build petsc/3.2/cle4.0_cray8.0.1
 ```bash
 smithy module create last
 smithy module use last
-module avail      petsc
-module display    petsc/3.2
-module load       petsc/3.2
+module avail   zlib
+module display zlib/1.2.8
+module load    zlib/1.2.8
 smithy module deploy last
 ```
 
 ???
 
-Show a quick demo
+Show a quick demo:
+```
+rm -rf /sw/xk6/zlib/1.2.8
+smithy new -t http://zlib.net/zlib-1.2.8.tar.gz zlib/1.2.8/sles11.1_gnu4.3.4
+smithy edit build zlib/1.2.8/sles11.1_gnu4.3.4
+smithy build zlib/1.2.8/sles11.1_gnu4.3.4
+smithy module use zlib/1.2.8/sles11.1_gnu4.3.4
+module avail zlib
+module display zlib
+smithy module deploy last
+```
 
 ---
 
@@ -426,25 +436,24 @@ Show a quick demo
 ### Create The Build
 
 ```bash
-smithy formula new \
-  --homepage=http://subversion.apache.org/ \
-  http://mirror.cogentco.com/pub/apache/subversion/subversion-1.7.8.tar.bz2
+smithy formula new --homepage=http://zlib.net/ http://zlib.net/zlib-1.2.8.tar.gz
+     create /sw/tools/smithy/formulas/zlib_formula.rb
 ```
 
 ### Build the Software
 
 ```bash
-vim subversion_formula.rb
-smithy formula install subversion/1.7.8/sles11.1_gnu4.3.4
+vim zlib_formula.rb
+smithy formula install zlib
 ```
 
 ### Create and edit a modulefile
 
 ```bash
-smithy module use subversion/1.7.8/sles11.1_gnu4.3.4
-module avail      subversion
-module display    subversion/1.7.8
-module load       subversion/1.7.8
+smithy module use zlib/1.2.8/sles11.1_gnu4.3.4
+module avail   zlib
+module display zlib/1.2.8
+module load    zlib/1.2.8
 smithy module deploy last
 ```
 
@@ -481,17 +490,38 @@ would like more info on ruby you might read through:
 [Ruby Documentation](http://www.ruby-lang.org/en/documentation/)
 
 ---
+
 # Formula Files
 
-Formulas attempt to create a domain specific language with the support of a full
-programming language, ruby. The structure of a formula is the same as a ruby class.
+.column[
+## Structure
+Formulas are a domain specific language with the support of a full
+programming language. The structure of a formula is the same as a ruby
+class.
+
 For example:
 
     class SubversionFormula < Formula
 
     end
 
-Everything that defines the formula will happen between these two lines.
+The file name of a formula should match the class name. The above example would
+be `subversion_formula.rb`.
+]
+
+.column[
+## Formula File Locations
+- `$HOME/.smithy/formulas`
+- Within the `$SMIHTY_CONFIG` file
+
+  ```
+  formula-directories:
+  - /sw/tools/smithy/formulas
+  ```
+
+- `smithy formula --directories=PATH1,PATH2`
+]
+
 ---
 
 # What can I put in a formula?
@@ -511,10 +541,10 @@ Everything that defines the formula will happen between these two lines.
 
 ]
 .column[
-### create or change makefiles
-`File.open("path/to/file"`
+### create files
+`File.open("path/to/file"...`
 
-### run the compilation
+### start the compilation
 `system "make"`
 
 ### run tests
@@ -549,7 +579,7 @@ Required methods: `homepage`, `url`, `def install`
 `prefix` is the path to the installation, `"--configure=#{prefix}
 --enable-shared"` is an example of string interpolation in ruby.
 
-You could also say "--configure=" + prefix + " --enable-shared"
+You could also say `"--configure=" + prefix + " --enable-shared"`
 
 `system` executes a shell command
 
@@ -633,7 +663,7 @@ template: inverse
       var slideshow = remark.create({
           ratio: '16:9',
           highlightStyle: 'github',
-          highlightLanguage: 'remark'
+          highlightLanguage: 'ruby'
         }) ;
     </script>
   </body>
