@@ -462,7 +462,7 @@ smithy module deploy last
 
 ???
 
-Show a quick demo:
+Demo:
 ```
 rm -rf /sw/xk6/zlib/1.2.8
 smithy new -t http://zlib.net/zlib-1.2.8.tar.gz zlib/1.2.8/sles11.1_gnu4.3.4
@@ -492,7 +492,7 @@ vim zlib_formula.rb
 smithy formula install zlib
 ```
 
-### Create and edit a modulefile
+### Test and deploy the modulefile
 
 ```bash
 smithy module use zlib/1.2.8/sles11.1_gnu4.3.4
@@ -504,7 +504,7 @@ smithy module deploy last
 
 ???
 
-Show a quick demo
+Demo
 
 ---
 
@@ -513,7 +513,7 @@ template: inverse
 
 ---
 
-# Getting Help
+## Getting Help
 
 The [smithy manpage](http://anthonydigirolamo.github.io/smithy/smithy.1.html) contains
 info on how to invoke smithy.
@@ -524,6 +524,11 @@ contains documentation on all Formula DSL methods.
 Running `smithy help` will show all subcommands. You can also run `smithy help
 formula` and `smithy help formula install` to get help on sub and sub-sub
 commands.
+
+Example formulas can be found at:
+[https://github.com/AnthonyDiGirolamo/smithy_formulas](https://github.com/AnthonyDiGirolamo/smithy_formulas)
+
+The [homebrew formula library](https://github.com/mxcl/homebrew/tree/master/Library/Formula) can also be useful.
 
 ## Ruby Basics
 
@@ -802,11 +807,172 @@ The [modulefile helper methods](http://anthonydigirolamo.github.io/smithy/smithy
 
 ---
 
+# Modulefile Resources
+
+* [Module Command Manpage](http://modules.sourceforge.net/man/module.html)
+
+* [Modulefile Manpage](http://modules.sourceforge.net/man/modulefile.html)
+
+* [Tcl Reference Manual](http://tmml.sourceforge.net/doc/tcl/)
+
+---
+
+## Documentation
+
+Smithy can also output simple html documentation for each application via the
+`publish` command.
+
+Source material can be written in html or markdown.
+
+```markdown
+# Git
+
+Category: Development Tools
+
+Excerpt: Git is an open source version control system designed to handle very large
+projects with speed and efficiency, but just as well suited for small personal
+repositories. It is especially popular in the open source community.
+
+## Description
+
+**Website:** [http://git-scm.com/](http://git-scm.com/)
+
+Git is an open source version control system designed to handle very large
+projects with speed and efficiency...
+
+Git falls in the category of distributed source code management tools ...
+
+## Use
+
+    module load git
+```
+
+---
+
+## Documentation
+
+### Description File Locations
+.column[
+
+    /sw
+    |--- redhat6
+    |  |--- subversion
+    |  |  |--- 1.6.17
+    |  |  |--- 1.7.8
+    |  |  `--- description.markdown
+    |  `--- git
+    |     |--- 1.7.9.5
+    |     |--- 1.8.2.1
+    |     `--- description.markdown
+    |
+    `--- xk6
+       |--- subversion
+       |  |--- 1.6.17
+       |  |--- 1.7.8
+       |  `--- description.markdown
+       `--- git
+          |--- 1.7.9.5
+          |--- 1.8.2.1
+          `--- description.markdown
+
+]
+.column[
+
+    /sw
+    |--- redhat6
+    |  |--- subversion
+    |  |  |--- 1.6.17
+    |  |  `--- 1.7.8
+    |  `--- git
+    |     |--- 1.7.9.5
+    |     `--- 1.8.2.1
+    |--- xk6
+    |  |--- subversion
+    |  |  |--- 1.6.17
+    |  |  `--- 1.7.8
+    |  `--- git
+    |     |--- 1.7.9.5
+    |     `--- 1.8.2.1
+    `--- descriptions
+       |--- subversion
+       |  `--- description.markdown
+       `--- git
+          `--- description.markdown
+
+With `descriptions-root: /sw/descriptions` in the `$SMIHTY_CONFIG` file.
+]
+
+---
+
+## Documentation
+
+### Generating
+```
+smithy publish git
+==> Publishing 1 package
+    updated /ccs/proj/ccsstaff/swdesc/data/all/git.html
+```
+
+### Output
+```html
+<h2>Git</h2>
+
+<p>Systems: Lens, Smoky, Titan</p>
+
+<p>Category: Development Tools</p>
+
+<p>Excerpt: Git is an open source version control system designed to handle very
+  large pr$jects with speed and efficiency, but just as well suited for small
+  personal repositories. It is especially popular in the open source
+  community.</p>
+
+<h3>Description</h3>
+```
+
+---
+
+## Documentation
+
+### Output
+```html
+<h2>Git</h2>
+
+<p>Systems: Lens, Smoky, Titan</p>
+
+<p>Category: Development Tools</p>
+
+<p>Excerpt: Git is an open source version control system designed to handle very
+  large pr$jects with speed and efficiency, but just as well suited for small
+  personal repositories. It is especially popular in the open source
+  community.</p>
+
+<h3>Description</h3>
+```
+
+### System Names
+
+Defined in the `$SMITHY_CONFIG` file:
+
+```markdown
+web-architecture-names:
+  xk6: titan
+  xk7: titan
+  analysis-x64: lens
+```
+
+---
+
+template: inverse
+
+# Questions?
+
+---
+
 
 name: last-page
 template: inverse
 
-## That's all folks!
+# That's all folks!
 
 .footnote[Slideshow created using [remark](http://github.com/gnab/remark).]
     </textarea>
