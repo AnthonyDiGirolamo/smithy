@@ -695,9 +695,113 @@ run before any shell commands
 
 ---
 
+## Making it More Dynamic
 
+Pass a block instead of an array
+
+```ruby
+module_commands do
+  ...
+end
+```
+
+This block will return an array of module commands that depends on the
+`build_name`.
+
+```ruby
+module_commands do
+  commands = [ "unload PrgEnv-gnu PrgEnv-pgi PrgEnv-cray PrgEnv-intel" ]
+
+  case build_name
+  when /gnu/
+    commands << "load PrgEnv-gnu"
+  when /pgi/
+    commands << "load PrgEnv-pgi"
+  when /intel/
+    commands << "load PrgEnv-intel"
+  when /cray/
+    commands << "load PrgEnv-cray"
+  end
+
+  commands << "load acml"
+  commands
+end
+```
 
 ---
+
+## Making it More Dynamic
+
+The same can be done with `depends_on`
+
+```ruby
+depends_on do
+  case build_name
+  when /python3.3/
+    [ "python/3.3.0", "python_numpy/1.7.1/*python3.3.0*" ]
+  when /python2.7/
+    [ "python/2.7.3", "python_numpy/1.7.1/*python2.7.3*" ]
+  end
+end
+```
+
+The `when /.../` syntax represents a regular expression
+
+`depends_on` strings can also contain wildcards `*`
+
+---
+
+.column[
+## Helper Methods
+#### name
+#### version
+#### build_name
+#### prefix
+#### system
+#### module_list
+#### module_is_available?
+#### module_environment_variable
+#### patch
+]
+.column[
+## Common Operations
+#### Change Working Directory
+#### Running Shell Commands
+#### Setting Environment Variables
+#### Creating Files
+
+The [smithy formula manpage](http://anthonydigirolamo.github.io/smithy/smithyformula.5.html#FORMULA-HELPER-METHODS) has more info.
+]
+
+---
+
+## Add a Modulefile
+
+The `modulefile` method expects a string written in ERB syntax. Anything
+between `<%= ... %>` will be interpreted as ruby code. The rest will appear in
+the resulting modulefile as is.
+
+```ruby
+modulefile <<-MODULEFILE.strip_heredoc
+  #%Module
+  proc ModulesHelp { } {
+     puts stderr "<%= @package.name %> <%= @package.version %>"
+     puts stderr ""
+  }
+  module-whatis "<%= @package.name %> <%= @package.version %>"
+
+  set PREFIX <%= @package.prefix %>
+
+  prepend-path PATH            $PREFIX/bin
+  prepend-path LD_LIBRARY_PATH $PREFIX/lib
+  prepend-path MANPATH         $PREFIX/share/man
+MODULEFILE
+```
+
+The [modulefile helper methods](http://anthonydigirolamo.github.io/smithy/smithyformula.5.html#MODULEFILE-HELPER-METHODS) section of the manpage has more details.
+
+---
+
 
 name: last-page
 template: inverse
