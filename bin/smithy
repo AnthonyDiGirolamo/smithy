@@ -58,7 +58,7 @@ require 'active_support/core_ext/string'
 require 'active_support/inflector'
 
 # require 'debugger'      #XXX
-# require 'pp'            #XXX
+# require 'awesome_print' #XXX
 # require 'pry'
 # require 'pry-doc'
 
