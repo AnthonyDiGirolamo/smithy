@@ -752,7 +752,7 @@ end
 
 The `when /.../` syntax represents a regular expression
 
-`depends_on` strings can also contain wildcards `*`
+`depends_on` strings can also contain wildcards `\*`
 
 ---
 
@@ -836,13 +836,31 @@ MODULEFILE
 
 ---
 
-# Modulefile Resources
+# Modulefile Tips
 
-* [Module Command Manpage](http://modules.sourceforge.net/man/module.html)
+- Try to update only the necessary environment variables.
 
-* [Modulefile Manpage](http://modules.sourceforge.net/man/modulefile.html)
+- If a package includes a shell script you must source you can determine what
+  needs to be set by dumping `env` to a file before and after then running `diff`
+  on the results.
 
-* [Tcl Reference Manual](http://tmml.sourceforge.net/doc/tcl/)
+- If it's a library, add LIBRARY and INCLUDE variables to help with compilation:
+
+  ```ruby
+  setenv <%= @package.name.upcase %>_DIR $PREFIX
+  setenv <%= @package.name.upcase %>_LIB "-L$PREFIX/lib"
+  setenv <%= @package.name.upcase %>_INC "-I$PREFIX/include"
+  ```
+
+- Modulefiles are written in TCL. You can do anything provided by TCL in
+  addition to the modulefile helpers. See these for more info:
+
+  - [Modulefile Manpage](http://modules.sourceforge.net/man/modulefile.html)
+
+  - [Tcl Reference Manual](http://tmml.sourceforge.net/doc/tcl/)
+
+- Good examples include the [hpctoolkit](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/hpctoolkit_formula.rb) and [hdf5](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/hdf5_formula.rb) modulefiles.
+
 
 ---
 
