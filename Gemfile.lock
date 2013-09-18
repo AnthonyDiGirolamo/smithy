@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    software_smithy (1.6.2)
+    software_smithy (1.6.3)
       activesupport (= 3.2.14)
       gli (= 2.7.0)
       kramdown (>= 1.1.0)
