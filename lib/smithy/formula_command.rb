@@ -9,6 +9,7 @@ module Smithy
       unless @formula_directories
         @formula_directories = [ File.join(Smithy::Config.homedir, ".smithy/formulas") ]
         if Smithy::Config.global[:"formula-directories"]
+          raise "The formula-directories option in $SMITHY_CONFIG should be an array" if Smithy::Config.global[:"formula-directories"].class != Array
           Smithy::Config.global[:"formula-directories"].reverse.each do |dir|
             @formula_directories << dir
           end

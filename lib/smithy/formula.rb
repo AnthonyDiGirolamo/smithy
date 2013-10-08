@@ -26,12 +26,14 @@ module Smithy
 
     # setup module environment by purging and loading only what's needed
     def initialize_modules
-      @modules = nil # re-evaluate modules block
-      @module_commands = nil # re-evaluate module_commands block
       @module_setup = ""
+      @module_commands = @modules = nil # re-evaluates the blocks
+
       raise "please specify modules OR modules_command, not both" if modules.present? && module_commands.present?
       raise "module_commands method must return an array" if module_commands.present? && module_commands.class != Array
+
       if ENV["MODULESHOME"]
+        @module_commands = @modules = nil # re-evaluates the blocks
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
         if modules.present?
@@ -122,9 +124,8 @@ module Smithy
     end
 
     def module_is_available?(mod)
-      return false unless @modulecmd
-
-      if `#{@modulecmd} avail #{mod} 2>&1` =~ /#{mod}/
+      module_avail = `#{module_setup} #{@modulecmd} avail #{mod} 2>&1`
+      if module_avail =~ /#{mod}/
         true
       else
         false
@@ -133,7 +134,7 @@ module Smithy
 
     def module_environment_variable(mod, var)
       module_display = `#{module_setup} #{@modulecmd} display #{mod} 2>&1`
-      if module_display =~ /(\S+)\s+#{var}\s+(.*)$/
+      if module_display =~ /^(\S+)\s+#{var}\s+(.*)$/
         return $2.strip
       else
         return ""
