@@ -88,7 +88,7 @@ module Smithy
       build = operating_system        if build.blank?
       p = Package.new :path => [name, version, build].join("/"), :group_writable => !formula_class.disable_group_writable
 
-      f = "#{formula_name.underscore.camelize}Formula".constantize.new(p)
+      f = formula_class.new(p)
       # Set the actual formula file path, otherwise it's just formula.rb
       f.formula_file = formula_file_path(formula_name)
 
@@ -162,7 +162,7 @@ module Smithy
     def self.new_command(options,args)
       @formula_name     = options[:name]
       @formula_name     = url_filename_basename(args.first) unless options[:name]
-      @formula_name     = @formula_name.camelize
+      @formula_name     = @formula_name.underscore.camelize
       @formula_url      = args.first
       @formula_homepage = options[:homepage]
       @formula_homepage = "#{URI(@formula_url).scheme}://#{URI(@formula_url).host}/" unless options[:homepage]
