@@ -38,28 +38,28 @@
 module Smithy
   FILE_NOTICE_COLUMNS = 12
   def notice_create(file)
-    puts "create ".rjust(12).color(:green).bright + file
+    puts "create ".rjust(12).color(:green) + file
   end
   def notice_exist(file)
-    puts "exists ".rjust(12).color(:blue).bright + file
+    puts "exists ".rjust(12).color(:blue) + file
   end
   def notice_using(file)
-    puts "using ".rjust(12).color(:blue).bright + file
+    puts "using ".rjust(12).color(:blue) + file
   end
   def notice_link(file1, file2)
-    puts "link ".rjust(12).bright + file1 + " -> " + file2
+    puts "link ".rjust(12) + file1 + " -> " + file2
   end
   def notice_identical(file)
-    puts "identical ".rjust(12).color(:blue).bright + file
+    puts "identical ".rjust(12).color(:blue) + file
   end
   def notice_conflict(file)
-    puts "conflict ".rjust(12).color(:red).bright + file
+    puts "conflict ".rjust(12).color(:red) + file
   end
   def notice_force(file)
-    puts "force ".rjust(12).color(:yellow).bright + file
+    puts "force ".rjust(12).color(:yellow) + file
   end
   def notice_skip(file)
-    puts "skip ".rjust(12).bright + file
+    puts "skip ".rjust(12) + file
   end
 
   class FileOperations

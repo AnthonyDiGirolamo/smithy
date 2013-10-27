@@ -482,7 +482,7 @@ module Smithy
           if File.size(f) == 0
             puts "empty ".rjust(12).color(:yellow) + f
           else
-            puts "exists ".rjust(12).bright + f
+            puts "exists ".rjust(12) + f
           end
           FileOperations.make_executable file[:dest], options if f =~ /#{ExecutableBuildFileNames.join('|')}/
         else

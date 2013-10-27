@@ -215,7 +215,7 @@ module Smithy
         d.write(@content)
         d.close
       end
-      puts "updated ".rjust(12).bright + description_output
+      puts "updated ".rjust(12) + description_output
 
       #TODO update category list
 
@@ -269,7 +269,7 @@ module Smithy
         end
       end
 
-      puts "updated ".rjust(12).bright + output
+      puts "updated ".rjust(12) + output
     end
 
   end
