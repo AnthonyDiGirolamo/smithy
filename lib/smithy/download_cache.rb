@@ -79,10 +79,10 @@ module Smithy
       raise "curl cannot be located, without it files cannot be downloaded" if curl.blank?
 
       if downloaded?
-        puts "downloaded ".rjust(12).color(:green).bright + downloaded_file_path
+        puts "downloaded ".rjust(12).color(:green) + downloaded_file_path
         return true
       else
-        puts "download ".rjust(12).color(:green).bright + url
+        puts "download ".rjust(12).color(:green) + url
       end
 
       args = ['-qf#L']

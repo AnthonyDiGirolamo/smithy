@@ -194,7 +194,7 @@ describe Formula do
       class Bzip2Formula < Formula
         homepage "http://www.bzip.org/"
         url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
-        modules ["ruby", "git"]
+        modules ["dot"]
         def install
         end
       end
@@ -237,10 +237,9 @@ describe Formula do
       z.modules.should == ["zlib", "1.2", "macos10.8_gnu4.2"]
     end
 
-    it "saves module purge commands", :if => ENV["MODULESHOME"] do
-      z = ZlibFormula.new
-      z.module_setup.should include("unset")
-      z.module_setup.should include("export")
+    it "module command loads only specified modules", :if => ENV["MODULESHOME"] do
+      z = Bzip2Formula.new
+      z.module_setup.should include("LOADEDMODULES=dot ")
     end
 
     it "properly resets module names if assigning a new package" do
@@ -252,9 +251,12 @@ describe Formula do
 
     it "properly loads modules" do
       z = Bzip2Formula.new
-      z.modules.should == ["ruby", "git"]
-      z.module_setup.should include("GITDIR=")
-      z.module_setup.should include("GEM_HOME=")
+      z.modules.should == ["dot"]
+      z.module_setup.should include("LOADEDMODULES=dot")
+    end
+
+    it "only calls initialize_modules once" do
+      pending
     end
   end
 
@@ -273,14 +275,48 @@ describe Formula do
     it "saves module commands" do
       Hdf5Formula.new.module_commands.should == ["swap PrgEnv-pgi PrgEnv-gnu", "swap gcc gcc/4.7.2", "load hdf5/1.8.8"]
     end
+  end
 
-    it "properly loads modules" do
-      h = Hdf5Formula.new
-      `#{h.module_setup} which pgcc     2>&1`.should include("which: no pgcc in")
-      `#{h.module_setup} which gcc      2>&1`.should include("/opt/gcc/4.7.2/bin/gcc")
-      `#{h.module_setup} echo $HDF5_DIR 2>&1`.should include("/opt/cray/hdf5/1.8.8/gnu/47")
+  describe "#module_is_available?" do
+    before(:all) do
+      class ModuleAvailableFormula < Formula
+        homepage "http://www.bzip.org/"
+        url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
+        module_commands do
+          mods = []
+          mods << "load dot" if module_is_available?("dot")
+          mods << "load null"
+          mods
+        end
+        def install
+        end
+      end
+    end
+
+    it "detects available modules" do
+      f = ModuleAvailableFormula.new
+      f.module_commands.should include "load dot", "load null"
+    end
+  end
+
+  describe "#module_environment_variable" do
+    before(:all) do
+      class ModuleEnvironmentVariableFormula < Formula
+        homepage "http://www.bzip.org/"
+        url "http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz"
+        def install
+        end
+        modulefile do
+          module_environment_variable("dot", "PATH")
+        end
+      end
+    end
+
+    it "captures module environment variables" do
+      f = ModuleEnvironmentVariableFormula.new
+      f.modulefile.should include "."
+      f.module_environment_variable("dot", "PATH").should include "."
     end
   end
 
 end
-

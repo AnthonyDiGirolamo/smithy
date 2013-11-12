@@ -9,6 +9,7 @@ module Smithy
       unless @formula_directories
         @formula_directories = [ File.join(Smithy::Config.homedir, ".smithy/formulas") ]
         if Smithy::Config.global[:"formula-directories"]
+          raise "The formula-directories option in $SMITHY_CONFIG should be an array" if Smithy::Config.global[:"formula-directories"].class != Array
           Smithy::Config.global[:"formula-directories"].reverse.each do |dir|
             @formula_directories << dir
           end
@@ -160,7 +161,7 @@ module Smithy
     def self.new_command(options,args)
       @formula_name     = options[:name]
       @formula_name     = url_filename_basename(args.first) unless options[:name]
-      @formula_name     = @formula_name.camelize
+      @formula_name     = @formula_name.underscore.camelize
       @formula_url      = args.first
       @formula_homepage = options[:homepage]
       @formula_homepage = "#{URI(@formula_url).scheme}://#{URI(@formula_url).host}/" unless options[:homepage]
