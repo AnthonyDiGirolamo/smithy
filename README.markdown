@@ -6,7 +6,7 @@ Overview
 
 `smithy` is a command line software installation/compilation tool that borrows
 ideas heavily from the excellent [homebrew](http://brew.sh/) package management
-system for Mac OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).
+system for Mac OS X and [SWTools](http://www.olcf.ornl.gov/center-projects/swtools/).[^1]
 
 Smithy is designed to sanely manage many software builds within a
 shared [HPC](http://en.wikipedia.org/wiki/High-performance_computing)
@@ -200,6 +200,11 @@ License
 Smithy is based on the ideas created in SWTools and uses a BSD license. See
 [LICENSE](https://github.com/AnthonyDiGirolamo/smithy/blob/master/LICENSE) for
 the exact text.
+
+References
+----------
+
+[^1]: N. Jones, M. R. Fahey, "Design, Implementation, and Experiences of Third-Party Software Administration at the ORNL NCCS," Proceedings of the 50th Cray User Group (CUG08), Helsinki, May 2008.
 
 Contributing and Support
 ------------------------
