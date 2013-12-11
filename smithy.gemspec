@@ -49,6 +49,7 @@ lib/smithy/module_file.rb
 lib/smithy/package.rb
 lib/smithy_version.rb
 man/man1/smithy.1
+man/man5/smithyformula.5
   )
   # s.files += Dir["formulas/*"]
   s.require_paths << 'lib'

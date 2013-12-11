@@ -367,6 +367,8 @@ module Smithy
           `unzip #{archive}`
         when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
           `tar xf #{archive}`
+        else
+          `tar xf #{archive}`
         end
 
         extracted_files = Dir.glob('*')
