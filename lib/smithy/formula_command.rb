@@ -86,8 +86,32 @@ module Smithy
       # Set the actual formula file path, otherwise it's just formula.rb
       f.formula_file = formula_file_path(formula_name)
 
+      guessing_new_name = true if version.blank? || build.blank?
       version = f.version      if version.blank?
       build = operating_system if build.blank?
+
+      if guessing_new_name
+        guessed_install_path = File.join(
+          # Smithy::Config.global[:full_software_root_path],
+          [name, version, build].join("/") )
+
+        use_guessed_name = false
+        while use_guessed_name == false do
+          prompt = Readline.readline("Did you mean #{guessed_install_path} ? (enter \"h\" for help) [ynh] ")
+          case prompt.downcase
+          when "y"
+            use_guessed_name = true
+          when "n"
+            notice_warn "Please re-run with a full target name including version and build name."
+            raise "Aborting install"
+          when "h"
+            puts "    y - yes, continue"
+            puts "    n - no, abort"
+            puts "    h - help, show this help"
+          end
+        end
+      end
+
       p = Package.new :path => [name, version, build].join("/"), :group_writable => f.group_writable?
       f.set_package(p) if p.valid?
 
