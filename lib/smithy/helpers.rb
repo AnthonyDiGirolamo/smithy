@@ -161,7 +161,7 @@ module Smithy
       b = "sles#{version}.#{patch}"
     end
 
-    if `gcc --version` =~ /gcc \((.*)\) ([\d\.]+)/
+    if `gcc --version 2>&1` =~ /gcc \((.*)\) ([\d\.]+)/
       b << "_gnu#{$2}"
     end
     return b
