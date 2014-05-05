@@ -1,13 +1,13 @@
 
-                                         T H E
+                             T H E
 
-                                      S M I T H Y
+                          S M I T H Y
 
-                                    S O F T W A R E
+                        S O F T W A R E
 
-                                 I N S T A L A T I O N
+                     I N S T A L A T I O N
 
-                                        T O O L
+                            T O O L
 
 class ZlibFormula < Formula
   homepage "http://zlib.net"
@@ -23,17 +23,26 @@ class ZlibFormula < Formula
 
   modulefile <<-MODULEFILE.strip_heredoc
     #%Module
-    proc ModulesHelp { } {
-       puts stderr "<%= @package.name %> <%= @package.version %>"
-       puts stderr ""
-    }
     module-whatis "<%= @package.name %> <%= @package.version %>"
-
     set PREFIX <%= @package.prefix %>
-
     prepend-path LD_LIBRARY_PATH $PREFIX/lib
     prepend-path MANPATH         $PREFIX/share/man
   MODULEFILE
 end
 
+$ smithy formula install zlib
 
+opt
+├── smithyrc
+├── formulas
+|   └── zlib_formula.rb
+└── mavericks
+    └── zlib
+        └── 1.2.8
+            ├── modulefile
+            |   └── zlib
+            └── x86_64
+                ├── include
+                ├── lib
+                ├── share
+                └── source
