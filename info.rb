@@ -5,9 +5,10 @@
 
                         S O F T W A R E
 
-                     I N S T A L A T I O N
+                    I N S T A L L A T I O N
 
                             T O O L
+
 
 class ZlibFormula < Formula
   homepage "http://zlib.net"
