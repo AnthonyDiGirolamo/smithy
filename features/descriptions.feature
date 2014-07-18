@@ -14,7 +14,7 @@ Feature: Create description files
       """
       ---
       software-root: /tmp/swsmithy
-      file-group-name: ccsstaff
+      file-group-name: staff
       hostname-architectures:
         awesome_sauce: x86-64
         smarty_pants: i686
@@ -28,7 +28,7 @@ Feature: Create description files
       """
       ---
       software-root: /tmp/swsmithy
-      file-group-name: ccsstaff
+      file-group-name: staff
       hostname-architectures:
         awesome_sauce: x86-64
         smarty_pants: i686

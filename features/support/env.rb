@@ -1,6 +1,5 @@
 require 'aruba/cucumber'
 require 'fileutils'
-require 'debugger'
 
 ENV['PATH'] = "#{File.expand_path(File.dirname(__FILE__) + '/../../bin')}#{File::PATH_SEPARATOR}#{ENV['PATH']}"
 ENV['GLI_DEBUG'] = 'true'
