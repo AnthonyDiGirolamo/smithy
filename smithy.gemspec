@@ -61,7 +61,6 @@ man/man5/smithyformula.5
   s.add_development_dependency('awesome_print')
   s.add_development_dependency('interactive_editor')
   s.add_development_dependency('cucumber')
-  s.add_development_dependency('byebug')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
   s.add_development_dependency('aruba')
