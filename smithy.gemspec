@@ -67,7 +67,7 @@ man/man5/smithyformula.5
   s.add_development_dependency('ronn')
   s.add_development_dependency('rspec')
   s.add_development_dependency('fuubar')
-  s.add_dependency('gli', '= 2.11.0')
+  s.add_dependency('gli', '= 2.10.0')
   s.add_dependency('kramdown', '= 1.4.0')
   s.add_dependency('open4', '= 1.3.4')
   s.add_dependency('rainbow', '= 1.1.4')
