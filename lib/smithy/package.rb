@@ -365,8 +365,6 @@ module Smithy
         case magic_bytes
         when /^PK\003\004/ # .zip archive
           `unzip #{archive}`
-        when /^\037\213/, /^BZh/, /^\037\235/  # gzip/bz2/compress compressed
-          `tar xf #{archive}`
         else
           `tar xf #{archive}`
         end
