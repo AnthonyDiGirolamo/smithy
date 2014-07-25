@@ -126,6 +126,7 @@ module Smithy
 
       packages.each do |package|
         f = build_formula(package, options[:"formula-name"])
+        f.check_dependencies
         f.package.create(:formula => true)
 
         formula_prefix_contents = Dir["#{f.prefix}/*"]

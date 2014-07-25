@@ -20,7 +20,11 @@ module Smithy
         # guess name and build_name
         @name = self.formula_name
         @build_name = operating_system
-        initialize_modules
+      end
+
+      if ENV["MODULESHOME"]
+        @modulecmd = "modulecmd sh"
+        @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
       end
     end
 
@@ -34,8 +38,6 @@ module Smithy
 
       if ENV["MODULESHOME"]
         @module_commands = @modules = nil # re-evaluates the blocks
-        @modulecmd = "modulecmd sh"
-        @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
         if modules.present?
           @module_setup << `#{@module_setup} #{@modulecmd} purge 2>/dev/null` << " "
           raise "modules must return a list of strings" unless modules.is_a? Array
@@ -54,7 +56,6 @@ module Smithy
       @version    = p.version
       @build_name = p.build_name
       @prefix     = p.prefix
-      initialize_modules
     end
 
     # DSL Methods
@@ -99,7 +100,7 @@ module Smithy
     end
 
     def run_install
-      check_dependencies if depends_on
+      initialize_modules
       install
       notice_success "SUCCESS #{@prefix}"
       return true
@@ -175,6 +176,7 @@ module Smithy
     end
 
     def check_dependencies
+      return true unless depends_on
       @depends_on = [depends_on] if depends_on.is_a? String
       missing_packages = []
       notice "Searching for dependencies"
