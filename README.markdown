@@ -190,7 +190,7 @@ Here is an example config file:
 
 You may wish to set this using a modulefile or a shell script. Examples are
 provided in
-[modulefiles/smithy/1.6](https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.6.4)
+[modulefiles/smithy/1.6](https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.6.5)
 and
 [environment.sh](https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh)
 
