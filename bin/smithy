@@ -667,7 +667,7 @@ command ['blame'] do |c|
         formula_path = formula_directory + "/" + formula_name
         owner = `cd #{formula_directory}; ls -AhlF #{formula_path}`.split(" ")[2]
         change_owners[owner] = [] if change_owners[owner].nil?
-        change_owners[owner] << formula_name
+        change_owners[owner] << formula_directory + "/" + formula_name
       end
     end
 
