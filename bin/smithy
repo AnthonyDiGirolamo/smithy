@@ -662,7 +662,7 @@ command ['blame'] do |c|
     change_owners = {}
     FormulaCommand.formula_directories.select{|dir| Dir.exists? dir}.each do |formula_directory|
       git_status = "cd #{formula_directory}; git status | grep .rb"
-      changed_formulas = `#{git_status}`.gsub("#\t","").split("\n")
+      changed_formulas = `#{git_status}`.gsub("#","").gsub("\t","").gsub("modified:   ","").split("\n")
       changed_formulas.each do |formula_name|
         formula_path = formula_directory + "/" + formula_name
         owner = `cd #{formula_directory}; ls -AhlF #{formula_path}`.split(" ")[2]
