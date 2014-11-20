@@ -658,19 +658,22 @@ end
 
 desc "Show owners of uncommited formula changes"
 command ['blame'] do |c|
-  formula_directory = "/sw/tools/smithy/formulas"
-  git_status = "cd #{formula_directory}; git status | grep .rb"
-  changed_formulas = `#{git_status}`.gsub("#\t","").split("\n")
-  change_owners = {}
-  changed_formulas.each do |formula_name|
-    formula_path = formula_directory + "/" + formula_name
-    owner = `ls -AhlF #{formula_path}`.split(" ")[2]
-    change_owners[owner] = [] if change_owners[owner].nil?
-    change_owners[owner] << formula_name
-  end
+  c.action do |global_options,options,args|
+    change_owners = {}
+    FormulaCommand.formula_directories.select{|dir| Dir.exists? dir}.each do |formula_directory|
+      git_status = "cd #{formula_directory}; git status | grep .rb"
+      changed_formulas = `#{git_status}`.gsub("#\t","").split("\n")
+      changed_formulas.each do |formula_name|
+        formula_path = formula_directory + "/" + formula_name
+        owner = `cd #{formula_directory}; ls -AhlF #{formula_path}`.split(" ")[2]
+        change_owners[owner] = [] if change_owners[owner].nil?
+        change_owners[owner] << formula_name
+      end
+    end
 
-  change_owners.each_pair do |owner, formulas|
-    puts "#{owner} => #{formulas.join(", ")}"
+    change_owners.each_pair do |owner, formulas|
+      puts "#{owner} => #{formulas.join(", ")}"
+    end
   end
 end
 # command ['publish_cray'] do |c|
