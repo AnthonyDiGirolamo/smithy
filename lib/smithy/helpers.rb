@@ -52,6 +52,16 @@ module Smithy
     STDOUT.puts command.ljust(width)+comment.color(:blue) #if STDOUT.tty?
   end
 
+  def notice_params(params_hash)
+    width = 0
+    params_hash.keys.each do |key|
+      width = key.to_s.size if key.to_s.size > width
+    end
+    params_hash.each do |key, value|
+      STDOUT.puts "  " + key.to_s.ljust(width) + " " + value.color(:blue) #if STDOUT.tty?
+    end
+  end
+
   def notice_success(message)
     # if STDOUT.tty?
       STDOUT.puts "==> ".color(:green) + message.color(:green)

@@ -693,7 +693,14 @@ post do |global,command,options,args|
 end
 
 on_error do |exception|
-  notice_exception exception.message unless exception.message.blank?
+  if exception.message.present?
+    notice_exception exception.message
+    notice_exception "Backtrace:"
+    # exception.backtrace.each do |line|
+    exception.backtrace.select{|l| l =~ /formula.rb/}.each do |line|
+      puts "  " + line
+    end
+  end
 
   log_exception(exception, @@global_argv, @@global_config)
   # Error logic here

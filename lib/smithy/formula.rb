@@ -3,7 +3,7 @@ module Smithy
     attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup
 
     def self.formula_name
-      self.to_s.underscore.split("/").last.gsub /_formula$/, ""
+      self.to_s.underscore.split("/").last.gsub(/_formula$/, "")
     end
     def formula_name
       self.class.formula_name
@@ -70,6 +70,27 @@ module Smithy
           @#{attr}
         end
       }
+    end
+
+    def self.params(params_hash)
+      raise "params method must be given a hash" unless params_hash.is_a?(Hash)
+
+      notice "Using Parameters:"
+      params_hash.each do |attr, value|
+        attr = attr.to_s
+        class_eval %Q{
+          def self.#{attr}(value = nil)
+            @#{attr} = value unless @#{attr}
+            @#{attr}
+          end
+          def #{attr}
+            @#{attr} = self.class.#{attr} unless @#{attr}
+            @#{attr}
+          end
+        }
+        self.send(attr, value)
+      end
+      notice_params params_hash
     end
 
     # DLS Version Method, can set a version or guess based on the filename
@@ -173,6 +194,17 @@ module Smithy
         Kernel.system @module_setup + args.join(' ')
       end
       fail_command if $?.exitstatus != 0
+    end
+
+    def python_command(*args)
+      python_version_output = `#{@module_setup} python --version 2>&1`
+      v = python_version_output.chomp.strip.split.last
+      if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
+        pyver = $1 + $2.delete(".")
+        pylibdir = "#{prefix}/lib/python#{pyver}/site-packages"
+        FileUtils.mkdir_p pylibdir
+        system "PYTHONPATH=$PYTHONPATH:#{pylibdir} python ", args.join(" ")
+      end
     end
 
     def check_dependencies
