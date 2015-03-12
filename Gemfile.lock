@@ -1,14 +1,3 @@
-PATH
-  remote: .
-  specs:
-    software_smithy (1.6.5)
-      activesupport (= 4.2.0)
-      gli (= 2.10.0)
-      kramdown (= 1.4.0)
-      open4 (= 1.3.4)
-      rainbow (= 1.1.4)
-      terminal-table (>= 1.4.5)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -65,10 +54,9 @@ GEM
       pry (~> 0.9)
       yard (~> 0.8)
     rainbow (1.1.4)
-    rake (10.0.3)
+    rake (10.1.0)
     rdiscount (2.0.7)
-    rdoc (3.12.1)
-      json (~> 1.4)
+    rdoc (4.1.0)
     ronn (0.7.3)
       hpricot (>= 0.8.2)
       mustache (>= 0.7.0)
@@ -94,15 +82,20 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  activesupport (= 4.2.0)
   aruba
   byebug
   cucumber
   fuubar
+  gli (= 2.10.0)
+  kramdown (= 1.4.0)
+  open4 (= 1.3.4)
   pry
   pry-byebug
   pry-doc
+  rainbow (= 1.1.4)
   rake
   rdoc
   ronn
   rspec
-  software_smithy!
+  terminal-table (>= 1.4.5)
