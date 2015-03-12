@@ -8,3 +8,5 @@ pkg
 tags
 tmp
 vendor/ruby
+packaging/vendor
+packaging/traveling*

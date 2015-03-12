@@ -36,5 +36,5 @@
 # }}}
 
 module Smithy
-  VERSION = '1.6.5'
+  VERSION = '1.7.0'
 end
