@@ -76,7 +76,12 @@ module Smithy
     def download
       curl = '/usr/bin/curl'
       curl = `which curl` unless File.exist? curl
-      raise "curl cannot be located, without it files cannot be downloaded" if curl.blank?
+      if curl.blank?
+        curl = '/usr/bin/wget'
+        curl = `which wget` unless File.exist? curl
+      end
+
+      raise "curl or wget cannot be located, without it files cannot be downloaded" if curl.blank?
 
       if downloaded?
         puts "downloaded ".rjust(12).color(:green) + downloaded_file_path
@@ -85,9 +90,14 @@ module Smithy
         puts "download ".rjust(12).color(:green) + url
       end
 
-      args = ['-qf#L']
-      args << "--silent" unless $stdout.tty?
-      args << '-o'
+      args = []
+      if curl.include?('curl')
+        args << '-qf#L'
+        args << "--silent" unless $stdout.tty?
+        args << '-o'
+      else # wget
+        args << '-O'
+      end
       args << downloaded_file_path
       args << url
 
