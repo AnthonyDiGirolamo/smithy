@@ -1,23 +1,23 @@
-module load ruby/1.9.3-p448
-module use /sw/tools/smithy/modulefiles
-module load smithy
+export SMITHY_PREFIX=/sw/tools/smithy
+export SMITHY_CONFIG=$SMITHY_PREFIX/smithyrc
+export MANPATH=$SMITHY_PREFIX/lib/app/man:$MANPATH
 
 smithy () {
   echo "$@" | grep -q "module use"
   if [ "$?" -eq 0 ] ; then
-    eval `/sw/tools/smithy/bin/smithy $@`
+    eval `$SMITHY_PREFIX/smithy $@`
   else
-    /sw/tools/smithy/bin/smithy $@
+    $SMITHY_PREFIX/smithy $@
   fi
 }
 
 if [[ -n ${ZSH_VERSION-} ]]; then
-  fpath=(/sw/tools/smithy/gems/software_smithy-1.6.4/etc/completion/zsh $fpath)
+  fpath=($SMITHY_PREFIX/lib/app/etc/completion/zsh $fpath)
   compinit
 fi
 
 if [[ -n ${BASH_VERSION-} ]]; then
-  source /sw/tools/smithy/gems/software_smithy-1.6.4/etc/completion/smithy-completion.bash
+  source $SMITHY_PREFIX/lib/app/etc/completion/smithy-completion.bash
 fi
 
 smithy reindex
