@@ -14,7 +14,7 @@ module Smithy
             @formula_directories << dir
           end
         end
-        @formula_directories << File.join(@@smithy_bin_root, "formulas")
+        @formula_directories << File.join(Smithy::Config.bin_root, "formulas")
       end
       @formula_directories
     end
@@ -82,7 +82,17 @@ module Smithy
       raise "unknown formula #{formula_name}" unless formula_names.include?(formula_name)
 
       require formula_file_path(formula_name)
-      f = "#{formula_name.underscore.camelize}Formula".constantize.new
+      formula_constant_name = "#{formula_name.underscore.camelize}Formula"
+
+      if version.present?
+        version_concern = "Version" + version.gsub(/\./, "_")
+        if formula_constant_name.constantize.const_defined?(version_concern)
+          formula_constant_name.constantize.class_eval "include #{version_concern}"
+        end
+      end
+
+      f = formula_constant_name.constantize.new
+
       # Set the actual formula file path, otherwise it's just formula.rb
       f.formula_file = formula_file_path(formula_name)
 
@@ -197,7 +207,7 @@ module Smithy
 
       destination = File.join(destination, "#{@formula_name.underscore}_formula.rb")
       FileOperations.render_erb :binding => binding,
-        :erb         => File.join(@@smithy_bin_root, "etc/templates/formula.rb.erb"),
+        :erb         => File.join(Smithy::Config.bin_root, "etc/templates/formula.rb.erb"),
         :destination => destination
       if Smithy::Config.global[:"file-group-name"]
         FileOperations.set_group(destination, Smithy::Config.global[:"file-group-name"])

@@ -93,7 +93,7 @@ module Smithy
       notice_params params_hash
     end
 
-    # DLS Version Method, can set a version or guess based on the filename
+    # DSL Version Method, can set a version or guess based on the filename
     def self.version(value = nil)
       unless @version
         if value
@@ -110,7 +110,7 @@ module Smithy
       @version
     end
 
-    # DLS Version Method, can set a version or guess based on the filename
+    # DSL Version Method, can set a version or guess based on the filename
     def self.disable_group_writable(value = true)
       @disable_group_writable = true
       @disable_group_writable

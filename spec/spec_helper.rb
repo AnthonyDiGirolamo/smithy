@@ -6,14 +6,19 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'rubygems'
-require 'debugger'
+
 require 'bundler/setup'
+Bundler.setup
+
+require 'byebug'
+require 'pry'
+require 'pry-byebug'
 
 require 'active_support/all'
 require 'smithy'
 include Smithy
 
-@@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+Smithy::Config.bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
 Smithy::Config.load_configuration
 
 RSpec.configure do |config|

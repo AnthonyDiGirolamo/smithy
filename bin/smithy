@@ -37,9 +37,10 @@
 # }}}
 
 # Absolute path to the smithy gem prefix
-@@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+
 # Add the smithy lib dir to the ruby library search path
-$: << File.expand_path(@@smithy_bin_root + '/lib')
+$: << File.expand_path(bin_root + '/lib')
 
 require 'English'
 require 'fileutils'
@@ -53,22 +54,26 @@ require 'terminal-table'
 require 'erb'
 require 'uri'
 require 'kramdown'
-require 'active_support/core_ext/hash'
-require 'active_support/core_ext/string'
-require 'active_support/inflector'
+# require 'active_support/core_ext/hash'
+# require 'active_support/core_ext/string'
+# require 'active_support/inflector'
+require 'active_support/all'
 
-# require 'debugger'      #XXX
-# require 'awesome_print' #XXX
+# require 'byebug'
 # require 'pry'
 # require 'pry-doc'
+# require 'pry-byebug'
 
-@@global_argv = ARGV.dup
+global_argv = ARGV.dup
 
 require 'gli'
 include GLI::App
 
 require 'smithy'
 include Smithy
+
+Smithy::Config.global_argv = global_argv
+Smithy::Config.bin_root    = bin_root
 
 version Smithy::VERSION
 
@@ -675,10 +680,8 @@ end
 pre do |global,command,options,args|
   Sickill::Rainbow.enabled = false if global[:"colors"] == false
 
-  Smithy::Config.config_file_name = File.join(@@smithy_bin_root,"etc/smithyrc")
+  Smithy::Config.config_file_name = File.join(Smithy::Config.bin_root, "etc/smithyrc")
   Smithy::Config.load_configuration(global)
-
-  @@global_config = global
 
   # Pre logic here
   # Return true to proceed; false to abort and not call the chosen command
@@ -702,7 +705,7 @@ on_error do |exception|
     end
   end
 
-  log_exception(exception, @@global_argv, @@global_config)
+  log_exception(exception, Smithy::Config.global_argv, Smithy::Config.global)
   # Error logic here
   # return false to skip default error handling
   false

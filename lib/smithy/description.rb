@@ -154,7 +154,7 @@ module Smithy
             @machine_table[web_machine_name][v] = Package.alternate_builds(File.join(architecture_path, v))
           end
         end
-        erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/machine_version_table.html.erb")
+        erb_file = File.join(Smithy::Config.bin_root, "/etc/templates/web/machine_version_table.html.erb")
 
       else
         @version_table = {}
@@ -164,9 +164,9 @@ module Smithy
           universal = true if @version_table[v].select{|b| b =~ /(universal|binary)/}.size > 0
         end
         if universal
-          erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_list.html.erb")
+          erb_file = File.join(Smithy::Config.bin_root, "/etc/templates/web/version_list.html.erb")
         else
-          erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/version_table.html.erb")
+          erb_file = File.join(Smithy::Config.bin_root, "/etc/templates/web/version_table.html.erb")
         end
 
       end
@@ -259,7 +259,7 @@ module Smithy
       end
       @packages.sort!
 
-      erb_file = File.join(@@smithy_bin_root, "/etc/templates/web/#{file}.html.erb")
+      erb_file = File.join(Smithy::Config.bin_root, "/etc/templates/web/#{file}.html.erb")
       output = File.join(www_arch, "/#{file}.html")
 
       erb = ERB.new(File.read(erb_file), nil, "<>")

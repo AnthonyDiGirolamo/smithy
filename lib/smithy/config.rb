@@ -38,9 +38,9 @@
 module Smithy
   class Config
     class << self
-      attr_accessor :config_file_name, :config_file_hash, :global, :hostname,
+      attr_accessor :config_file_name, :config_file_hash, :global, :global_argv, :hostname,
         :arch, :root, :full_root, :web_root, :file_group, :descriptions_root,
-        :web_architecture_names
+        :web_architecture_names, :bin_root
 
       def group_writable?
         @global[:"disable-group-writable"] ? false : true

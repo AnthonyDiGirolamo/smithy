@@ -97,7 +97,7 @@ module Smithy
         FileOperations.install_file(existing_modulefile, module_file, options) if File.exists?(existing_modulefile)
       else
         FileOperations.render_erb :destination => module_file,
-          :erb => File.join(@@smithy_bin_root, "/etc/templates/modulefile.erb"),
+          :erb => File.join(Smithy::Config.bin_root, "/etc/templates/modulefile.erb"),
           :binding => get_binding, :options => options
       end
 

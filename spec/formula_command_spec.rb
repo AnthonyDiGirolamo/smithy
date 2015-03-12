@@ -1,6 +1,6 @@
 require 'smithy'
 include Smithy
-@@smithy_bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
+Smithy::Config.bin_root = File.expand_path(File.dirname(File.realpath(__FILE__))+ '/../')
 
 describe FormulaCommand do
   it "stores formula directories" do

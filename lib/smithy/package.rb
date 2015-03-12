@@ -84,7 +84,7 @@ module Smithy
       file_list = []
       PackageFileNames.each do |name, file|
         file_list << { :name => name,
-          :src  => File.join(@@smithy_bin_root, "etc/templates/package", file),
+          :src  => File.join(Smithy::Config.bin_root, "etc/templates/package", file),
           :dest => File.join(application_directory, file) }
       end
       return file_list
@@ -108,7 +108,7 @@ module Smithy
     def build_support_files(alternate_source)
       file_list = []
       BuildFileNames.each do |name, file|
-        src = File.join(@@smithy_bin_root, "etc/templates/build", file)
+        src = File.join(Smithy::Config.bin_root, "etc/templates/build", file)
         src += ".erb" if BuildFileERBs.include?(file)
 
         if alternate_source && Dir.exists?(alternate_source)
