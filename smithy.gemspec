@@ -58,8 +58,6 @@ man/man5/smithyformula.5
   s.rdoc_options << '--title' << 'smithy' << '--main' << 'smithy.rdoc' << '-ri'
   s.bindir = 'bin'
   s.executables << 'smithy'
-  s.add_development_dependency('awesome_print')
-  s.add_development_dependency('interactive_editor')
   s.add_development_dependency('cucumber')
   s.add_development_dependency('rake')
   s.add_development_dependency('rdoc')
@@ -67,13 +65,14 @@ man/man5/smithyformula.5
   s.add_development_dependency('ronn')
   s.add_development_dependency('rspec')
   s.add_development_dependency('fuubar')
-  s.add_development_dependency('debugger')
+  s.add_development_dependency('byebug')
+  s.add_development_dependency('pry-byebug')
   s.add_development_dependency('pry')
   s.add_development_dependency('pry-doc')
   s.add_dependency('gli', '= 2.10.0')
   s.add_dependency('kramdown', '= 1.4.0')
   s.add_dependency('open4', '= 1.3.4')
   s.add_dependency('rainbow', '= 1.1.4')
-  s.add_dependency('activesupport', '= 3.2.14')
+  s.add_dependency('activesupport', '= 4.2.0')
   s.add_dependency('terminal-table', '>= 1.4.5')
 end
