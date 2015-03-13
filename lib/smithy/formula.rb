@@ -240,7 +240,7 @@ module Smithy
         @supported_build_names.each do |n|
           STDOUT.puts "  " + (n.is_a?(Regexp) ? n.source : n)
         end
-        raise "use a build_name that includes any of the following substrings: " + @supported_build_names.join(", ")
+        raise "use a build_name that includes any of the above patterns"
       end
     end
 
