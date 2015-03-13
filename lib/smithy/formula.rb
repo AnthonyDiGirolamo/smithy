@@ -196,9 +196,21 @@ module Smithy
       fail_command if $?.exitstatus != 0
     end
 
-    def python(*args)
+    def current_python_version
       python_version_output = `#{@module_setup} python --version 2>&1`
-      v = python_version_output.chomp.strip.split.last
+      python_version_output.chomp.strip.split.last
+    end
+
+    def build_name_python
+      if build_name =~ /python((\d+\.)?(\d+\.)?(\d+))/
+        "python/#{$1}"
+      else
+        raise "cannot determine which python version based on the build_name: #{build_name}"
+      end
+    end
+
+    def system_python(*args)
+      v = current_python_version
       if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
         pyver = "/python" + $1 + $2.delete(".")
       else
@@ -206,6 +218,7 @@ module Smithy
       end
       pylibdir = "#{prefix}/lib#{pyver}/site-packages"
       FileUtils.mkdir_p pylibdir
+      Kernel.system "cd #{prefix} && ln -snf lib lib64"
       system "PYTHONPATH=$PYTHONPATH:#{pylibdir} python ", args.join(" ")
     end
 
