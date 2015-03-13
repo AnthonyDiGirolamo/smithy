@@ -136,6 +136,7 @@ module Smithy
 
       packages.each do |package|
         f = build_formula(package, options[:"formula-name"])
+        f.check_supported_build_names
         f.check_dependencies
         f.package.create(:formula => true)
 

@@ -196,14 +196,41 @@ module Smithy
       fail_command if $?.exitstatus != 0
     end
 
-    def python_command(*args)
+    def python(*args)
       python_version_output = `#{@module_setup} python --version 2>&1`
       v = python_version_output.chomp.strip.split.last
       if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
-        pyver = $1 + $2.delete(".")
-        pylibdir = "#{prefix}/lib/python#{pyver}/site-packages"
-        FileUtils.mkdir_p pylibdir
-        system "PYTHONPATH=$PYTHONPATH:#{pylibdir} python ", args.join(" ")
+        pyver = "/python" + $1 + $2.delete(".")
+      else
+        pyver = ""
+      end
+      pylibdir = "#{prefix}/lib#{pyver}/site-packages"
+      FileUtils.mkdir_p pylibdir
+      system "PYTHONPATH=$PYTHONPATH:#{pylibdir} python ", args.join(" ")
+    end
+
+    def self.supported_build_names(*build_names)
+      @supported_build_names = build_names unless @supported_build_names
+      @supported_build_names
+    end
+
+    def supported_build_names
+      @supported_build_names = self.class.supported_build_names unless @supported_build_names
+      @supported_build_names
+    end
+
+    def check_supported_build_names
+      return true unless supported_build_names.present?
+      build_found = false
+      @supported_build_names.each do |n|
+        build_found = true if build_name.include?(n)
+      end
+      unless build_found
+        notice_warn self.class.name + " supported build names:"
+        @supported_build_names.each do |n|
+          STDOUT.puts "  " + n
+        end
+        raise "use a build_name that includes any of the following substrings: " + @supported_build_names.join(", ")
       end
     end
 
@@ -214,7 +241,7 @@ module Smithy
       notice "Searching for dependencies"
       depends_on.each do |package|
         name, version, build = package.split('/')
-        path = Package.all(:name => name, :version => version, :build => build).first
+        path = Package.all(:name => name, :version => version, :build => build).last
         if path
           notice_using(path)
           p = Package.new(:path => path)

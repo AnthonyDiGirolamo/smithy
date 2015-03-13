@@ -698,8 +698,7 @@ end
 on_error do |exception|
   if exception.message.present?
     notice_exception exception.message
-    notice_exception "Backtrace:"
-    # exception.backtrace.each do |line|
+
     exception.backtrace.select{|l| l =~ /formula.rb/}.each do |line|
       puts "  " + line
     end
