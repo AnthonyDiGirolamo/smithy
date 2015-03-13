@@ -229,12 +229,16 @@ module Smithy
       return true unless supported_build_names.present?
       build_found = false
       @supported_build_names.each do |n|
-        build_found = true if build_name.include?(n)
+        if n.is_a?(String)
+          build_found = true if build_name.include?(n)
+        elsif n.is_a?(Regexp)
+          build_found = true if build_name =~ n
+        end
       end
       unless build_found
         notice_warn self.class.name + " supported build names:"
         @supported_build_names.each do |n|
-          STDOUT.puts "  " + n
+          STDOUT.puts "  " + (n.is_a?(Regexp) ? n.source : n)
         end
         raise "use a build_name that includes any of the following substrings: " + @supported_build_names.join(", ")
       end
