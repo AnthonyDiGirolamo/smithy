@@ -36,6 +36,7 @@ _smithy_architectures() {
 local -a _1st_arguments
 _1st_arguments=(
   'build:Build software'
+  'clean:Clean installed modules and builds'
   'edit:Edit package support files'
   'formula:Install software from predefined formulas'
   'help:Shows a list of commands or help for one command'
@@ -68,8 +69,8 @@ _arguments \
 
 # Match Sub-command
 if (( CURRENT == 1 )); then
-	_describe -t commands "smithy subcommand" _1st_arguments
-	return
+  _describe -t commands "smithy subcommand" _1st_arguments
+  return
 fi
 
 # echo $words >/dev/ttys004
@@ -89,6 +90,21 @@ case "$words[1]" in
       '(-n --dry-run)'{-n,--dry-run}'[See what scripts will be run without running them]' \
       '(-s --suppress-stdout)'{-s,--suppress-stdout}'[Suppress messages from STDOUT.]' \
       '1: :->forms' &&  return 0
+
+    if [[ "$state" == forms ]]; then
+      _smithy_packages
+    fi
+    ;;
+
+  clean)
+    _subsub_commands=(
+      'build:clean a given build'
+    )
+    # Match subsub-command
+    if (( CURRENT == 2 )); then
+      _describe -t subcommands "clean subcommand" _subsub_commands
+      return
+    fi
 
     if [[ "$state" == forms ]]; then
       _smithy_packages

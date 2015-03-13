@@ -100,6 +100,7 @@ _smithy ()
       *)
         __smithycomp "
         build
+        clean
         edit
         formula
         help
@@ -119,6 +120,7 @@ _smithy ()
   # subcommands have their own completion functions
   case "$cmd" in
   build|test)    _smithy_build  ;;
+  clean)         _smithy_clean  ;;
   edit)          _smithy_edit   ;;
   formula)       _smithy_formula ;;
   help)          _smithy_help   ;;
@@ -136,7 +138,7 @@ __smithy_complete_packages ()
 {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local cache_file=$HOME/.smithy/completion_packages
-  if [[ -e $cache_file ]] 
+  if [[ -e $cache_file ]]
   then
     local packages=$(cat $cache_file)
   else
@@ -149,7 +151,7 @@ __smithy_complete_formulas ()
 {
   local cur="${COMP_WORDS[COMP_CWORD]}"
   local cache_file=$HOME/.smithy/completion_formulas
-  if [[ -e $cache_file ]] 
+  if [[ -e $cache_file ]]
   then
     local packages=$(cat $cache_file)
   else
@@ -236,6 +238,18 @@ _smithy_edit () {
     __smithycomp "
       --split
       --editor="
+    return
+    ;;
+  esac
+  __smithy_complete_packages
+}
+
+_smithy_clean () {
+  local cur="${COMP_WORDS[COMP_CWORD]}"
+  local prv="${COMP_WORDS[COMP_CWORD-1]}"
+  case "$prv" in
+  clean)
+    __smithycomp "build"
     return
     ;;
   esac
