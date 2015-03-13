@@ -188,12 +188,14 @@ module Smithy
         notice "Reindexing packages"
         FormulaCommand.initialize_directories
         formulas = FormulaCommand.formula_names
+        formulas_versions = FormulaCommand.formula_versions
         packages = Package.all.collect{|s| s.gsub(/#{full_root}\//, '')}
 
         FileUtils.mkdir_p(File.join(homedir, ".smithy"))
 
         File.open(File.join(homedir, ".smithy", "completion_formulas"), "w+") do |f|
           f.puts formulas
+          f.puts formulas_versions
         end
         File.open(File.join(homedir, ".smithy", "completion_packages"), "w+") do |f|
           f.puts packages

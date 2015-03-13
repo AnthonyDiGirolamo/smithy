@@ -37,10 +37,34 @@ module Smithy
       @formula_files
     end
 
+    def self.formula_basename(f)
+      File.basename(f, "_formula.rb")
+    end
+
     # Format the full file paths to display only the name
     def self.formula_names
-      @formula_names = formula_files.collect{|f| File.basename(f,"_formula.rb")}.uniq unless @formula_names
+      @formula_names = formula_files.collect{|f| formula_basename(f)}.uniq unless @formula_names
       @formula_names
+    end
+
+    def self.formula_versions
+      formula_versions = []
+      formula_files.collect do |f|
+        formula_contents = File.open(f).read rescue ""
+        unless formula_contents.blank?
+          version_number     = $1                              if formula_contents =~ /^\s+version\s+['"](.*?)['"]$/
+          url_version_number = url_filename_version_number($1) if formula_contents =~ /^\s+url\s+['"](.*?)['"]$/
+
+          if version_number.present? || url_version_number != "none"
+            formula_versions << formula_basename(f) + "/" + (version_number || url_version_number)
+          end
+
+          formula_contents.scan(/^\s+concern\s+:Version(.*?)\s+do$/).each do |m|
+            formula_versions << formula_basename(f) + "/" + m.first.gsub(/\_/, ".")
+          end
+        end
+      end
+      formula_versions.uniq
     end
 
     # Return the file path of a single formula file
