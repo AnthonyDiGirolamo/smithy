@@ -146,7 +146,7 @@ module Smithy
 
     def module_is_available?(mod)
       module_avail = `#{module_setup} #{@modulecmd} avail -l #{mod} 2>&1`
-      if module_avail =~ /^#{mod}\s/
+      if module_avail =~ /^#{mod}/
         true
       else
         false
