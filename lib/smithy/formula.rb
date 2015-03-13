@@ -110,7 +110,6 @@ module Smithy
       @version
     end
 
-    # DSL Version Method, can set a version or guess based on the filename
     def self.disable_group_writable(value = true)
       @disable_group_writable = true
       @disable_group_writable
@@ -209,7 +208,7 @@ module Smithy
       end
     end
 
-    def system_python(*args)
+    def run_loaded_python(*args)
       v = current_python_version
       if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
         pyver = "/python" + $1 + $2.delete(".")

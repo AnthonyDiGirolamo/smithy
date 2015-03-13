@@ -384,7 +384,7 @@ module Smithy
       end
     end
 
-    def update_version_table_file(options)
+    def update_version_table_file(options = {})
       version_table_file = File.join(application_directory, ".versions")
       version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
       if version_table[version].is_a? String
@@ -394,6 +394,19 @@ module Smithy
       else
         version_table.merge!({version.encode('UTF-8') => build_name.encode('UTF-8')})
       end
+
+      FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
+      FileOperations.set_group version_table_file, group, options
+      FileOperations.make_group_writable version_table_file, options if group_writable?
+    end
+
+    def remove_version_from_table_file(options = {})
+      version_table_file = File.join(application_directory, ".versions")
+      version_table = YAML.load_file(version_table_file).stringify_keys rescue {}
+
+      builds = version_table[version.encode('UTF-8')]
+      builds.reject!{|build| build == build_name.encode('UTF-8')}
+      version_table[version.encode('UTF-8')] = builds
 
       FileOperations.install_from_string version_table.to_yaml, version_table_file, options.merge({:force => true})
       FileOperations.set_group version_table_file, group, options
@@ -452,6 +465,12 @@ module Smithy
         end
 
       end
+    end
+
+    def destroy
+      notice_delete(prefix)
+      FileUtils.rm_rf(prefix)
+      remove_version_from_table_file
     end
 
     def module_load_prgenv

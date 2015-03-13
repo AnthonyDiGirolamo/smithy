@@ -40,6 +40,9 @@ module Smithy
   def notice_create(file)
     puts "create ".rjust(12).color(:green) + file
   end
+  def notice_delete(file)
+    puts "delete ".rjust(12).color(:red) + file
+  end
   def notice_exist(file)
     puts "exists ".rjust(12).color(:blue) + file
   end

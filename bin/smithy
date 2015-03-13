@@ -54,9 +54,6 @@ require 'terminal-table'
 require 'erb'
 require 'uri'
 require 'kramdown'
-# require 'active_support/core_ext/hash'
-# require 'active_support/core_ext/string'
-# require 'active_support/inflector'
 require 'active_support/all'
 
 # require 'byebug'
@@ -571,6 +568,32 @@ command ['show'] do |c|
   c.command :example_config do |example_config|
     example_config.action do
       puts Smithy::Config.example_config
+    end
+  end
+end
+
+desc "Clean installed modules and builds"
+command ["clean"] do |c|
+
+  c.desc "clean a given build"
+  c.long_desc "Clean build names using the format: APPLICATION/VERSION/BUILD"
+  c.arg_name "PATH"
+  c.command :build do |build|
+    build.action do |global_options,options,args|
+      packages = args.dup
+
+      if args.empty?
+        notice "Reading package names from STDIN..."
+        packages = STDIN.readlines.map{|p| p.chomp}
+      end
+
+      raise "You must supply at least one package to clean" if packages.empty?
+
+      packages.each do |package|
+        p = Package.new path: package
+        notice "Cleaning Build #{p.prefix}"
+        p.destroy
+      end
     end
   end
 end
