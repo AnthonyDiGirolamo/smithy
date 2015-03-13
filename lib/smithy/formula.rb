@@ -208,13 +208,16 @@ module Smithy
       end
     end
 
-    def run_loaded_python(*args)
+    def system_python(*args)
+      system "which python"
       v = current_python_version
       if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
+        python_full_version = $&
         pyver = "/python" + $1 + $2.delete(".")
       else
         pyver = ""
       end
+      raise "current python version (#{python_full_version}) does not match the version specified in the build_name (#{build_name_python})" if build_name_python.split("/").last != python_full_version
       pylibdir = "#{prefix}/lib#{pyver}/site-packages"
       FileUtils.mkdir_p pylibdir
       Kernel.system "cd #{prefix} && ln -snf lib lib64"
