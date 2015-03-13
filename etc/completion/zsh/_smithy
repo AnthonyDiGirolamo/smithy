@@ -143,13 +143,13 @@ case "$words[1]" in
     )
     # Match subsub-command
     if (( CURRENT == 2 )); then
-      _describe -t subcommands "edit subcommand" _subsub_commands
+      _describe -t subcommands "module subcommand" _subsub_commands
       return
     fi
 
     _arguments \
       '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
-      '1: :->forms' &&  return 0
+      '2: :->forms' &&  return 0
 
     if [[ "$state" == forms ]]; then
       _smithy_packages
