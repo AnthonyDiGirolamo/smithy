@@ -130,6 +130,26 @@ module Smithy
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
     end
 
+    def python_module_build_list(package, builds, args = {})
+      package.build_name
+      valid_builds = Hash[builds.select{|b| b.include?("python")}.collect{|b| [python_version_from_build_name(b), b]}.select{|b| global_module_is_available?(b.first)}]
+
+      output = [ "if [ is-loaded " ]
+
+      valid_builds.each do |modulefile, buildname|
+        output.last << modulefile + " ] {\n"
+        output.last << "  set BUILD " + buildname + "\n"
+        output.last << "  set LIBDIR " + python_libdir(buildname) + "\n"
+        output << ""
+      end
+
+      output.reject!(&:blank?)
+
+      output.last << "}\n"
+
+      output.join("} elseif [ is-loaded ")
+    end
+
     def module_build_list(package, builds, args = {})
       output = ""
 

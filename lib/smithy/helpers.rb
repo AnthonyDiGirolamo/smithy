@@ -193,6 +193,36 @@ module Smithy
     name
   end
 
+  def python_version_from_build_name(build_name)
+    if build_name =~ /python((\d+\.)?(\d+\.)?(\d+))/
+      "python/#{$1}"
+    else
+      raise "cannot determine which python version based on the build_name: #{build_name}"
+    end
+  end
+
+  def python_libdir(version)
+    if version =~ /(\d+\.)?(\d+\.)?(\d+)/
+      python_full_version = $&
+      "python" + $1 + $2.delete(".")
+    else
+      ""
+    end
+  end
+
+  def global_module_is_available?(mod)
+    if ENV["MODULESHOME"]
+      modulecmd = "modulecmd sh"
+      modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
+      module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
+      if module_avail =~ /^#{mod}\s/
+        true
+      else
+        false
+      end
+    end
+  end
+
   def log_exception(e, argv, config)
     logfile = Smithy::Config.global[:"global-error-log"]
     if logfile.present?

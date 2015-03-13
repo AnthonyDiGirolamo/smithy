@@ -145,8 +145,8 @@ module Smithy
     end
 
     def module_is_available?(mod)
-      module_avail = `#{module_setup} #{@modulecmd} avail #{mod} 2>&1`
-      if module_avail =~ /#{mod}/
+      module_avail = `#{module_setup} #{@modulecmd} avail -l #{mod} 2>&1`
+      if module_avail =~ /^#{mod}\s/
         true
       else
         false
@@ -201,24 +201,15 @@ module Smithy
     end
 
     def build_name_python
-      if build_name =~ /python((\d+\.)?(\d+\.)?(\d+))/
-        "python/#{$1}"
-      else
-        raise "cannot determine which python version based on the build_name: #{build_name}"
-      end
+      python_version_from_build_name(build_name)
     end
 
     def system_python(*args)
       system "which python"
-      v = current_python_version
-      if v =~ /^(\d+\.)?(\d+\.)?(\d+)$/
-        python_full_version = $&
-        pyver = "/python" + $1 + $2.delete(".")
-      else
-        pyver = ""
-      end
+      python_full_version = current_python_version
+      pyver = python_libdir(python_full_version)
       raise "current python version (#{python_full_version}) does not match the version specified in the build_name (#{build_name_python})" if build_name_python.split("/").last != python_full_version
-      pylibdir = "#{prefix}/lib#{pyver}/site-packages"
+      pylibdir = "#{prefix}/lib/#{pyver}/site-packages"
       FileUtils.mkdir_p pylibdir
       Kernel.system "cd #{prefix} && ln -snf lib lib64"
       system "PYTHONPATH=$PYTHONPATH:#{pylibdir} python ", args.join(" ")
@@ -277,5 +268,5 @@ module Smithy
       end
     end
 
-  end #class Formula
-end #module Smithy
+  end
+end
