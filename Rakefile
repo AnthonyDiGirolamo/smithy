@@ -56,7 +56,8 @@ task :generate_markdown, [:html_file] do |t, args|
 end
 
 PACKAGE_NAME = "smithy"
-VERSION = "1.7.0"
+require_relative 'lib/smithy_version.rb'
+VERSION = Smithy::VERSION
 TRAVELING_RUBY_VERSION = "20150210-2.1.5"
 
 desc "Package your app"
