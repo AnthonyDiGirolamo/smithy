@@ -594,6 +594,8 @@ command ["clean"] do |c|
         notice "Cleaning Build #{p.prefix}"
         p.destroy
       end
+
+      Smithy::Config.reindex_completion_caches
     end
   end
 end
