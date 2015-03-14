@@ -112,21 +112,40 @@ name-version.tar... format. If a url does not follow that format then manually
 specifying the version with the [version][] method works best.
 
 ### supported_build_names
-This method takes any number of strings or regexes. When used, smithy will check
+This method takes any number of strings or regexes. When used smithy will check
 the supplied [build_name][] and validate it against what is specified under
 [supported_build_names][]. If the [build_name][] does not match a string or
 regex the install is aborted.
 
 This is useful for when a formula must have specific build names in order to
-install correctly.
-
-For example, using the this line in a formula:
+install correctly. For example, using the this line in a formula:
 
     supported_build_names "python2.7", "python3"
 
-And running `smithy formula install python_numpy/1.9.2/python2.6` (note
-python2.6 does not match anything in the [supported_build_names][] line above).
-Will produce the following output in smithy and abort the install:
+And running `smithy formula install python_nose/1.3.4/python2.6` (note
+`python2.6` does not match anything in the [supported_build_names][] line
+above). Then smithy will output the following abort the install:
+
+    ==> PythonNoseFormula supported build names:
+      python2.7
+      python3
+    ==> ERROR: use a build_name that includes any of the above patterns
+
+When using strings with [supported_build_names][] smithy will check to see if
+the [build_name][] contains any supplied substrings.
+
+If using regexes they must simply match the build name. Here is an example using
+regexes:
+
+    supported_build_names /python.*gnu/
+
+That regex checks for `python` followed by any number of characters followed by
+`gnu`. When running `smithy formula install python_numpy/1.9.2/python2.7.9` with the
+above you should see:
+
+    ==> PythonNumpyFormula supported build names:
+      python.*gnu
+    ==> ERROR: use a build_name that includes any of the above patterns
 
 ### params
 
