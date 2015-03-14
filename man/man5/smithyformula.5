@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "SMITHYFORMULA" "5" "May 2014" "" ""
+.TH "SMITHYFORMULA" "5" "March 2015" "" ""
 .
 .SH "NAME"
 \fBsmithyformula\fR \- writing formulas for smithy
@@ -115,7 +115,172 @@ These methods should be defined at the highest level of the formula file, right 
 A hash of the downloaded file to verify the download performed correctly, e\.g\. \fBsha1 "fe633d02f7d964842d7ea804278b75120fc60c11"\fR
 .
 .SS "version"
-Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\.
+Manually define the version number, if omitted smithy will guess the version number from the url\. This works best when the filename in a url follows the name\-version\.tar\.\.\. format\. If a url does not follow that format then manually specifying the version with the \fIversion\fR method works best\.
+.
+.SS "supported_build_names"
+This method takes any number of strings or regexes\. When used smithy will check the supplied \fIbuild_name\fR and validate it against what is specified under \fIsupported_build_names\fR\. If the \fIbuild_name\fR does not match a string or regex the install is aborted\.
+.
+.P
+This is useful for when a formula must have specific build names in order to install correctly\. For example, using the this line in a formula:
+.
+.IP "" 4
+.
+.nf
+
+supported_build_names "python2\.7", "python3"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+And running \fBsmithy formula install python_nose/1\.3\.4/python2\.6\fR (note \fBpython2\.6\fR does not match anything in the \fIsupported_build_names\fR line above)\. Then smithy will output the following abort the install:
+.
+.IP "" 4
+.
+.nf
+
+==> PythonNoseFormula supported build names:
+  python2\.7
+  python3
+==> ERROR: use a build_name that includes any of the above patterns
+.
+.fi
+.
+.IP "" 0
+.
+.P
+When using strings with \fIsupported_build_names\fR smithy will check to see if the \fIbuild_name\fR contains any supplied substrings\.
+.
+.P
+If using regexes they must simply match the build name\. Here is an example using regexes:
+.
+.IP "" 4
+.
+.nf
+
+supported_build_names /python\.*gnu/
+.
+.fi
+.
+.IP "" 0
+.
+.P
+That regex checks for \fBpython\fR followed by any number of characters followed by \fBgnu\fR\. When running \fBsmithy formula install python_numpy/1\.9\.2/python2\.7\.9\fR with the above you should see:
+.
+.IP "" 4
+.
+.nf
+
+==> PythonNumpyFormula supported build names:
+  python\.*gnu
+==> ERROR: use a build_name that includes any of the above patterns
+.
+.fi
+.
+.IP "" 0
+.
+.SS "params"
+This method is used to specify some unchanging variables you would like to use in any block throughout the formula\. It can be useful if you want some variables located at the top of the formula file that are easily changed\. It takes a hash where the keys are variable names and the values are the variable contents\. For example:
+.
+.IP "" 4
+.
+.nf
+
+class ExampleFormula do
+  homepage "http://example\.com"
+  url "http://example\.com/example\-1\.2\.3\.tar\.gz"
+
+  params example_api_version: "1\.0",
+         build_folder: "example1\.0"
+
+  def install
+    system "\./configure \-\-api\-version #{example_api_version} \-\-build\-dir #{build_folder}"
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.SS "concern :Version1_2_3 do"
+Concerns are used allow formulas to support multiple versions\. When used, their contents will override the same methods defined at the root level of a formula class\. They are a part of the ActiveSupport Concerning Module \fIhttp://api\.rubyonrails\.org/classes/Module/Concerning\.html\fR
+.
+.P
+To specify a concern for version 1\.2\.3 of a package add the following to a formula (replacing the comment with the methods you would like to override)\.
+.
+.IP "" 4
+.
+.nf
+
+concern :Version1_2_3 do
+  included do
+    # override methods here
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Anything formula DSL method can be overridden including \fIdef install\fR\. Concerns must have the \fB:Version1_2_3\fR naming format where periods \fB\.\fR are changed to underscores \fB_\fR\. This will correspond to a version of \fB1\.2\.3\fR\.
+.
+.P
+Here is an example of a python formula that supports version \fB2\.7\.9\fR and \fB3\.4\.3\fR\. The concern only overrides the download urls and md5s\.
+.
+.IP "" 4
+.
+.nf
+
+class PythonFormula < Formula
+  homepage "www\.python\.org/"
+
+  depends_on "sqlite"
+
+  module_commands ["unload python"]
+
+  concern :Version2_7_9 do
+    included do
+      url "https://www\.python\.org/ftp/python/2\.7\.9/Python\-2\.7\.9\.tgz"
+      md5 "5eebcaa0030dc4061156d3429657fb83"
+    end
+  end
+
+  concern :Version3_4_3 do
+    included do
+      url "https://www\.python\.org/ftp/python/3\.4\.3/Python\-3\.4\.3\.tgz"
+      md5 "4281ff86778db65892c05151d5de738d"
+    end
+  end
+
+  def install
+    module_list
+    ENV["CPPFLAGS"] = "\-I#{sqlite\.prefix}/include"
+    ENV["LDFLAGS"]  = "\-L#{sqlite\.prefix}/lib"
+    system "\./configure \-\-prefix=#{prefix} \-\-enable\-shared"
+    system "make"
+    system "make install"
+  end
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Using the above formula it is possible to install python with the following and smithy will download the correct tarball for each version:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install python/2\.7\.9/sles11\.3_gnu4\.3\.4
+smithy formula install python/3\.4\.3/sles11\.3_gnu4\.3\.4
+.
+.fi
+.
+.IP "" 0
 .
 .SS "disable_group_writable"
 Calling this method within the formula will skip setting group writable file permissions after the build is complete\. It\'s equivalent to running smithy with the \fB\-\-disable\-group\-writable\fR option\. See \fBsmithy help\fR for more info on global command line options\.
@@ -395,7 +560,7 @@ MODULEFILE
 The \fB<<\-MODULEFILE\.strip_heredoc\fR syntax denotes the beginning for a multi\-line string\. The string ends with \fBMODULEFILE\fR\. You can substitute any word for \fBMODULEFILE\fR\. The \fB\.strip_heredoc\fR method removes leading whitespace from the string so the output isn\'t unecessarily indented\.
 .
 .P
-The modulefile definition uses the erb format \fIhttp://ruby\-doc\.org/stdlib\-2\.0/libdoc/erb/rdoc/ERB\.html\fR Anything between the \fB<%= \.\.\. %>\fR delimiters will be interpreted as ruby code\. There are a few helper methods that you can use inside these delimiters see the next section titled \fIMODULEFILE HELPER METHODS\fR for details\.
+The modulefile definition uses the erb format \fIhttp://ruby\-doc\.org/stdlib\-2\.0/libdoc/erb/rdoc/ERB\.html\fR Anything between the \fB<%= \.\.\. %>\fR delimiters will be interpreted as ruby code\. There are a few helper methods that you can use inside these delimiters see the next section titled [MODULEFILE HELPER METHODS][] for details\.
 .
 .P
 A more complicated modulefile may examine already loaded modules to determine which build to load\. For instance if the user has gcc or a gnu programming environment module loaded then your modulefile will want to load the gnu build\. Here is an example designed to dynamically set the build:
@@ -459,144 +624,10 @@ end
 .IP "" 0
 .
 .P
-The contents of the install method depends heavily on the software being installed\. For a list of additional helper methods for use inside install see the \fIFORMULA HELPER METHODS\fR section\.
-.
-.SH "MODULEFILE HELPER METHODS"
-.
-.SS "<code><%= @package\.name %></code>"
-This will return the name of the application being installed\. It is the same as the APPLICATION part of the \fBsmithy formula install APPLICATION/VERSION/BUILD\fR command\.
-.
-.SS "<code><%= @package\.version %></code>"
-Similar to the above, this returns the version number\.
-.
-.SS "<code><%= @package\.build_name %></code>"
-Same as the name and version methods, this will return the build name of the applcation\.
-.
-.SS "<code><%= @package\.prefix %></code>"
-This line will return the full prefix to an application\. If we run \fBsmithy formula install bzip2/1\.0\.4/pgi13\.4\fR and our software\-root is \fB/sw/xk6\fR this command will return \fB/sw/xk6/bzip2/1\.0\.4/pgi13\.4\fR
-.
-.SS "<code><%= @builds %></code>"
-The \fB@builds\fR variable is an array of strings that contain the list of available builds for a given application\. Say we have a bzip2 formula and ran the following installs:
-.
-.IP "" 4
-.
-.nf
-
-smithy formula install bzip2/1\.0\.4/gnu4\.3\.4
-smithy formula install bzip2/1\.0\.4/gnu4\.7\.2
-smithy formula install bzip2/1\.0\.4/pgi13\.4
-smithy formula install bzip2/1\.0\.4/intel12
-.
-.fi
-.
-.IP "" 0
-.
-.P
-The directory structure for the above builds would look like (assuming \fB/sw/xk6\fR is the software\-root):
-.
-.IP "" 4
-.
-.nf
-
-/sw/xk6/bzip2/1\.0\.4
-`\-\-\- modulefile
-|  `\-\-\- bzip2
-|     `\-\-\- 1\.0\.4
-`\-\-\- gnu4\.3\.4
-|  `\-\-\- bin
-|  `\-\-\- include
-|  `\-\-\- lib
-|  `\-\-\- source
-|  `\-\-\- share
-`\-\-\- gnu4\.7\.2
-|  `\-\-\- bin
-|  `\-\-\- include
-|  `\-\-\- lib
-|  `\-\-\- source
-|  `\-\-\- share
-`\-\-\- pgi13\.4
-|  `\-\-\- bin
-|  `\-\-\- include
-|  `\-\-\- lib
-|  `\-\-\- source
-|  `\-\-\- share
-`\-\-\- intel12
-   `\-\-\- bin
-   `\-\-\- include
-   `\-\-\- lib
-   `\-\-\- source
-   `\-\-\- share
-.
-.fi
-.
-.IP "" 0
-.
-.P
-The \fB@builds\fR array would then be \fB[ "gnu4\.3\.4", "gnu4\.7\.2", "pgi13\.4", "intel12" ]\fR\. This lets you figure out what builds exist and use them in your modulefile\.
-.
-.SS "<code><%= @builds\.size %></code>"
-size \fIhttp://ruby\-doc\.org/core\-2\.0/Array\.html#method\-i\-size\fR is a standard ruby method that counts the number of elements in an array\. For the above example this would return \fB4\fR\.
-.
-.SS "<code><%= module_build_list @package, @builds %></code>"
-This is a helper method in smithy that will generate the tcl necessary to conditionally load builds based on what compiler programming environment modules a user has loaded\. It takes \fB@package\fR and \fB@builds\fR as arguments\. Using the above bzip2 example the result of using this method would be:
-.
-.IP "" 4
-.
-.nf
-
-if [ is\-loaded PrgEnv\-gnu ] {
-  if [ is\-loaded gcc/4\.3\.4 ] {
-    set BUILD gnu4\.3\.4
-  } elseif [ is\-loaded gcc/4\.7\.2 ] {
-    set BUILD gnu4\.7\.2
-  } else {
-    set BUILD gnu4\.7\.2
-  }
-} elseif [ is\-loaded PrgEnv\-pgi ] {
-  set BUILD pgi13\.4
-} elseif [ is\-loaded PrgEnv\-intel ] {
-  set BUILD intel12
-} elseif [ is\-loaded PrgEnv\-cray ] {
-  puts stderr "Not implemented for the cray compiler"
-}
-if {![info exists BUILD]} {
-  puts stderr "[module\-info name] is only available for the following environments:"
-  puts stderr "gnu4\.3\.4"
-  puts stderr "gnu4\.7\.2"
-  puts stderr "intel12"
-  puts stderr "pgi13\.4"
-  break
-}
-.
-.fi
-.
-.IP "" 0
-.
-.SS "<code><% if \.\.\. %></code>"
-This is standard erb ruby code\. Delimiters like \fB<% \.\.\. %>\fR do NOT put their results in the final modulefile, they are only used for control flow\. Delimiters with the extra = sign \fB<%= \.\.\. %>\fR will put their results in the final modulefile\.
-.
-.P
-This is best used to conditionally render content to the modulefile and takes the form:
-.
-.IP "" 4
-.
-.nf
-
-<% if @builds\.size > 1 %>
-  \.\.\.
-<% else %>
-  \.\.\.
-<% end %>
-.
-.fi
-.
-.IP "" 0
-.
-.P
-Where \fB@builds\.size > 1\fR can be any expression which returns true or false\. If the if condition is true then the lines between the if and else will be put in the modulefile, otherwise lines between the else and end will be used\.
+The contents of the install method depends heavily on the software being installed\. For a list of additional helper methods for use inside install see the [FORMULA HELPER METHODS][] section\.
 .
 .SH "FORMULA HELPER METHODS"
-These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one \fIFORMULA DSL METHODS\fR\.
+These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one [FORMULA DSL METHODS][]\.
 .
 .SS "name"
 This will return the name of the application being installed\. It is the same as the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD command\. It can be used as a variable as well as inside of a string using the \fB#{ \.\.\. }\fR delimiters\. e\.g\. \fB"#{name}"\fR
@@ -612,6 +643,62 @@ This line will return the full prefix to an application\. If we run smithy formu
 .
 .SS "system"
 This method accepts a string or multiple strings separated by commas\. It will run the given command in a subshell and setup the modules as defined by the \fImodule_commands\fR or \fImodules\fR methods\. Each call to system is independent from the last\. Modules are reloaded and environment variables are reset\.
+.
+.SS "system_python"
+The \fIsystem_python\fR method runs \fBpython\fR using a \fIsystem\fR command and sets the \fBPYTHONPATH\fR environment variable to a location in the current \fIprefix\fR\. This is useful for running a \fBsetup\.py\fR for a python module\. It is designed to be used like:
+.
+.IP "" 4
+.
+.nf
+
+system_python "setup\.py install \-\-prefix=#{prefix} \-\-compile"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Under the hood it is running:
+.
+.IP "" 4
+.
+.nf
+
+system "PYTHONPATH=$PYTHONPATH:#{prefix}/lib/#{python_libdir(current_python_version)}/site\-packages python",
+  "setup\.py install \-\-prefix=#{prefix} \-\-compile"
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Where \fBpython_libdir(current_python_version)\fR is the lib directory for the version of python in the \fB$PATH\fR e\.g\. \fBpython2\.7\fR or \fBpython3\.4\fR
+.
+.SS "build_name_python"
+This is a helper to change a full python version specified in the module name e\.g\. \fBpython2\.7\.9\fR or \fBpython3\.4\.3\fR to a version with a forward slash e\.g\. \fBpython/2\.7\.9\fR or \fBpython/3\.4\.3\fR respectively\.
+.
+.P
+It is useful for when a formula is installed with a python version in the \fIbuild_name\fR and you want to get the corresponding python version string for use in a \fImodule_commands\fR or \fIdepends_on\fR block\. For example:
+.
+.IP "" 4
+.
+.nf
+
+depends_on do
+  build_name_python
+end
+
+module_commands do
+  [ "unload python",
+    "load #{build_name_python}" ]
+end
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If the above is used when installing a formula with \fBpython2\.7\.9\fR in the build name e\.g\. \fBsmithy formula install python_numpy/1\.9\.2/python2\.7\.9_gnu4\.8\.2\fR then \fIbuild_name_python\fR will return \fBpython/2\.7\.9\fR\.
 .
 .SS "module_list"
 This method will run \fBmodule list\fR and print it\'s output durring the install process\. Useful for verifying the modules loaded are the ones you want\.
@@ -720,6 +807,226 @@ EOF
 .fi
 .
 .IP "" 0
+.
+.SH "PYTHON SPECIFIC HELPERS"
+Python module installations require some extra consideration\. To make life a bit easier Smithy provides the following methods\.
+.
+.IP "\(bu" 4
+\fIbuild_name_python\fR
+.
+.IP "\(bu" 4
+\fIsystem_python\fR
+.
+.IP "\(bu" 4
+\fI\fB<%= python_module_build_list @package, @builds %>\fR\fR
+.
+.IP "" 0
+.
+.SH "MODULEFILE HELPER METHODS"
+.
+.SS "<code><%= @package\.name %></code>"
+This will return the name of the application being installed\. It is the same as the APPLICATION part of the \fBsmithy formula install APPLICATION/VERSION/BUILD\fR command\.
+.
+.SS "<code><%= @package\.version %></code>"
+Similar to the above, this returns the version number\.
+.
+.SS "<code><%= @package\.build_name %></code>"
+Same as the name and version methods, this will return the build name of the applcation\.
+.
+.SS "<code><%= @package\.prefix %></code>"
+This line will return the full prefix to an application\. If we run \fBsmithy formula install bzip2/1\.0\.4/pgi13\.4\fR and our software\-root is \fB/sw/xk6\fR this command will return \fB/sw/xk6/bzip2/1\.0\.4/pgi13\.4\fR
+.
+.SS "<code><%= @builds %></code>"
+The \fB@builds\fR variable is an array of strings that contain the list of available builds for a given application\. Say we have a bzip2 formula and ran the following installs:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install bzip2/1\.0\.4/gnu4\.3\.4
+smithy formula install bzip2/1\.0\.4/gnu4\.7\.2
+smithy formula install bzip2/1\.0\.4/pgi13\.4
+smithy formula install bzip2/1\.0\.4/intel12
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The directory structure for the above builds would look like (assuming \fB/sw/xk6\fR is the software\-root):
+.
+.IP "" 4
+.
+.nf
+
+/sw/xk6/bzip2/1\.0\.4
+`\-\-\- modulefile
+|  `\-\-\- bzip2
+|     `\-\-\- 1\.0\.4
+`\-\-\- gnu4\.3\.4
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- gnu4\.7\.2
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- pgi13\.4
+|  `\-\-\- bin
+|  `\-\-\- include
+|  `\-\-\- lib
+|  `\-\-\- source
+|  `\-\-\- share
+`\-\-\- intel12
+   `\-\-\- bin
+   `\-\-\- include
+   `\-\-\- lib
+   `\-\-\- source
+   `\-\-\- share
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The \fB@builds\fR array would then be \fB[ "gnu4\.3\.4", "gnu4\.7\.2", "pgi13\.4", "intel12" ]\fR\. This lets you figure out what builds exist and use them in your modulefile\.
+.
+.SS "<code><%= @builds\.size %></code>"
+size \fIhttp://ruby\-doc\.org/core\-2\.0/Array\.html#method\-i\-size\fR is a standard ruby method that counts the number of elements in an array\. For the above example this would return \fB4\fR\.
+.
+.SS "<code><%= module_build_list @package, @builds %></code>"
+This is a helper method that will generate the tcl necessary to conditionally load builds based on what compiler programming environment modules a user has loaded\. It takes \fB@package\fR and \fB@builds\fR as arguments\. Using the above bzip2 example the result of using this method would be:
+.
+.IP "" 4
+.
+.nf
+
+if [ is\-loaded PrgEnv\-gnu ] {
+  if [ is\-loaded gcc/4\.3\.4 ] {
+    set BUILD gnu4\.3\.4
+  } elseif [ is\-loaded gcc/4\.7\.2 ] {
+    set BUILD gnu4\.7\.2
+  } else {
+    set BUILD gnu4\.7\.2
+  }
+} elseif [ is\-loaded PrgEnv\-pgi ] {
+  set BUILD pgi13\.4
+} elseif [ is\-loaded PrgEnv\-intel ] {
+  set BUILD intel12
+} elseif [ is\-loaded PrgEnv\-cray ] {
+  puts stderr "Not implemented for the cray compiler"
+}
+if {![info exists BUILD]} {
+  puts stderr "[module\-info name] is only available for the following environments:"
+  puts stderr "gnu4\.3\.4"
+  puts stderr "gnu4\.7\.2"
+  puts stderr "intel12"
+  puts stderr "pgi13\.4"
+  break
+}
+.
+.fi
+.
+.IP "" 0
+.
+.SS "<code><%= python_module_build_list @package, @builds %></code>"
+This method is similar to the previously mentioned [module_build_list][] except that it will create a block specific to python versions\. It requires that a full python version be part of the current build name e\.g\. \fBpython2\.7\.9\fR\. It will look at the builds installed for the current formula and create a corresponding tcl if block\. It will also check to see if python modules exist that correspond to the build names\.
+.
+.P
+For example, lets assume we perform the following installs for the python_numpy \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_numpy_formula\.rb\fR formula:
+.
+.IP "" 4
+.
+.nf
+
+smithy formula install python_numpy/1\.9\.2/python2\.7\.9_gnu4\.8\.2
+smithy formula install python_numpy/1\.9\.2/python3\.4\.3_gnu4\.8\.2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Then the following builds will exist:
+.
+.IP "" 4
+.
+.nf
+
+python_numpy
+`\-\-\- 1\.9\.2
+   `\-\-\- python2\.7\.9_gnu4\.8\.2
+   `\-\-\- python3\.4\.3_gnu4\.8\.2
+.
+.fi
+.
+.IP "" 0
+.
+.P
+If the \fBpython/2\.7\.9\fR and \fBpython/3\.4\.3\fR modules exist then [python_module_build_list][] method will create the following output:
+.
+.IP "" 4
+.
+.nf
+
+if [ is\-loaded python/2\.7\.9 ] {
+  set BUILD python2\.7\.9_gnu4\.8\.2
+  set LIBDIR python2\.7
+} elseif [ is\-loaded python/3\.4\.3 ] {
+  set BUILD python3\.4\.3_gnu4\.8\.2
+  set LIBDIR python3\.4
+}
+if {![info exists BUILD]} {
+  puts stderr "[module\-info name] is only available for the following environments:"
+  puts stderr "python/2\.7\.9"
+  puts stderr "python/3\.4\.3"
+  break
+}
+.
+.fi
+.
+.IP "" 0
+.
+.P
+It is designed to be used like this:
+.
+.IP "" 4
+.
+.nf
+
+<%= python_module_build_list @package, @builds %>
+set PREFIX <%= @package\.version_directory %>/$BUILD
+.
+.fi
+.
+.IP "" 0
+.
+.SS "<code><% if \.\.\. %></code>"
+This is standard erb ruby code\. Delimiters like \fB<% \.\.\. %>\fR do NOT put their results in the final modulefile, they are only used for control flow\. Delimiters with the extra = sign \fB<%= \.\.\. %>\fR will put their results in the final modulefile\.
+.
+.P
+This is best used to conditionally render content to the modulefile and takes the form:
+.
+.IP "" 4
+.
+.nf
+
+<% if @builds\.size > 1 %>
+  \.\.\.
+<% else %>
+  \.\.\.
+<% end %>
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Where \fB@builds\.size > 1\fR can be any expression which returns true or false\. If the if condition is true then the lines between the if and else will be put in the modulefile, otherwise lines between the else and end will be used\.
 .
 .SH "COMMON OPERATIONS"
 .
@@ -894,7 +1201,7 @@ end
 .IP "" 0
 .
 .SS "Putting it Together"
-You can combine these methods in many ways\. This bit of code is from the uvcdat formula \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula\.rb\fR and creates symlinks from an openssl installaion into a directory under the uvcdat prefix\.
+You can combine these methods in many ways\. This bit of code is from the uvcdat formula \fIhttps://github\.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula\.rb\fR and it creates symlinks from an openssl installation into a directory under the uvcdat prefix\.
 .
 .IP "" 4
 .

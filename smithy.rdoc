@@ -108,6 +108,15 @@ Suppress messages from STDOUT.
 
 
 
+==== Command: <tt>clean </tt>
+Clean installed modules and builds
+
+
+===== Commands
+====== Command: <tt>build  PATH</tt>
+clean a given build
+
+Clean build names using the format: APPLICATION/VERSION/BUILD
 ==== Command: <tt>edit  build|test|env|modulefile NAME</tt>
 Edit package support files
 

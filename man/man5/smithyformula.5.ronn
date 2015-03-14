@@ -166,10 +166,11 @@ example:
       end
     end
 
-### concern :Version1_2_3 do Concerns are used allow formulas to support
-multiple versions. When used, their contents will override the same methods
-defined at the root level of a formula class. They are a part of the
-[ActiveSupport Concerning
+### concern :Version1_2_3 do
+
+Concerns are used allow formulas to support multiple versions. When used, their
+contents will override the same methods defined at the root level of a formula
+class. They are a part of the [ActiveSupport Concerning
 Module](http://api.rubyonrails.org/classes/Module/Concerning.html)
 
 To specify a concern for version 1.2.3 of a package add the following to a
@@ -653,7 +654,7 @@ easier Smithy provides the following methods.
 
 * [build_name_python][]
 * [system_python][]
-* [`<%= python_module_build_list @package, @builds %>`][-python_module_build_list-package-builds-]
+* [`<%= python_module_build_list @package, @builds %>`](#-python_module_build_list-package-builds-)
 
 
 MODULEFILE HELPER METHODS
