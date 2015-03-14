@@ -1,7 +1,8 @@
 smithyformula(5) -- writing formulas for smithy
 ===============================================
 
-## DESCRIPTION
+DESCRIPTION
+-----------
 
 The main goal of formulas is to consolidate all knowledge required to build a
 software package. This can include:
@@ -23,7 +24,8 @@ It's common for build scripts to run the compilation but omit patches, changes
 to makefile, or any other modification to the source. With formulas it's easy to
 make patches and output any files needed to compile software.
 
-## CREATING NEW FORMULAS
+CREATING NEW FORMULAS
+---------------------
 
 The best way to create a new formula is to start with a working example. There
 are many complete working examples in the [smithy_formulas
@@ -58,7 +60,8 @@ This will create a formula file inside `~/.smithy/formulas` or the first formula
 directory specified in the `$SMITHY_CONFIG` file. In either case, the full path
 to that file will be displayed.
 
-## STRUCTURE
+STRUCTURE
+---------
 
 Formulas attempt to create a domain specific language with the support of a full
 programming language, ruby. The structure of a formula is the same as a ruby class.
@@ -85,7 +88,8 @@ Minutes](http://www.ruby-lang.org/en/documentation/quickstart/) or try another
 source on the [Ruby Documentation](http://www.ruby-lang.org/en/documentation/)
 page.
 
-## FORMULA DSL METHODS
+FORMULA DSL METHODS
+-------------------
 
 These methods should be defined at the highest level of the formula file, right
 after the `class GitFormula < Formula` line.
@@ -106,6 +110,12 @@ Manually define the version number, if omitted smithy will guess the version
 number from the url. This works best when the filename in a url follows the
 name-version.tar... format.
 
+### supported_build_names
+
+### params
+
+### concern :Version1_2_3 do
+
 ### disable_group_writable
 Calling this method within the formula will skip setting group writable file
 permissions after the build is complete. It's equivalent to running smithy with
@@ -113,7 +123,6 @@ the `--disable-group-writable` option. See `smithy help` for more info on global
 command line options.
 
 ### depends_on
-
 This method expects either a single string or an array of strings that define
 dependencies for this formula. e.g.
 
@@ -375,7 +384,130 @@ The contents of the install method depends heavily on the software being
 installed. For a list of additional helper methods for use inside install see
 the [FORMULA HELPER METHODS][] section.
 
-## MODULEFILE HELPER METHODS
+FORMULA HELPER METHODS
+----------------------
+
+These methods are designed to be used within the [def install][] method of a
+formula file or within a block passed to one [FORMULA DSL METHODS][].
+
+### name
+This will return the name of the application being installed. It is the same as
+the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
+command. It can be used as a variable as well as inside of a string using the
+`#{ ... }` delimiters. e.g. `"#{name}"`
+
+### version
+Similar to the above, this returns the version number.
+
+### build_name
+Same as the name and version methods, this will return the build name of the
+applcation.
+
+### prefix
+This line will return the full prefix to an application. If we run smithy
+formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
+command will return /sw/xk6/bzip2/1.0.4/pgi13.4
+
+### system
+This method accepts a string or multiple strings separated by commas. It will
+run the given command in a subshell and setup the modules as defined by the
+[module_commands][] or [modules][] methods. Each call to system is independent
+from the last. Modules are reloaded and environment variables are reset.
+
+### module_list
+This method will run `module list` and print it's output durring the install
+process. Useful for verifying the modules loaded are the ones you want.
+
+### module_is_available?
+This method will check if a given modulename is available on the system you are
+performing the installation on. It takes one string argument, the module name.
+It can be used within the [def install][], [depends_on][], [module_commands][],
+or [modules][] methods.
+
+    if module_is_available?("hdf5/1.8.8")
+      ...
+    end
+
+### module_environment_variable
+Using this method will return the contents of an environment varible set by a
+modulefile. It takes two string arguments, the module name and the environment
+variable name. For example, if you wished to get the value of the `$HDF5_DIR`
+variable set within the `hdf5/1.8.8` module you could run:
+
+    hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+
+Using this method to get environment variable set by modules is necessary since
+the modules are only set before running a [system][] command. See [Setting
+Environment Variables][] for more info.  It can be used within the [def
+install][], [depends_on][], [module_commands][], or [modules][] methods.
+
+By combining the [module_is_available?][] and [module_environment_variable][]
+methods you can conditionally retrieve the contents of environment variables set
+within a given module.
+
+    if module_is_available?("hdf5/1.8.8")
+      hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
+    end
+
+### patch
+
+The patch method is a convinience method to apply patches to code. Behind the
+scenes it creates a file named `patch.diff` with the passed content and runs
+`patch -p1 <patch.diff`. Using the heredoc syntax works best to strip leading
+whitespace. For example:
+
+    patch <<-EOF.strip_heredoc
+      diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
+      index e867fb2..22fb40c 100644
+      --- a/CMake/cdat_modules/cairo_external.cmake
+      +++ b/CMake/cdat_modules/cairo_external.cmake
+      @@ -1,7 +1,7 @@
+
+       set(Cairo_source "${CMAKE_CURRENT_BINARY_DIR}/build/Cairo")
+       set(Cairo_install "${cdat_EXTERNALS}")
+      -set(Cairo_conf_args --disable-static)
+      +set(Cairo_conf_args --enable-gobject=no --disable-static)
+
+       ExternalProject_Add(Cairo
+         DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
+    EOF
+
+Any input you provide must be compatible with the patch command. You can use
+interpolated strings `#{ ... }` to modify the content of patches as well:
+
+    patch <<-EOF.strip_heredoc
+      diff --git a/Makefile.in b/Makefile.in
+      new file mode 100644
+      index 0000000..1235d4b
+      --- /dev/null
+      +++ b/Makefile.in
+      @@ -0,0 +1,12 @@
+      +SHELL = /bin/sh
+      +PLAT = LINUX
+      +BLLIB = #{acml_prefix}/gfortran64/lib/libacml.a
+      +CBLIB = #{prefix}/lib/libcblas.a
+      +CC = gcc
+      +FC = gfortran
+      +LOADER = $(FC)
+      +CFLAGS = -O3 -DADD_
+      +FFLAGS = -O3
+      +ARCH = ar
+      +ARCHFLAGS = r
+      +RANLIB = ranlib
+    EOF
+
+PYTHON HELPERS
+--------------
+
+### build_name_python
+
+### system_python
+
+### `<%= python_module_build_list @package, @builds %>`
+
+
+MODULEFILE HELPER METHODS
+-------------------------
 
 ### `<%= @package.name %>`
 
@@ -501,118 +633,8 @@ Where `@builds.size > 1` can be any expression which returns true or false. If
 the if condition is true then the lines between the if and else will be put in
 the modulefile, otherwise lines between the else and end will be used.
 
-## FORMULA HELPER METHODS
-
-These methods are designed to be used within the [def install][] method of a
-formula file or within a block passed to one [FORMULA DSL METHODS][].
-
-### name
-This will return the name of the application being installed. It is the same as
-the APPLICATION part of the smithy formula install APPLICATION/VERSION/BUILD
-command. It can be used as a variable as well as inside of a string using the
-`#{ ... }` delimiters. e.g. `"#{name}"`
-
-### version
-Similar to the above, this returns the version number.
-
-### build_name
-Same as the name and version methods, this will return the build name of the
-applcation.
-
-### prefix
-This line will return the full prefix to an application. If we run smithy
-formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
-command will return /sw/xk6/bzip2/1.0.4/pgi13.4
-
-### system
-This method accepts a string or multiple strings separated by commas. It will
-run the given command in a subshell and setup the modules as defined by the
-[module_commands][] or [modules][] methods. Each call to system is independent
-from the last. Modules are reloaded and environment variables are reset.
-
-### module_list
-This method will run `module list` and print it's output durring the install
-process. Useful for verifying the modules loaded are the ones you want.
-
-### module_is_available?
-This method will check if a given modulename is available on the system you are
-performing the installation on. It takes one string argument, the module name.
-It can be used within the [def install][], [depends_on][], [module_commands][],
-or [modules][] methods.
-
-    if module_is_available?("hdf5/1.8.8")
-      ...
-    end
-
-### module_environment_variable
-Using this method will return the contents of an environment varible set by a
-modulefile. It takes two string arguments, the module name and the environment
-variable name. For example, if you wished to get the value of the `$HDF5_DIR`
-variable set within the `hdf5/1.8.8` module you could run:
-
-    hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
-
-Using this method to get environment variable set by modules is necessary since
-the modules are only set before running a [system][] command. See [Setting
-Environment Variables][] for more info.  It can be used within the [def
-install][], [depends_on][], [module_commands][], or [modules][] methods.
-
-By combining the [module_is_available?][] and [module_environment_variable][]
-methods you can conditionally retrieve the contents of environment variables set
-within a given module.
-
-    if module_is_available?("hdf5/1.8.8")
-      hdf5_prefix = module_environment_variable("hdf5/1.8.8", "HDF5_DIR")
-    end
-
-### patch
-
-The patch method is a convinience method to apply patches to code. Behind the
-scenes it creates a file named `patch.diff` with the passed content and runs
-`patch -p1 <patch.diff`. Using the heredoc syntax works best to strip leading
-whitespace. For example:
-
-    patch <<-EOF.strip_heredoc
-      diff --git a/CMake/cdat_modules/cairo_external.cmake b/CMake/cdat_modules/cairo_external.cmake
-      index e867fb2..22fb40c 100644
-      --- a/CMake/cdat_modules/cairo_external.cmake
-      +++ b/CMake/cdat_modules/cairo_external.cmake
-      @@ -1,7 +1,7 @@
-
-       set(Cairo_source "${CMAKE_CURRENT_BINARY_DIR}/build/Cairo")
-       set(Cairo_install "${cdat_EXTERNALS}")
-      -set(Cairo_conf_args --disable-static)
-      +set(Cairo_conf_args --enable-gobject=no --disable-static)
-
-       ExternalProject_Add(Cairo
-         DOWNLOAD_DIR ${CDAT_PACKAGE_CACHE_DIR}
-    EOF
-
-Any input you provide must be compatible with the patch command. You can use
-interpolated strings `#{ ... }` to modify the content of patches as well:
-
-    patch <<-EOF.strip_heredoc
-      diff --git a/Makefile.in b/Makefile.in
-      new file mode 100644
-      index 0000000..1235d4b
-      --- /dev/null
-      +++ b/Makefile.in
-      @@ -0,0 +1,12 @@
-      +SHELL = /bin/sh
-      +PLAT = LINUX
-      +BLLIB = #{acml_prefix}/gfortran64/lib/libacml.a
-      +CBLIB = #{prefix}/lib/libcblas.a
-      +CC = gcc
-      +FC = gfortran
-      +LOADER = $(FC)
-      +CFLAGS = -O3 -DADD_
-      +FFLAGS = -O3
-      +ARCH = ar
-      +ARCHFLAGS = r
-      +RANLIB = ranlib
-    EOF
-
-## COMMON OPERATIONS
+COMMON OPERATIONS
+-----------------
 
 ### Change Working Directory
 
@@ -728,7 +750,7 @@ based on an environment variable like this:
 
 You can combine these methods in many ways. This bit of code is from the
 [uvcdat formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/uvcdat_formula.rb)
-and creates symlinks from an openssl installaion into a directory under the
+and it creates symlinks from an openssl installation into a directory under the
 uvcdat prefix.
 
     Dir.chdir prefix
@@ -761,6 +783,7 @@ command per array element. That system command uses an `openssl.prefix` method
 that is made available by the [depends_on][] defined earlier in the formula to
 get the location of the openssl installation.
 
-## SEE ALSO
+SEE ALSO
+--------
 
 smithy(1)
