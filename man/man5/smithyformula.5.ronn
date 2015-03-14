@@ -414,6 +414,10 @@ run the given command in a subshell and setup the modules as defined by the
 [module_commands][] or [modules][] methods. Each call to system is independent
 from the last. Modules are reloaded and environment variables are reset.
 
+### system_python
+
+### build_name_python
+
 ### module_list
 This method will run `module list` and print it's output durring the install
 process. Useful for verifying the modules loaded are the ones you want.
@@ -496,14 +500,10 @@ interpolated strings `#{ ... }` to modify the content of patches as well:
       +RANLIB = ranlib
     EOF
 
-PYTHON HELPERS
---------------
+PYTHON SPECIFIC HELPERS
+-----------------------
 
-### build_name_python
-
-### system_python
-
-### `<%= python_module_build_list @package, @builds %>`
+[build_name_python][] [system_python][]
 
 
 MODULEFILE HELPER METHODS
@@ -613,6 +613,52 @@ Using the above bzip2 example the result of using this method would be:
       puts stderr "pgi13.4"
       break
     }
+
+### `<%= python_module_build_list @package, @builds %>`
+
+This method is similar to the previously mentioned [module_build_list][] except
+that it will create a block specific to python versions. It requires that a full
+python version be part of the current build name e.g. `python2.7.9`. It will
+look at the builds installed for the current formula and create a corresponding
+tcl if block. It will also check to see if python modules exist that correspond to
+the build names.
+
+For example, lets assume we perform the following installs for the
+[python_numpy](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_numpy_formula.rb)
+formula:
+
+    smithy formula install python_numpy/1.9.2/python2.7.9_gnu4.8.2
+    smithy formula install python_numpy/1.9.2/python3.4.3_gnu4.8.2
+
+Then the following builds will exist:
+
+    python_numpy
+    `--- 1.9.2
+       `--- python2.7.9_gnu4.8.2
+       `--- python3.4.3_gnu4.8.2
+
+If the `python/2.7.9` and `python/3.4.3` modules exist then
+[python_module_build_list][] method will create the following output:
+
+    if [ is-loaded python/2.7.9 ] {
+      set BUILD python2.7.9_gnu4.8.2
+      set LIBDIR python2.7
+    } elseif [ is-loaded python/3.4.3 ] {
+      set BUILD python3.4.3_gnu4.8.2
+      set LIBDIR python3.4
+    }
+    if {![info exists BUILD]} {
+      puts stderr "[module-info name] is only available for the following environments:"
+      puts stderr "python/2.7.9"
+      puts stderr "python/3.4.3"
+      break
+    }
+
+It is designed to be used like this:
+
+    <%= python_module_build_list @package, @builds %>
+    set PREFIX <%= @package.version_directory %>/$BUILD
+
 
 ### `<% if ... %>`
 This is standard erb ruby code. Delimiters like `<% ... %>` do NOT put their
