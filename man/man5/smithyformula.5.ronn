@@ -148,8 +148,83 @@ above you should see:
     ==> ERROR: use a build_name that includes any of the above patterns
 
 ### params
+This method is used to specify some unchanging variables you would like to use
+in any block throughout the formula. It can be useful if you want some variables
+located at the top of the formula file that are easily changed. It takes a hash
+where the keys are variable names and the values are the variable contents. For
+example:
 
-### concern :Version1_2_3 do
+    class ExampleFormula do
+      homepage "http://example.com"
+      url "http://example.com/example-1.2.3.tar.gz"
+
+      params example_api_version: "1.0",
+             build_folder: "example1.0"
+
+      def install
+        system "./configure --api-version #{example_api_version} --build-dir #{build_folder}"
+      end
+    end
+
+### concern :Version1_2_3 do Concerns are used allow formulas to support
+multiple versions. When used, their contents will override the same methods
+defined at the root level of a formula class. They are a part of the
+[ActiveSupport Concerning
+Module](http://api.rubyonrails.org/classes/Module/Concerning.html)
+
+To specify a concern for version 1.2.3 of a package add the following to a
+formula (replacing the comment with the methods you would like to override).
+
+
+    concern :Version1_2_3 do
+      included do
+        # override methods here
+      end
+    end
+
+Anything formula DSL method can be overridden including [def install][].
+Concerns must have the `:Version1_2_3` naming format where periods `.` are
+changed to underscores `_`. This will correspond to a version of `1.2.3`.
+
+Here is an example of a python formula that supports version `2.7.9` and
+`3.4.3`. The concern only overrides the download urls and md5s.
+
+    class PythonFormula < Formula
+      homepage "www.python.org/"
+
+      depends_on "sqlite"
+
+      module_commands ["unload python"]
+
+      concern :Version2_7_9 do
+        included do
+          url "https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz"
+          md5 "5eebcaa0030dc4061156d3429657fb83"
+        end
+      end
+
+      concern :Version3_4_3 do
+        included do
+          url "https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz"
+          md5 "4281ff86778db65892c05151d5de738d"
+        end
+      end
+
+      def install
+        module_list
+        ENV["CPPFLAGS"] = "-I#{sqlite.prefix}/include"
+        ENV["LDFLAGS"]  = "-L#{sqlite.prefix}/lib"
+        system "./configure --prefix=#{prefix} --enable-shared"
+        system "make"
+        system "make install"
+      end
+    end
+
+Using the above formula it is possible to install python with the following and
+smithy will download the correct tarball for each version:
+
+    smithy formula install python/2.7.9/sles11.3_gnu4.3.4
+    smithy formula install python/3.4.3/sles11.3_gnu4.3.4
 
 ### disable_group_writable
 Calling this method within the formula will skip setting group writable file
