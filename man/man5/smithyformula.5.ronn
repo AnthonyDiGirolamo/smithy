@@ -108,9 +108,25 @@ A hash of the downloaded file to verify the download performed correctly, e.g.
 ### version
 Manually define the version number, if omitted smithy will guess the version
 number from the url. This works best when the filename in a url follows the
-name-version.tar... format.
+name-version.tar... format. If a url does not follow that format then manually
+specifying the version with the [version][] method works best.
 
 ### supported_build_names
+This method takes any number of strings or regexes. When used, smithy will check
+the supplied [build_name][] and validate it against what is specified under
+[supported_build_names][]. If the [build_name][] does not match a string or
+regex the install is aborted.
+
+This is useful for when a formula must have specific build names in order to
+install correctly.
+
+For example, using the this line in a formula:
+
+    supported_build_names "python2.7", "python3"
+
+And running `smithy formula install python_numpy/1.9.2/python2.6` (note
+python2.6 does not match anything in the [supported_build_names][] line above).
+Will produce the following output in smithy and abort the install:
 
 ### params
 
@@ -409,14 +425,49 @@ formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
 command will return /sw/xk6/bzip2/1.0.4/pgi13.4
 
 ### system
+
 This method accepts a string or multiple strings separated by commas. It will
 run the given command in a subshell and setup the modules as defined by the
 [module_commands][] or [modules][] methods. Each call to system is independent
 from the last. Modules are reloaded and environment variables are reset.
 
 ### system_python
+The [system_python][] method runs `python` using a [system][] command and sets
+the `PYTHONPATH` environment variable to a location in the current [prefix][].
+This is useful for running a `setup.py` for a python module. It is designed to
+be used like:
+
+    system_python "setup.py install --prefix=#{prefix} --compile"
+
+Under the hood it is running:
+
+    system "PYTHONPATH=$PYTHONPATH:#{prefix}/lib/#{python_libdir(current_python_version)}/site-packages python",
+      "setup.py install --prefix=#{prefix} --compile"
+
+Where `python_libdir(current_python_version)` is the lib directory for the
+version of python in the `$PATH` e.g. `python2.7` or `python3.4`
 
 ### build_name_python
+This is a helper to change a full python version specified in the module name
+e.g. `python2.7.9` or `python3.4.3` to a version with a forward slash e.g.
+`python/2.7.9` or `python/3.4.3` respectively.
+
+It is useful for when a formula is installed with a python version in the
+[build_name][] and you want to get the corresponding python version string for
+use in a [module_commands][] or [depends_on][] block. For example:
+
+    depends_on do
+      build_name_python
+    end
+
+    module_commands do
+      [ "unload python",
+        "load #{build_name_python}" ]
+    end
+
+If the above is used when installing a formula with `python2.7.9` in the build
+name e.g. `smithy formula install python_numpy/1.9.2/python2.7.9_gnu4.8.2` then
+[build_name_python][] will return `python/2.7.9`.
 
 ### module_list
 This method will run `module list` and print it's output durring the install
@@ -503,7 +554,12 @@ interpolated strings `#{ ... }` to modify the content of patches as well:
 PYTHON SPECIFIC HELPERS
 -----------------------
 
-[build_name_python][] [system_python][]
+Python module installations require some extra consideration. To make life a bit
+easier Smithy provides the following methods.
+
+* [build_name_python][]
+* [system_python][]
+* [`<%= python_module_build_list @package, @builds %>`][-python_module_build_list-package-builds-]
 
 
 MODULEFILE HELPER METHODS
@@ -585,10 +641,10 @@ this would return `4`.
 
 ### `<%= module_build_list @package, @builds %>`
 
-This is a helper method in smithy that will generate the tcl necessary to
-conditionally load builds based on what compiler programming environment
-modules a user has loaded. It takes `@package` and `@builds` as arguments.
-Using the above bzip2 example the result of using this method would be:
+This is a helper method that will generate the tcl necessary to conditionally
+load builds based on what compiler programming environment modules a user has
+loaded. It takes `@package` and `@builds` as arguments.  Using the above bzip2
+example the result of using this method would be:
 
     if [ is-loaded PrgEnv-gnu ] {
       if [ is-loaded gcc/4.3.4 ] {
