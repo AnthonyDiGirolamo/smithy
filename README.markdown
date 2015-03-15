@@ -32,9 +32,9 @@ Documentation
 
 Lots of information and a tutorial can be found on the manpages:
 
-* [smithy](http://anthonydigirolamo.github.com/smithy/smithy.1.html)
+* [smithy](http://anthonydigirolamo.github.com/smithy/smithy.1.html?2)
 
-* [smithyformula](http://anthonydigirolamo.github.com/smithy/smithyformula.5.html)
+* [smithyformula](http://anthonydigirolamo.github.com/smithy/smithyformula.5.html?2)
 
 Installation
 ------------
