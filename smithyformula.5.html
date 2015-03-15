@@ -257,7 +257,7 @@ example:</p>
 end
 </code></pre>
 
-<h3 id="concern-Version1_2_3-do">concern :Version1_2_3 do</h3>
+<h3 id="concern-for_version-1-2-3-do">concern for_version("1.2.3") do</h3>
 
 <p>Concerns are used allow formulas to support multiple versions. When used, their
 contents will override the same methods defined at the root level of a formula
@@ -267,16 +267,14 @@ Module</a></p>
 <p>To specify a concern for version 1.2.3 of a package add the following to a
 formula (replacing the comment with the methods you would like to override).</p>
 
-<pre><code>concern :Version1_2_3 do
+<pre><code>concern for_version("1.2.3") do
   included do
     # override methods here
   end
 end
 </code></pre>
 
-<p>Anything formula DSL method can be overridden including <a href="#def-install" title="def install" data-bare-link="true">def install</a>.
-Concerns must have the <code>:Version1_2_3</code> naming format where periods <code>.</code> are
-changed to underscores <code>_</code>. This will correspond to a version of <code>1.2.3</code>.</p>
+<p>Anything formula DSL method can be overridden including <a href="#def-install" title="def install" data-bare-link="true">def install</a>.</p>
 
 <p>Here is an example of a python formula that supports version <code>2.7.9</code> and
 <code>3.4.3</code>. The concern only overrides the download urls and md5s.</p>
@@ -288,14 +286,14 @@ changed to underscores <code>_</code>. This will correspond to a version of <cod
 
   module_commands ["unload python"]
 
-  concern :Version2_7_9 do
+  concern for_version("2.7.9") do
     included do
       url "https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz"
       md5 "5eebcaa0030dc4061156d3429657fb83"
     end
   end
 
-  concern :Version3_4_3 do
+  concern for_version("3.4.3") do
     included do
       url "https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz"
       md5 "4281ff86778db65892c05151d5de738d"
