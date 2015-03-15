@@ -4,42 +4,57 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Smithy by AnthonyDiGirolamo</title>
-
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
   </head>
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/AnthonyDiGirolamo/smithy">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/AnthonyDiGirolamo/smithy/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/AnthonyDiGirolamo/smithy/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
     <div class="wrapper">
-      <header>
-        <h1>Smithy</h1>
-        <p>Smithy will help you build, test, and install software with ease.</p>
-        <p class="view"><a href="https://github.com/AnthonyDiGirolamo/smithy">View the Project on GitHub <small>AnthonyDiGirolamo/smithy</small></a></p>
-        <ul>
-          <li><a href="https://github.com/AnthonyDiGirolamo/smithy/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/AnthonyDiGirolamo/smithy/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/AnthonyDiGirolamo/smithy">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
+
       <section>
+        <div id="title">
+          <h1>Smithy</h1>
+          <p>Smithy will help you build, test, and install software with ease.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/AnthonyDiGirolamo">AnthonyDiGirolamo</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
         <h1>
-<a name="software-smithy" class="anchor" href="#software-smithy"><span class="octicon octicon-link"></span></a>Software Smithy</h1>
+<a id="smithy" class="anchor" href="#smithy" aria-hidden="true"><span class="octicon octicon-link"></span></a>Smithy</h1>
+
+<p>This repo is for the Smithy application itself. For formulas see
+<a href="https://github.com/AnthonyDiGirolamo/smithy_formulas">smithy_formulas</a></p>
 
 <h2>
-<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h2>
 
-<p><code>smithy</code> is a command line software installation/compilation tool that borrows
-ideas heavily from the excellent <a href="http://brew.sh/">homebrew</a> package management
-system for Mac OS X and <a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.<a href="#smithy_ref1"><sup>1</sup></a></p>
+<p><code>smithy</code> is a command line software installation tool that borrows ideas heavily
+from the excellent <a href="http://brew.sh/">homebrew</a> package management system for Mac
+OS X and
+<a href="http://www.olcf.ornl.gov/center-projects/swtools/">SWTools</a>.<a href="#smithy_ref1"><sup>1</sup></a></p>
 
-<p>Smithy is designed to sanely manage many software builds within a
-shared <a href="http://en.wikipedia.org/wiki/High-performance_computing">HPC</a>
-Linux environment using <a href="http://modules.sourceforge.net/">modulefiles</a> to load
+<p>Smithy is designed to sanely manage many software builds within a shared
+<a href="http://en.wikipedia.org/wiki/High-performance_computing">HPC</a> Linux or Mac
+environment using <a href="http://modules.sourceforge.net/">modulefiles</a> to load
 software into a user's shell.</p>
 
 <p>Software builds are created with a few conventions:</p>
@@ -49,164 +64,60 @@ software into a user's shell.</p>
 <li>Prefixes are defined by their name, version, and build name</li>
 <li>Software is loaded into the shell using <a href="http://modules.sourceforge.net/">modulefiles</a>
 </li>
-<li>Builds are performed by <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#BUILD-SCRIPTS">build scripts</a> or <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#FORMULAS">formulas</a>
+<li>Builds are performed by <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#FORMULAS">formulas</a> or <a href="http://anthonydigirolamo.github.io/smithy/smithy.1.html#BUILD-SCRIPTS">build scripts</a>
 </li>
-</ul><p>As an example:</p>
+</ul>
 
-<pre><code>/opt                         Software Root
-├── redhat6                    OS directory
-|   |
-|   ├── modulefiles                Modules live here
-|   |   ├── git                         Application
-|   |   |   ├── 1.7.8.5                     Versions
-|   |   |   └── 1.8.2.1
-|   |   └── petsc
-|   |       ├── 3.2
-|   |       └── 3.3
-|   |
-|   ├── git                        Application Name
-|   |   ├── 1.7.8.5                    Version
-|   |   |   └── rhel6.4_gnu4.4.7           Build Name
-|   |   └── 1.8.2.1
-|   |       └── rhel6.4_gnu4.4.7
-|   |
-|   └── petsc
-|       ├── 3.2
-|       |   ├── rhel6.4_pgi12.8            Build using PGI 12.8 compiler
-|       |   └── rhel6.4_gnu4.6.3           Build using GNU 4.6.3 compiler
-|       └── 3.3
-|           ├── rhel6.4_pgi12.8
-|           ├── rhel6.4_pgi13.4
-|           └── rhel6.4_gnu4.7.1
-|
-└── sles11                     Another OS directory
-    |
-    ├── modulefiles
-    |   └── git
-    |       ├── 1.7.8.5
-    |       └── 1.8.2.1
-    |
-    └── git
-        ├── 1.7.9.5
-        |   └── sles11.1_gnu4.3.4
-        └── 1.8.2.1
-            └── sles11.1_gnu4.3.4
-</code></pre>
+<p>Examples of many formulas can be found in the
+<a href="https://github.com/AnthonyDiGirolamo/smithy_formulas">smithy_formulas</a> repo.</p>
 
 <h2>
-<a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Documentation</h2>
+<a id="documentation" class="anchor" href="#documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Documentation</h2>
 
 <p>Lots of information and a tutorial can be found on the manpages:</p>
 
 <ul>
 <li><p><a href="http://anthonydigirolamo.github.com/smithy/smithy.1.html">smithy</a></p></li>
 <li><p><a href="http://anthonydigirolamo.github.com/smithy/smithyformula.5.html">smithyformula</a></p></li>
-</ul><h2>
-<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+</ul>
 
-<p>smithy is available through <a href="http://rubygems.org/gems/software_smithy">rubygems</a>
-so if you already have ruby 1.9.2 or higher available just run:</p>
+<h2>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<pre><code>gem install software_smithy
+<p>Smithy is available for download on the <a href="https://github.com/AnthonyDiGirolamo/smithy/releases">releases
+page</a>. Once downloaded it
+can be extracted and run from any location. Smithy is written in
+<a href="https://www.ruby-lang.org/">ruby</a> and provides a built in ruby environment via
+<a href="http://phusion.github.io/traveling-ruby/">Traveling-Ruby</a>. You do not need to
+install ruby to use Smithy. Releases for Mac and Linux are available.</p>
+
+<h2>
+<a id="running" class="anchor" href="#running" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running</h2>
+
+<p>Extract to a directory of your choice and set the <code>$SMITHY_PREFIX</code> environment
+variable in the <code>environment.sh</code> file. Assuming you extracted Smithy to
+<code>/sw/tools/smithy</code> the top of the environment.sh file should look like:</p>
+
+<pre><code>export SMITHY_PREFIX=/sw/tools/smithy
+export SMITHY_CONFIG=$SMITHY_PREFIX/smithyrc
+export MANPATH=$SMITHY_PREFIX/lib/app/man:$MANPATH
 </code></pre>
 
-<p>Set <code>$SMITHY_CONFIG</code> to your smithy config file and you're good to go. If you
-need to install ruby or require a multiuser installation read on:</p>
-
-<h3>
-<a name="installing-ruby" class="anchor" href="#installing-ruby"><span class="octicon octicon-link"></span></a>Installing ruby</h3>
-
-<p>Smithy requires ruby 1.9.2 or later. Most enterprise Linux distributions only
-ship version 1.8.7 and you may need build your own copy. The simplest way is
-using the excellent <a href="https://github.com/sstephenson/ruby-build">ruby-build</a>
-script. As an example, this will install ruby with a prefix of
-<code>/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4</code></p>
-
-<pre><code>curl -L https://github.com/sstephenson/ruby-build/archive/master.zip -o ruby-build.zip
-unzip ruby-build.zip
-cd ruby-build-master
-./bin/ruby-build -h
-./bin/ruby-build --definitions
-./bin/ruby-build 1.9.3-p286 /sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4
-</code></pre>
-
-<p>Many sites use <a href="http://modules.sourceforge.net/">Environment Modules</a> to allow
-users to load and unload software into their environment. Here is sample
-modulefile for ruby installed in the previous example.</p>
-
-<pre><code>#%Module1.0
-proc ModulesHelp { } {
-  puts stderr "Ruby 1.9.3 patch 286"
-  puts stderr "The gem command will install gems to the ~/.gem directory."
-}
-module-whatis "Ruby 1.9.3-p286"
-
-set PREFIX /sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4
-prepend-path PATH            $PREFIX/bin
-prepend-path LD_LIBRARY_PATH $PREFIX/lib
-prepend-path MANPATH         $PREFIX/share/man
-setenv       GEM_HOME        $env(HOME)/.gem/ruby/1.9.1
-setenv       GEM_PATH        $env(HOME)/.gem/ruby/1.9.1:$PREFIX/lib/ruby/gems/1.9.1
-prepend-path PATH            $env(HOME)/.gem/ruby/1.9.1/bin:$PREFIX/lib/ruby/gems/1.9.1/bin
-</code></pre>
-
-<p>This file should be saved to <code>$MODULEPATH/ruby/1.9.3</code></p>
-
-<h3>
-<a name="installing-smithy" class="anchor" href="#installing-smithy"><span class="octicon octicon-link"></span></a>Installing smithy</h3>
-
-<h4>
-<a name="choosting-an-install-location" class="anchor" href="#choosting-an-install-location"><span class="octicon octicon-link"></span></a>Choosting an install location</h4>
-
-<p>There are two ways to install smithy. The simplest is by simply installing the
-<code>software_smithy</code> gem. This will install smithy and it's required gems in
-your home directory:</p>
-
-<pre><code>gem install software_smithy
-</code></pre>
-
-<p>If you are installing in production for all users you will want to install
-smithy somewhere everyone can access. There are two places you might want to do
-this:</p>
-
-<h5>
-<a name="rubys-default-gem_path" class="anchor" href="#rubys-default-gem_path"><span class="octicon octicon-link"></span></a>Ruby's default <code>GEM_PATH</code>
-</h5>
-
-<p>If you installed manually using the examples above, this will be something like
-<code>PREFIX/lib/ruby/gems/1.9.1</code> This will give access to smithy whenever
-ruby is loaded into a users environment using the modulefile above. To install
-to ruby's default <code>GEM_PATH</code> (following the above example):</p>
-
-<pre><code>export GEM_HOME=/sw/xk6/ruby/1.9.3-p286/sles11.1_gnu4.3.4/lib/ruby/gems/1.9.1
-gem install software_smithy --no-rdoc --no-ri
-</code></pre>
-
-<h5>
-<a name="a-different-location-of-your-choosing" class="anchor" href="#a-different-location-of-your-choosing"><span class="octicon octicon-link"></span></a>A different location of your choosing.</h5>
-
-<p>This is useful if you want a single smithy install location for more than one
-install of ruby (typically on separate machines). This method is a bit more
-complicated and requires users to load smithy into their environment manually in
-addition to ruby.</p>
-
-<p>Assuming you use environment modules you can install smithy to a separate
-directory e.g. <code>/sw/tools/smithy</code> with the
-<a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/script/install_smithy">install_smithy</a>
-script. This will setup a folder containing the smithy gem, a modulefile and a
-script that sets up shell completion. Users can load smithy into their
-environment by running:</p>
+<p>Once set, source the <code>environment.sh</code> using <code>bash</code> or <code>zsh</code></p>
 
 <pre><code>source /sw/tools/smithy/environment.sh
 </code></pre>
 
-<h3>
-<a name="loading-smithy-into-your-environment" class="anchor" href="#loading-smithy-into-your-environment"><span class="octicon octicon-link"></span></a>Loading smithy into your environment</h3>
-
 <p>Smithy depends on a config file to define it's behavior. Once created you can
-point smithy to it's location using the <code>$SMITHY_CONFIG</code> environment variable.</p>
+point Smithy to it's location by setting the <code>$SMITHY_CONFIG</code> environment
+variable.</p>
 
-<p>Here is an example config file:</p>
+<p>You can generate an example config file using Smithy itself by running:</p>
+
+<pre><code>smithy show example_config
+</code></pre>
+
+<p>Here is an example config file in <a href="http://yaml.org/">yaml</a> format:</p>
 
 <pre><code>---
 software-root: /sw
@@ -233,40 +144,31 @@ formula-directories:
 global-error-log: /sw/tools/smithy/exceptions.log
 </code></pre>
 
-<p>You may wish to set this using a modulefile or a shell script. Examples are
-provided in
-<a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/modulefiles/smithy/1.6.3">modulefiles/smithy/1.6</a>
-and
-<a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/environment.sh">environment.sh</a></p>
-
 <h2>
-<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
 <p>Smithy is based on the ideas created in SWTools and uses a BSD license. See
 <a href="https://github.com/AnthonyDiGirolamo/smithy/blob/master/LICENSE">LICENSE</a> for
 the exact text.</p>
 
 <h2>
-<a name="references" class="anchor" href="#references"><span class="octicon octicon-link"></span></a>References</h2>
+<a id="references" class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h2>
 
 <p><a name="smithy_ref1"></a></p>
 
 <p>N. Jones, M. R. Fahey, "Design, Implementation, and Experiences of Third-Party Software Administration at the ORNL NCCS," Proceedings of the 50th Cray User Group (CUG08), Helsinki, May 2008.</p>
 
 <h2>
-<a name="contributing-and-support" class="anchor" href="#contributing-and-support"><span class="octicon octicon-link"></span></a>Contributing and Support</h2>
+<a id="contributing-and-support" class="anchor" href="#contributing-and-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing and Support</h2>
 
-<p>The smithy <a href="https://github.com/AnthonyDiGirolamo/smithy">github repo</a> contains
+<p>The Smithy <a href="https://github.com/AnthonyDiGirolamo/smithy">github repo</a> contains
 all development files. Please fork and send me a pull request with any additions
 or changes.</p>
 
 <p>If you encounter any issues please <a href="https://github.com/AnthonyDiGirolamo/smithy/issues">open an issue</a> on github. Or send me an email.</p>
       </section>
+
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/AnthonyDiGirolamo">AnthonyDiGirolamo</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
     <!--[if !IE]><script>fixScale(document);</script><![endif]-->
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
