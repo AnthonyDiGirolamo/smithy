@@ -166,7 +166,7 @@ example:
       end
     end
 
-### concern :Version1_2_3 do
+### concern for_version("1.2.3") do
 
 Concerns are used allow formulas to support multiple versions. When used, their
 contents will override the same methods defined at the root level of a formula
@@ -177,15 +177,13 @@ To specify a concern for version 1.2.3 of a package add the following to a
 formula (replacing the comment with the methods you would like to override).
 
 
-    concern :Version1_2_3 do
+    concern for_version("1.2.3") do
       included do
         # override methods here
       end
     end
 
 Anything formula DSL method can be overridden including [def install][].
-Concerns must have the `:Version1_2_3` naming format where periods `.` are
-changed to underscores `_`. This will correspond to a version of `1.2.3`.
 
 Here is an example of a python formula that supports version `2.7.9` and
 `3.4.3`. The concern only overrides the download urls and md5s.
@@ -197,14 +195,14 @@ Here is an example of a python formula that supports version `2.7.9` and
 
       module_commands ["unload python"]
 
-      concern :Version2_7_9 do
+      concern for_version("2.7.9") do
         included do
           url "https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz"
           md5 "5eebcaa0030dc4061156d3429657fb83"
         end
       end
 
-      concern :Version3_4_3 do
+      concern for_version("3.4.3") do
         included do
           url "https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz"
           md5 "4281ff86778db65892c05151d5de738d"

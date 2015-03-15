@@ -223,6 +223,10 @@ module Smithy
     end
   end
 
+  def for_version(version)
+    ("Version" + version.to_s.squish.gsub(/[\. ]/, "_")).to_sym
+  end
+
   def log_exception(e, argv, config)
     logfile = Smithy::Config.global[:"global-error-log"]
     if logfile.present?

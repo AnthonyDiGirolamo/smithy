@@ -203,7 +203,7 @@ end
 .
 .IP "" 0
 .
-.SS "concern :Version1_2_3 do"
+.SS "concern for_version(\"1\.2\.3\") do"
 Concerns are used allow formulas to support multiple versions\. When used, their contents will override the same methods defined at the root level of a formula class\. They are a part of the ActiveSupport Concerning Module \fIhttp://api\.rubyonrails\.org/classes/Module/Concerning\.html\fR
 .
 .P
@@ -213,7 +213,7 @@ To specify a concern for version 1\.2\.3 of a package add the following to a for
 .
 .nf
 
-concern :Version1_2_3 do
+concern for_version("1\.2\.3") do
   included do
     # override methods here
   end
@@ -224,7 +224,7 @@ end
 .IP "" 0
 .
 .P
-Anything formula DSL method can be overridden including \fIdef install\fR\. Concerns must have the \fB:Version1_2_3\fR naming format where periods \fB\.\fR are changed to underscores \fB_\fR\. This will correspond to a version of \fB1\.2\.3\fR\.
+Anything formula DSL method can be overridden including \fIdef install\fR\.
 .
 .P
 Here is an example of a python formula that supports version \fB2\.7\.9\fR and \fB3\.4\.3\fR\. The concern only overrides the download urls and md5s\.
@@ -240,14 +240,14 @@ class PythonFormula < Formula
 
   module_commands ["unload python"]
 
-  concern :Version2_7_9 do
+  concern for_version("2\.7\.9") do
     included do
       url "https://www\.python\.org/ftp/python/2\.7\.9/Python\-2\.7\.9\.tgz"
       md5 "5eebcaa0030dc4061156d3429657fb83"
     end
   end
 
-  concern :Version3_4_3 do
+  concern for_version("3\.4\.3") do
     included do
       url "https://www\.python\.org/ftp/python/3\.4\.3/Python\-3\.4\.3\.tgz"
       md5 "4281ff86778db65892c05151d5de738d"
