@@ -49,7 +49,7 @@ module Smithy
 
     def self.formula_versions
       formula_versions = []
-      formula_files.collect do |f|
+      formula_files.each do |f|
         formula_contents = File.open(f).read rescue ""
         unless formula_contents.blank?
           version_number     = $1                              if formula_contents =~ /^\s+version\s+['"](.*?)['"]$/
@@ -61,6 +61,10 @@ module Smithy
 
           formula_contents.scan(/^\s+concern\s+:Version(.*?)\s+do$/).each do |m|
             formula_versions << formula_basename(f) + "/" + m.first.gsub(/\_/, ".")
+          end
+
+          formula_contents.scan(/^\s+concern\s+for_version\(['"](.*?)['"]\)\s+do$/).each do |m|
+            formula_versions << formula_basename(f) + "/" + m.first
           end
         end
       end
