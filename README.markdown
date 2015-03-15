@@ -65,10 +65,6 @@ Smithy depends on a config file to define it's behavior. Once created you can
 point Smithy to it's location by setting the `$SMITHY_CONFIG` environment
 variable.
 
-You can generate an example config file using Smithy itself by running:
-
-    smithy show example_config
-
 Here is an example config file in [yaml](http://yaml.org/) format:
 
     ---
