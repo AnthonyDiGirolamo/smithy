@@ -106,6 +106,9 @@ case "$words[1]" in
       return
     fi
 
+    _arguments \
+      '2: :->forms' &&  return 0
+
     if [[ "$state" == forms ]]; then
       _smithy_packages
     fi
