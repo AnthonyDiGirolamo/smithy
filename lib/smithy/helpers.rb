@@ -211,11 +211,12 @@ module Smithy
   end
 
   def global_module_is_available?(mod)
+    byebug
     if ENV["MODULESHOME"]
       modulecmd = "modulecmd sh"
       modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
       module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
-      if module_avail =~ /^#{mod}\s/
+      if module_avail =~ /^#{mod}/
         true
       else
         false
