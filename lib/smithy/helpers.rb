@@ -193,9 +193,9 @@ module Smithy
     name
   end
 
-  def python_version_from_build_name(build_name)
+  def get_python_version_from_build_name(build_name, separator: "/")
     if build_name =~ /python((\d+\.)?(\d+\.)?(\d+))/
-      "python/#{$1}"
+      "python#{separator}#{$1}"
     else
       raise "cannot determine which python version based on the build_name: #{build_name}"
     end

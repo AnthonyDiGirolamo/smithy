@@ -201,14 +201,22 @@ module Smithy
     end
 
     def build_name_python
-      python_version_from_build_name(build_name)
+      raise "please use 'python_version_from_build_name' instead of 'build_name_python'"
+    end
+
+    def python_module_from_build_name
+      get_python_version_from_build_name(build_name)
+    end
+
+    def python_version_from_build_name
+      get_python_version_from_build_name(build_name, separator: "")
     end
 
     def system_python(*args)
       system "which python"
       python_full_version = current_python_version
       pyver = python_libdir(python_full_version)
-      raise "current python version (#{python_full_version}) does not match the version specified in the build_name (#{build_name_python})" if build_name_python.split("/").last != python_full_version
+      raise "current python version (#{python_full_version}) does not match the version specified in the build_name (#{python_module_from_build_name})" if python_module_from_build_name.split("/").last != python_full_version
       pylibdir = "#{prefix}/lib/#{pyver}/site-packages"
       FileUtils.mkdir_p pylibdir
       Kernel.system "cd #{prefix} && ln -snf lib lib64"
