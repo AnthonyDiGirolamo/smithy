@@ -242,6 +242,12 @@ module Smithy
     ("Version" + version.to_s.squish.gsub(/[\. ]/, "_")).to_sym
   end
 
+  def config_value(value)
+    result = Smithy::Config.config_file_hash.try(:[], value)
+    raise "config_value #{value} does not exist in #{Smithy::Config.config_file_name}" if result.blank?
+    result
+  end
+
   def log_exception(e, argv, config)
     logfile = Smithy::Config.global[:"global-error-log"]
     if logfile.present?
