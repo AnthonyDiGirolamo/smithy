@@ -146,35 +146,48 @@ module Smithy
     # end
   end
 
-  def operating_system
-    b = `uname -m`.chomp
-    redhat = "/etc/redhat-release"
-    suse = "/etc/SuSE-release"
-    if File.exists? redhat
-      # Red Hat Enterprise Linux Server release 6.3 (Santiago)
-      # CentOS release 5.9 (Final)
-      content = File.read(redhat)
-      content =~ /([\d\.]+)/
-      version = $1
-      b = "rhel" if content =~ /Red Hat/
-      b = "centos" if content =~ /CentOS/
-      b += version
-    elsif File.exists? suse
-      # SUSE Linux Enterprise Server 11 (x86_64)
-      # VERSION = 11
-      # PATCHLEVEL = 1
-      content = File.read(suse)
-      content =~ /VERSION = (\d+)/
-      version = $1
-      content =~ /PATCHLEVEL = (\d+)/
-      patch = $1
-      b = "sles#{version}.#{patch}"
-    end
+  concerning :OperatingSystemHelpers do
+    included do
+      def operating_system
+        b = `uname -m`.chomp
+        redhat = "/etc/redhat-release"
+        suse = "/etc/SuSE-release"
+        if File.exists? redhat
+          # Red Hat Enterprise Linux Server release 6.3 (Santiago)
+          # CentOS release 5.9 (Final)
+          content = File.read(redhat)
+          content =~ /([\d\.]+)/
+          version = $1
+          b = "rhel" if content =~ /Red Hat/
+          b = "centos" if content =~ /CentOS/
+          b += version
+        elsif File.exists? suse
+          # SUSE Linux Enterprise Server 11 (x86_64)
+          # VERSION = 11
+          # PATCHLEVEL = 1
+          content = File.read(suse)
+          content =~ /VERSION = (\d+)/
+          version = $1
+          content =~ /PATCHLEVEL = (\d+)/
+          patch = $1
+          b = "sles#{version}.#{patch}"
+        end
 
-    if `gcc --version 2>&1` =~ /gcc \((.*)\) ([\d\.]+)/
-      b << "_gnu#{$2}"
+        if `gcc --version 2>&1` =~ /gcc \((.*)\) ([\d\.]+)/
+          b << "_gnu#{$2}"
+        end
+        return b
+      end
+
+      def cray_linux_version
+        return ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
+        return false
+      end
+
+      def cray_system?
+        cray_linux_version.present?
+      end
     end
-    return b
   end
 
   def url_filename(url)
