@@ -574,6 +574,12 @@ If the above is used when installing a formula with `python2.7.9` in the [build_
  e.g. `smithy formula install python_scipy/0.15.1/python2.7.9_gnu4.8.2` then
 [python_version_from_build_name][] will return `python2.7.9`.
 
+### python_libdir(version)
+This method will extract the major and minor version numbers for the python version
+being installed. This is only useful for the [python formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_formula.rb). It is useful when referencing the python libdir, which is shared
+among different patch versions. When installing python/3.4.3/sles11.1_gnu4.8.2 the 
+result of `python_libdir(version)` will be `python3.4`.
+
 ### module_list
 This method will run `module list` and print it's output durring the install
 process. Useful for verifying the modules loaded are the ones you want.
