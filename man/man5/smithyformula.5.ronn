@@ -541,7 +541,7 @@ Where `python_libdir(current_python_version)` is the lib directory for the
 version of python in the `$PATH` e.g. `python2.7` or `python3.4`
 
 ### python_module_from_build_name
-This is a helper to change a full python version specified in the module name
+This is a helper to change a full python version specified in the [build_name][]
 e.g. `python2.7.9` or `python3.4.3` to a version with a forward slash e.g.
 `python/2.7.9` or `python/3.4.3` respectively.
 
@@ -561,6 +561,18 @@ use in a [module_commands][] or [depends_on][] block. For example:
 If the above is used when installing a formula with `python2.7.9` in the build
 name e.g. `smithy formula install python_numpy/1.9.2/python2.7.9_gnu4.8.2` then
 [python_module_from_build_name][] will return `python/2.7.9`.
+
+### python_version_from_build_name
+Like [python_module_from_build_name][], this is a helper to extract the python
+version from the [build_name][]. It is useful when a formula is installed with
+a python version in the [build_name][] and you want to get the corresponding
+python version string for use in a [depends_on][] block. For example:
+
+    depends_on "python_numpy/1.9.2/#{python_version_from_build_name}*" 
+
+If the above is used when installing a formula with `python2.7.9` in the [build_name][]
+ e.g. `smithy formula install python_scipy/0.15.1/python2.7.9_gnu4.8.2` then
+[python_version_from_build_name][] will return `python2.7.9`.
 
 ### module_list
 This method will run `module list` and print it's output durring the install
@@ -651,6 +663,7 @@ Python module installations require some extra consideration. To make life a bit
 easier Smithy provides the following methods.
 
 * [python_module_from_build_name][]
+* [python_version_from_build_name][]
 * [system_python][]
 * [`<%= python_module_build_list @package, @builds %>`](#-python_module_build_list-package-builds-)
 
