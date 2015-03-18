@@ -116,7 +116,7 @@ def create_package(target)
   sh "mkdir -p #{package_dir}/lib/app"
   sh "cp -r bin lib man etc #{package_dir}/lib/app/"
   sh "mkdir #{package_dir}/lib/ruby"
-  sh "tar -xzf packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_dir}/lib/ruby"
+  sh "gtar -xzf packaging/traveling-ruby-#{TRAVELING_RUBY_VERSION}-#{target}.tar.gz -C #{package_dir}/lib/ruby"
   sh "cp packaging/wrapper.sh #{package_dir}/#{PACKAGE_NAME}"
   sh "cp -r environment.sh #{package_dir}/"
   sh "cp -pR packaging/vendor #{package_dir}/lib/"
@@ -124,7 +124,7 @@ def create_package(target)
   sh "mkdir #{package_dir}/lib/vendor/.bundle"
   sh "cp packaging/bundler-config #{package_dir}/lib/vendor/.bundle/config"
   if !ENV['DIR_ONLY']
-    sh "tar -czf #{package_dir}.tar.gz #{package_dir}"
+    sh "gtar -czf #{package_dir}.tar.gz #{package_dir}"
     sh "rm -rf #{package_dir}"
   end
 end
