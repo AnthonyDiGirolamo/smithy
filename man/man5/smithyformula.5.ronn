@@ -568,17 +568,19 @@ version from the [build_name][]. It is useful when a formula is installed with
 a python version in the [build_name][] and you want to get the corresponding
 python version string for use in a [depends_on][] block. For example:
 
-    depends_on "python_numpy/1.9.2/#{python_version_from_build_name}*" 
+    depends_on "python_numpy/1.9.2/#{python_version_from_build_name}*"
 
 If the above is used when installing a formula with `python2.7.9` in the [build_name][]
  e.g. `smithy formula install python_scipy/0.15.1/python2.7.9_gnu4.8.2` then
 [python_version_from_build_name][] will return `python2.7.9`.
 
 ### python_libdir(version)
-This method will extract the major and minor version numbers for the python version
-being installed. This is only useful for the [python formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_formula.rb). It is useful when referencing the python libdir, which is shared
-among different patch versions. When installing python/3.4.3/sles11.1_gnu4.8.2 the 
-result of `python_libdir(version)` will be `python3.4`.
+This method will extract the major and minor version numbers for the python
+version being installed. This is only useful for the [python
+formula](https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_formula.rb).
+It is useful when referencing the python libdir, which is shared among different
+patch versions. When installing python/3.4.3/sles11.1_gnu4.8.2 the result of
+`python_libdir(version)` will be `python3.4`.
 
 ### module_list
 This method will run `module list` and print it's output durring the install
@@ -670,6 +672,7 @@ easier Smithy provides the following methods.
 
 * [python_module_from_build_name][]
 * [python_version_from_build_name][]
+* [python_libdir(version)](#python_libdir-version-)
 * [system_python][]
 * [`<%= python_module_build_list @package, @builds %>`](#-python_module_build_list-package-builds-)
 

@@ -659,9 +659,9 @@ be used like:</p>
 <p>Where <code>python_libdir(current_python_version)</code> is the lib directory for the
 version of python in the <code>$PATH</code> e.g. <code>python2.7</code> or <code>python3.4</code></p>
 
-<h3 id="build_name_python">build_name_python</h3>
+<h3 id="python_module_from_build_name">python_module_from_build_name</h3>
 
-<p>This is a helper to change a full python version specified in the module name
+<p>This is a helper to change a full python version specified in the <a href="#build_name" title="build_name" data-bare-link="true">build_name</a>
 e.g. <code>python2.7.9</code> or <code>python3.4.3</code> to a version with a forward slash e.g.
 <code>python/2.7.9</code> or <code>python/3.4.3</code> respectively.</p>
 
@@ -670,18 +670,41 @@ e.g. <code>python2.7.9</code> or <code>python3.4.3</code> to a version with a fo
 use in a <a href="#module_commands" title="module_commands" data-bare-link="true">module_commands</a> or <a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a> block. For example:</p>
 
 <pre><code>depends_on do
-  build_name_python
+  python_module_from_build_name
 end
 
 module_commands do
   [ "unload python",
-    "load #{build_name_python}" ]
+    "load #{python_module_from_build_name}" ]
 end
 </code></pre>
 
 <p>If the above is used when installing a formula with <code>python2.7.9</code> in the build
 name e.g. <code>smithy formula install python_numpy/1.9.2/python2.7.9_gnu4.8.2</code> then
-<a href="#build_name_python" title="build_name_python" data-bare-link="true">build_name_python</a> will return <code>python/2.7.9</code>.</p>
+<a href="#python_module_from_build_name" title="python_module_from_build_name" data-bare-link="true">python_module_from_build_name</a> will return <code>python/2.7.9</code>.</p>
+
+<h3 id="python_version_from_build_name">python_version_from_build_name</h3>
+
+<p>Like <a href="#python_module_from_build_name" title="python_module_from_build_name" data-bare-link="true">python_module_from_build_name</a>, this is a helper to extract the python
+version from the <a href="#build_name" title="build_name" data-bare-link="true">build_name</a>. It is useful when a formula is installed with
+a python version in the <a href="#build_name" title="build_name" data-bare-link="true">build_name</a> and you want to get the corresponding
+python version string for use in a <a href="#depends_on" title="depends_on" data-bare-link="true">depends_on</a> block. For example:</p>
+
+<pre><code>depends_on "python_numpy/1.9.2/#{python_version_from_build_name}*"
+</code></pre>
+
+<p>If the above is used when installing a formula with <code>python2.7.9</code> in the <a href="#build_name" title="build_name" data-bare-link="true">build_name</a>
+ e.g. <code>smithy formula install python_scipy/0.15.1/python2.7.9_gnu4.8.2</code> then
+<a href="#python_version_from_build_name" title="python_version_from_build_name" data-bare-link="true">python_version_from_build_name</a> will return <code>python2.7.9</code>.</p>
+
+<h3 id="python_libdir-version-">python_libdir(version)</h3>
+
+<p>This method will extract the major and minor version numbers for the python
+version being installed. This is only useful for the <a href="https://github.com/AnthonyDiGirolamo/smithy_formulas/blob/master/python_formula.rb">python
+formula</a>.
+It is useful when referencing the python libdir, which is shared among different
+patch versions. When installing python/3.4.3/sles11.1_gnu4.8.2 the result of
+<code>python_libdir(version)</code> will be <code>python3.4</code>.</p>
 
 <h3 id="module_list">module_list</h3>
 
@@ -779,7 +802,9 @@ EOF
 easier Smithy provides the following methods.</p>
 
 <ul>
-<li><a href="#build_name_python" title="build_name_python" data-bare-link="true">build_name_python</a></li>
+<li><a href="#python_module_from_build_name" title="python_module_from_build_name" data-bare-link="true">python_module_from_build_name</a></li>
+<li><a href="#python_version_from_build_name" title="python_version_from_build_name" data-bare-link="true">python_version_from_build_name</a></li>
+<li><a href="#python_libdir-version-" data-bare-link="true">python_libdir(version)</a></li>
 <li><a href="#system_python" title="system_python" data-bare-link="true">system_python</a></li>
 <li><a href="#-python_module_build_list-package-builds-" data-bare-link="true"><code>&lt;%= python_module_build_list @package, @builds %></code></a></li>
 </ul>
