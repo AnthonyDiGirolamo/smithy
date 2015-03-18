@@ -204,7 +204,10 @@ module Smithy
   def python_libdir(version)
     if version =~ /(\d+\.)?(\d+\.)?(\d+)/
       python_full_version = $&
-      "python" + $1 + $2.delete(".")
+      major_version = $1
+      minor_version = $2 || $3
+      minor_version.delete!(".")
+      "python" + major_version + minor_version
     else
       ""
     end
