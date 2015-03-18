@@ -9,6 +9,13 @@ module Smithy
       self.class.formula_name
     end
 
+    def self.arch
+      Smithy::Config.arch
+    end
+    def arch
+      self.class.arch
+    end
+
     def initialize(passed_package = nil)
       @formula_file = __FILE__
       raise "no install method implemented" unless self.respond_to?(:install)
@@ -141,15 +148,6 @@ module Smithy
       if ENV['MODULESHOME']
         notice "module list"
         Kernel.system @module_setup + "#{@modulecmd} list 2>&1"
-      end
-    end
-
-    def module_is_available?(mod)
-      module_avail = `#{module_setup} #{@modulecmd} avail -l #{mod} 2>&1`
-      if module_avail =~ /^#{mod}/
-        true
-      else
-        false
       end
     end
 

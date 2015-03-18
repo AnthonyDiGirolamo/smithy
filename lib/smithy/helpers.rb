@@ -58,7 +58,7 @@ module Smithy
       width = key.to_s.size if key.to_s.size > width
     end
     params_hash.each do |key, value|
-      STDOUT.puts "  " + key.to_s.ljust(width) + " " + value.color(:blue) #if STDOUT.tty?
+      STDOUT.puts "  " + key.to_s.ljust(width) + " " + value.to_s.color(:blue) #if STDOUT.tty?
     end
   end
 
@@ -213,16 +213,15 @@ module Smithy
     end
   end
 
-  def global_module_is_available?(mod)
-    if ENV["MODULESHOME"]
-      modulecmd = "modulecmd sh"
-      modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
-      module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
-      if module_avail =~ /^#{mod}/
-        true
-      else
-        false
-      end
+  def module_is_available?(mod)
+    raise "$MODULESHOME is not set" unless ENV["MODULESHOME"].present?
+    modulecmd = "modulecmd sh"
+    modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
+    module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
+    if module_avail =~ /^#{mod}/
+      true
+    else
+      false
     end
   end
 
