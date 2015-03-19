@@ -209,6 +209,8 @@ module Smithy
           Dir.chdir File.join(f.package.prefix, "source")
         end
 
+
+        f.additional_roots = options[:"additional-roots"].try(:split,",") || []
         if f.run_install
           f.package.create_valid_build_file
           f.package.set_file_permissions_recursive

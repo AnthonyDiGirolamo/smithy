@@ -56,7 +56,7 @@ require 'uri'
 require 'kramdown'
 require 'active_support/all'
 
-# require 'byebug'
+require 'byebug'
 # require 'pry'
 # require 'pry-doc'
 # require 'pry-byebug'
@@ -651,6 +651,10 @@ command ['formula'] do |c|
     subcommand.desc "Formula name"
     subcommand.arg_name "NAME"
     subcommand.flag [:f, "formula-name"]
+
+    subcommand.desc "Comma-separated list of additional software root directories"
+    subcommand.arg_name "DIR,DIR,DIR"
+    subcommand.flag [:a, "additional-roots"]
 
     subcommand.desc "Create modulefiles as well"
     subcommand.switch [:m, "modulefile"], :negatable => false

@@ -1,6 +1,6 @@
 module Smithy
   class Formula
-    attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup
+    attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup, :additional_roots
 
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub(/_formula$/, "")
@@ -26,6 +26,8 @@ module Smithy
         @modulecmd = "modulecmd sh"
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
       end
+
+      @additional_roots = []
     end
 
     # setup module environment by purging and loading only what's needed
@@ -119,10 +121,29 @@ module Smithy
       ! self.class.instance_variables.include?(:@disable_group_writable)
     end
 
-    def run_install
-      initialize_modules
+    def run_formula_install_method
       install
       notice_success "SUCCESS #{@prefix}"
+    end
+
+    def run_install
+      initialize_modules
+      # install to default software root
+      run_formula_install_method
+
+      # Set sw root and prefix per additional_root
+      additional_roots.each do |additional_root|
+        package.root = additional_root
+        @prefix = package.prefix
+        notice "Installing to additional location #{@prefix}"
+        run_formula_install_method
+      end
+
+      # Restore original software root and prefix
+      unless additional_roots.empty?
+        package.root = Smithy::Config.root
+        @prefix = package.prefix
+      end
       return true
     end
 
