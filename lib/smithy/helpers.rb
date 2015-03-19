@@ -58,7 +58,7 @@ module Smithy
       width = key.to_s.size if key.to_s.size > width
     end
     params_hash.each do |key, value|
-      STDOUT.puts "  " + key.to_s.ljust(width) + " " + value.color(:blue) #if STDOUT.tty?
+      STDOUT.puts "  " + key.to_s.ljust(width) + " " + value.to_s.color(:blue) #if STDOUT.tty?
     end
   end
 
@@ -146,35 +146,48 @@ module Smithy
     # end
   end
 
-  def operating_system
-    b = `uname -m`.chomp
-    redhat = "/etc/redhat-release"
-    suse = "/etc/SuSE-release"
-    if File.exists? redhat
-      # Red Hat Enterprise Linux Server release 6.3 (Santiago)
-      # CentOS release 5.9 (Final)
-      content = File.read(redhat)
-      content =~ /([\d\.]+)/
-      version = $1
-      b = "rhel" if content =~ /Red Hat/
-      b = "centos" if content =~ /CentOS/
-      b += version
-    elsif File.exists? suse
-      # SUSE Linux Enterprise Server 11 (x86_64)
-      # VERSION = 11
-      # PATCHLEVEL = 1
-      content = File.read(suse)
-      content =~ /VERSION = (\d+)/
-      version = $1
-      content =~ /PATCHLEVEL = (\d+)/
-      patch = $1
-      b = "sles#{version}.#{patch}"
-    end
+  concerning :OperatingSystemHelpers do
+    included do
+      def operating_system
+        b = `uname -m`.chomp
+        redhat = "/etc/redhat-release"
+        suse = "/etc/SuSE-release"
+        if File.exists? redhat
+          # Red Hat Enterprise Linux Server release 6.3 (Santiago)
+          # CentOS release 5.9 (Final)
+          content = File.read(redhat)
+          content =~ /([\d\.]+)/
+          version = $1
+          b = "rhel" if content =~ /Red Hat/
+          b = "centos" if content =~ /CentOS/
+          b += version
+        elsif File.exists? suse
+          # SUSE Linux Enterprise Server 11 (x86_64)
+          # VERSION = 11
+          # PATCHLEVEL = 1
+          content = File.read(suse)
+          content =~ /VERSION = (\d+)/
+          version = $1
+          content =~ /PATCHLEVEL = (\d+)/
+          patch = $1
+          b = "sles#{version}.#{patch}"
+        end
 
-    if `gcc --version 2>&1` =~ /gcc \((.*)\) ([\d\.]+)/
-      b << "_gnu#{$2}"
+        if `gcc --version 2>&1` =~ /gcc \((.*)\) ([\d\.]+)/
+          b << "_gnu#{$2}"
+        end
+        return b
+      end
+
+      def cray_linux_version
+        return ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
+        return false
+      end
+
+      def cray_system?
+        cray_linux_version.present?
+      end
     end
-    return b
   end
 
   def url_filename(url)
@@ -213,21 +226,26 @@ module Smithy
     end
   end
 
-  def global_module_is_available?(mod)
-    if ENV["MODULESHOME"]
-      modulecmd = "modulecmd sh"
-      modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
-      module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
-      if module_avail =~ /^#{mod}/
-        true
-      else
-        false
-      end
+  def module_is_available?(mod)
+    raise "$MODULESHOME is not set" unless ENV["MODULESHOME"].present?
+    modulecmd = "modulecmd sh"
+    modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
+    module_avail = `#{modulecmd} avail -l #{mod} 2>&1`
+    if module_avail =~ /^#{mod}/
+      true
+    else
+      false
     end
   end
 
   def for_version(version)
     ("Version" + version.to_s.squish.gsub(/[\. ]/, "_")).to_sym
+  end
+
+  def config_value(value)
+    result = Smithy::Config.config_file_hash.try(:[], value)
+    raise "config_value #{value} does not exist in #{Smithy::Config.config_file_name}" if result.blank?
+    result
   end
 
   def log_exception(e, argv, config)
