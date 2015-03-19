@@ -1,6 +1,6 @@
 module Smithy
   class Formula
-    attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup, :additional_roots
+    attr_accessor :formula_file, :name, :build_name, :prefix, :package, :module_setup
 
     def self.formula_name
       self.to_s.underscore.split("/").last.gsub(/_formula$/, "")
@@ -34,7 +34,6 @@ module Smithy
         @modulecmd = "#{ENV["MODULESHOME"]}/bin/modulecmd sh" if File.exists?("#{ENV["MODULESHOME"]}/bin/modulecmd")
       end
 
-      @additional_roots = []
     end
 
     # setup module environment by purging and loading only what's needed
@@ -68,7 +67,7 @@ module Smithy
     end
 
     # DSL Methods
-    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile }.each do |attr|
+    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile additional_software_roots }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           @#{attr} = block_given? ? block : value unless @#{attr}
@@ -139,7 +138,7 @@ module Smithy
       run_formula_install_method
 
       # Set sw root and prefix per additional_root
-      additional_roots.each do |additional_root|
+      (additional_software_roots || []).each do |additional_root|
         package.root = additional_root
         @prefix = package.prefix
         notice "Installing to additional location #{@prefix}"
@@ -147,7 +146,7 @@ module Smithy
       end
 
       # Restore original software root and prefix
-      unless additional_roots.empty?
+      unless (additional_software_roots || []).empty?
         package.root = Smithy::Config.root
         @prefix = package.prefix
       end
