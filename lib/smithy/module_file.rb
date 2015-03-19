@@ -132,7 +132,7 @@ module Smithy
 
     def python_module_build_list(package, builds, args = {})
       package.build_name
-      valid_builds = Hash[builds.select{|b| b.include?("python")}.collect{|b| [get_python_version_from_build_name(b), b]}.select{|b| global_module_is_available?(b.first)}]
+      valid_builds = Hash[builds.select{|b| b.include?("python")}.collect{|b| [get_python_version_from_build_name(b), b]}.select{|b| module_is_available?(b.first)}]
 
       output = [ "if [ is-loaded " ]
 

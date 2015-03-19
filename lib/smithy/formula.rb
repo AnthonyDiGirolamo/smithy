@@ -138,7 +138,7 @@ module Smithy
       run_formula_install_method
 
       # Set sw root and prefix per additional_root
-      (additional_software_roots || []).each do |additional_root|
+      (additional_software_roots || []).compact.each do |additional_root|
         package.root = additional_root
         @prefix = package.prefix
         notice "Installing to additional location #{@prefix}"
@@ -146,7 +146,7 @@ module Smithy
       end
 
       # Restore original software root and prefix
-      unless (additional_software_roots || []).empty?
+      unless (additional_software_roots || []).compact.empty?
         package.root = Smithy::Config.root
         @prefix = package.prefix
       end
