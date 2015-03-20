@@ -248,6 +248,12 @@ module Smithy
     result
   end
 
+  def hostname(strip_trailing_numbers: false)
+    h = Smithy::Config.hostname
+    h.gsub!(/\d+$/, "") if strip_trailing_numbers
+    h
+  end
+
   def log_exception(e, argv, config)
     logfile = Smithy::Config.global[:"global-error-log"]
     if logfile.present?
