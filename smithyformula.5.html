@@ -606,6 +606,32 @@ end
 installed. For a list of additional helper methods for use inside install see
 the [FORMULA HELPER METHODS][] section.</p>
 
+<h3 id="additional_software_roots">additional_software_roots</h3>
+
+<p>This method takes an array of strings (or a block that returns an array of
+strings) containing paths to additional software root directories. This is
+useful for when you have a package that must be installed to two or more
+separate locations. The source is still extracted to one location and the
+compilation is performed there. The <a href="#def-install" title="def install" data-bare-link="true">def install</a> method is just executed
+again with the additional prefixes. For example say our formula contained the
+line:</p>
+
+<pre><code>additional_software_roots ["/lustre/atlas/sw"]
+</code></pre>
+
+<p>Then when we run <code>smithy formula install python_numpy/1.9.2/python2.7.9</code> then
+python will still be installed to the default prefix of
+<code>/sw/xk6/python_numpy/1.9.2/python2.7.9</code> It will also get installed to
+<code>/lustre/atlas/sw/xk6/python_numpy/1.9.2/python2.7.9</code></p>
+
+<p>You can combine this with <a href="#config_value" title="config_value" data-bare-link="true">config_value</a> to generalize you formulas further.
+Say we always need to know where software gets installed on the lustre
+filesystem. We can add this line to the config file: <code>lustre-filesystem:
+/lustre/atlas/sw</code> and in out formulas say:</p>
+
+<pre><code>additional_software_roots [ config_value("lustre-filesystem") ]
+</code></pre>
+
 <h2 id="FORMULA-HELPER-METHODS">FORMULA HELPER METHODS</h2>
 
 <p>These methods are designed to be used within the <a href="#def-install" title="def install" data-bare-link="true">def install</a> method of a
@@ -632,6 +658,56 @@ applcation.</p>
 <p>This line will return the full prefix to an application. If we run smithy
 formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
 command will return /sw/xk6/bzip2/1.0.4/pgi13.4</p>
+
+<h3 id="hostname">hostname</h3>
+
+<p>This method will return the hostname of the machine smithy is running on.</p>
+
+<h3 id="arch">arch</h3>
+
+<p>This method will return the current architecture specified in the config file
+for the current hostname. For example if the config file contains:</p>
+
+<pre><code>---
+software-root: /sw
+file-group-name: ccsstaff
+hostname-architectures:
+  titan-ext: xk6
+  titan-login: xk6
+</code></pre>
+
+<p>And you run smithy on <code>titan-ext1</code> then <code>arch</code> will return <code>xk6</code></p>
+
+<h3 id="cray_linux_version">cray_linux_version</h3>
+
+<p>If smithy is running on a cray system this method will return the Cray Linux
+Environment version. Otherwise it will return false.</p>
+
+<h3 id="cray_system-">cray_system?</h3>
+
+<p>This method will return true if smithy is running on a cray system.</p>
+
+<h3 id="config_value">config_value</h3>
+
+<p>This method lets you retrieve arbitrary values from the <code>$SMITHY_CONFIG</code> file.
+Since that file is in <a href="http://yaml.org/">YAML</a> format you can easily append
+extra values for use in your formulas.</p>
+
+<p>For example, if your system has a specific path for a filesystem your formula
+needs to know about then you can add it you the config file. Say we add a line
+titled <code>lustre-filesystem</code>:</p>
+
+<pre><code>---
+software-root: /sw
+file-group-name: ccsstaff
+hostname-architectures:
+  titan-ext: xk6
+  titan-login: xk6
+lustre-filesystem: /lustre/atlas/sw
+</code></pre>
+
+<p>You can then call <code>config_value("lustre-filesystem")</code> in your formulas and get
+<code>/lustre/atlas/sw</code> back.</p>
 
 <h3 id="system">system</h3>
 
