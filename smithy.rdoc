@@ -1,6 +1,6 @@
 == smithy - Smithy will help you build, test, and install software with ease.
 
-v1.8.4
+v1.9.0
 
 === Global Options
 === --arch NAME
@@ -168,6 +168,13 @@ Install a package using a formula
 
 
 ======= Options
+======= -a|--additional-roots DIR,DIR,DIR
+
+Comma-separated list of additional software root directories
+
+[Default Value] None
+
+
 ======= -f|--formula-name NAME
 
 Formula name
