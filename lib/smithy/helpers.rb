@@ -180,8 +180,10 @@ module Smithy
       end
 
       def cray_linux_version
-        return ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
-        return false
+        version = false
+        version = ENV["XTOS_VERSION"]   if ENV["XTOS_VERSION"].present?
+        version = ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
+        return version
       end
 
       def cray_system?
