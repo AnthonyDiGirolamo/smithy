@@ -517,6 +517,42 @@ This line will return the full prefix to an application. If we run smithy
 formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
 command will return /sw/xk6/bzip2/1.0.4/pgi13.4
 
+### hostname
+This method will return the hostname of the machine smithy is running on.
+
+### arch
+This method will return the current architecture specified in the config file
+for the current hostname. For example if the config file contains:
+
+    ---
+    software-root: /sw
+    file-group-name: ccsstaff
+    hostname-architectures:
+      titan-ext: xk6
+      titan-login: xk6
+
+And you run smithy on `titan-ext1` then `arch` will return `xk6`
+
+### config_value
+This method lets you retrieve arbitrary values from the `$SMITHY_CONFIG` file.
+Since that file is in [YAML](http://yaml.org/) format you can easily append
+extra values for use in your formulas.
+
+For example, if your system has a specific path for a filesystem your formula
+needs to know about then you can add it you the config file. Say we add a line
+titled `lustre-filesystem`:
+
+    ---
+    software-root: /sw
+    file-group-name: ccsstaff
+    hostname-architectures:
+      titan-ext: xk6
+      titan-login: xk6
+    lustre-filesystem: /lustre/atlas/sw
+
+You can then call `config_value("lustre-filesystem")` in your formulas and get
+`/lustre/atlas/sw` back.
+
 ### system
 
 This method accepts a string or multiple strings separated by commas. It will
