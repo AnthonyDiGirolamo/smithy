@@ -10,3 +10,5 @@ tmp
 vendor/ruby
 packaging/vendor
 packaging/traveling*
+# developer's local smithyrc
+smithyrc
