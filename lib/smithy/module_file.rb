@@ -139,7 +139,7 @@ module Smithy
       valid_builds.each do |modulefile, buildname|
         output.last << modulefile + " ] {\n"
         output.last << "  set BUILD " + buildname + "\n"
-        output.last << "  set LIBDIR " + python_libdir(buildname) + "\n"
+        output.last << "  set LIBDIR " + python_libdir(get_python_version_from_build_name(buildname)) + "\n"
         output << ""
       end
 
