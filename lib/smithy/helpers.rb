@@ -180,8 +180,10 @@ module Smithy
       end
 
       def cray_linux_version
-        return ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
-        return false
+        version = false
+        version = ENV["XTOS_VERSION"]   if ENV["XTOS_VERSION"].present?
+        version = ENV["CRAYOS_VERSION"] if ENV["CRAYOS_VERSION"].present?
+        return version
       end
 
       def cray_system?
@@ -246,6 +248,12 @@ module Smithy
     result = Smithy::Config.config_file_hash.try(:[], value)
     raise "config_value #{value} does not exist in #{Smithy::Config.config_file_name}" if result.blank?
     result
+  end
+
+  def hostname(strip_trailing_numbers: false)
+    h = Smithy::Config.hostname
+    h.gsub!(/\d+$/, "") if strip_trailing_numbers
+    h
   end
 
   def log_exception(e, argv, config)

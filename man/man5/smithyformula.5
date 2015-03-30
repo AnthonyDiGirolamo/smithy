@@ -626,6 +626,35 @@ end
 .P
 The contents of the install method depends heavily on the software being installed\. For a list of additional helper methods for use inside install see the [FORMULA HELPER METHODS][] section\.
 .
+.SS "additional_software_roots"
+This method takes an array of strings (or a block that returns an array of strings) containing paths to additional software root directories\. This is useful for when you have a package that must be installed to two or more separate locations\. The source is still extracted to one location and the compilation is performed there\. The \fIdef install\fR method is just executed again with the additional prefixes\. For example say our formula contained the line:
+.
+.IP "" 4
+.
+.nf
+
+additional_software_roots ["/lustre/atlas/sw"]
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Then when we run \fBsmithy formula install python_numpy/1\.9\.2/python2\.7\.9\fR then python will still be installed to the default prefix of \fB/sw/xk6/python_numpy/1\.9\.2/python2\.7\.9\fR It will also get installed to \fB/lustre/atlas/sw/xk6/python_numpy/1\.9\.2/python2\.7\.9\fR
+.
+.P
+You can combine this with \fIconfig_value\fR to generalize you formulas further\. Say we always need to know where software gets installed on the lustre filesystem\. We can add this line to the config file: \fBlustre\-filesystem: /lustre/atlas/sw\fR and in out formulas say:
+.
+.IP "" 4
+.
+.nf
+
+additional_software_roots [ config_value("lustre\-filesystem") ]
+.
+.fi
+.
+.IP "" 0
+.
 .SH "FORMULA HELPER METHODS"
 These methods are designed to be used within the \fIdef install\fR method of a formula file or within a block passed to one [FORMULA DSL METHODS][]\.
 .
@@ -640,6 +669,61 @@ Same as the name and version methods, this will return the build name of the app
 .
 .SS "prefix"
 This line will return the full prefix to an application\. If we run smithy formula install bzip2/1\.0\.4/pgi13\.4 and our software\-root is /sw/xk6 this command will return /sw/xk6/bzip2/1\.0\.4/pgi13\.4
+.
+.SS "hostname"
+This method will return the hostname of the machine smithy is running on\.
+.
+.SS "arch"
+This method will return the current architecture specified in the config file for the current hostname\. For example if the config file contains:
+.
+.IP "" 4
+.
+.nf
+
+\-\-\-
+software\-root: /sw
+file\-group\-name: ccsstaff
+hostname\-architectures:
+  titan\-ext: xk6
+  titan\-login: xk6
+.
+.fi
+.
+.IP "" 0
+.
+.P
+And you run smithy on \fBtitan\-ext1\fR then \fBarch\fR will return \fBxk6\fR
+.
+.SS "cray_linux_version"
+If smithy is running on a cray system this method will return the Cray Linux Environment version\. Otherwise it will return false\.
+.
+.SS "cray_system?"
+This method will return true if smithy is running on a cray system\.
+.
+.SS "config_value"
+This method lets you retrieve arbitrary values from the \fB$SMITHY_CONFIG\fR file\. Since that file is in YAML \fIhttp://yaml\.org/\fR format you can easily append extra values for use in your formulas\.
+.
+.P
+For example, if your system has a specific path for a filesystem your formula needs to know about then you can add it you the config file\. Say we add a line titled \fBlustre\-filesystem\fR:
+.
+.IP "" 4
+.
+.nf
+
+\-\-\-
+software\-root: /sw
+file\-group\-name: ccsstaff
+hostname\-architectures:
+  titan\-ext: xk6
+  titan\-login: xk6
+lustre\-filesystem: /lustre/atlas/sw
+.
+.fi
+.
+.IP "" 0
+.
+.P
+You can then call \fBconfig_value("lustre\-filesystem")\fR in your formulas and get \fB/lustre/atlas/sw\fR back\.
 .
 .SS "system"
 This method accepts a string or multiple strings separated by commas\. It will run the given command in a subshell and setup the modules as defined by the \fImodule_commands\fR or \fImodules\fR methods\. Each call to system is independent from the last\. Modules are reloaded and environment variables are reset\.

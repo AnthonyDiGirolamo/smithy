@@ -493,6 +493,30 @@ The contents of the install method depends heavily on the software being
 installed. For a list of additional helper methods for use inside install see
 the [FORMULA HELPER METHODS][] section.
 
+### additional_software_roots
+
+This method takes an array of strings (or a block that returns an array of
+strings) containing paths to additional software root directories. This is
+useful for when you have a package that must be installed to two or more
+separate locations. The source is still extracted to one location and the
+compilation is performed there. The [def install][] method is just executed
+again with the additional prefixes. For example say our formula contained the
+line:
+
+    additional_software_roots ["/lustre/atlas/sw"]
+
+Then when we run `smithy formula install python_numpy/1.9.2/python2.7.9` then
+python will still be installed to the default prefix of
+`/sw/xk6/python_numpy/1.9.2/python2.7.9` It will also get installed to
+`/lustre/atlas/sw/xk6/python_numpy/1.9.2/python2.7.9`
+
+You can combine this with [config_value][] to generalize you formulas further.
+Say we always need to know where software gets installed on the lustre
+filesystem. We can add this line to the config file: `lustre-filesystem:
+/lustre/atlas/sw` and in out formulas say:
+
+    additional_software_roots [ config_value("lustre-filesystem") ]
+
 FORMULA HELPER METHODS
 ----------------------
 
@@ -516,6 +540,49 @@ applcation.
 This line will return the full prefix to an application. If we run smithy
 formula install bzip2/1.0.4/pgi13.4 and our software-root is /sw/xk6 this
 command will return /sw/xk6/bzip2/1.0.4/pgi13.4
+
+### hostname
+This method will return the hostname of the machine smithy is running on.
+
+### arch
+This method will return the current architecture specified in the config file
+for the current hostname. For example if the config file contains:
+
+    ---
+    software-root: /sw
+    file-group-name: ccsstaff
+    hostname-architectures:
+      titan-ext: xk6
+      titan-login: xk6
+
+And you run smithy on `titan-ext1` then `arch` will return `xk6`
+
+### cray_linux_version
+If smithy is running on a cray system this method will return the Cray Linux
+Environment version. Otherwise it will return false.
+
+### cray_system?
+This method will return true if smithy is running on a cray system.
+
+### config_value
+This method lets you retrieve arbitrary values from the `$SMITHY_CONFIG` file.
+Since that file is in [YAML](http://yaml.org/) format you can easily append
+extra values for use in your formulas.
+
+For example, if your system has a specific path for a filesystem your formula
+needs to know about then you can add it you the config file. Say we add a line
+titled `lustre-filesystem`:
+
+    ---
+    software-root: /sw
+    file-group-name: ccsstaff
+    hostname-architectures:
+      titan-ext: xk6
+      titan-login: xk6
+    lustre-filesystem: /lustre/atlas/sw
+
+You can then call `config_value("lustre-filesystem")` in your formulas and get
+`/lustre/atlas/sw` back.
 
 ### system
 
