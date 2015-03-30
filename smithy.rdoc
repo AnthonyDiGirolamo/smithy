@@ -168,6 +168,13 @@ Install a package using a formula
 
 
 ======= Options
+======= -a|--additional-roots DIR,DIR,DIR
+
+Comma-separated list of additional software root directories
+
+[Default Value] None
+
+
 ======= -f|--formula-name NAME
 
 Formula name
