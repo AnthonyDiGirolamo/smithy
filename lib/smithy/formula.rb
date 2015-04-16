@@ -67,7 +67,7 @@ module Smithy
     end
 
     # DSL Methods
-    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on modulefile additional_software_roots }.each do |attr|
+    %w{ homepage url md5 sha1 sha2 sha256 modules module_commands depends_on additional_software_roots }.each do |attr|
       class_eval %Q{
         def self.#{attr}(value = nil, &block)
           @#{attr} = block_given? ? block : value unless @#{attr}
@@ -78,6 +78,16 @@ module Smithy
           @#{attr}
         end
       }
+    end
+
+    def self.modulefile(value = nil, &block)
+      @modulefile = block_given? ? block : value.strip_heredoc.lstrip unless @modulefile
+      @modulefile
+    end
+
+    def modulefile
+      @modulefile = self.class.modulefile.is_a?(Proc) ? instance_eval(&self.class.modulefile).strip_heredoc.lstrip : self.class.modulefile.strip_heredoc.lstrip unless @modulefile
+      @modulefile
     end
 
     def self.params(params_hash)

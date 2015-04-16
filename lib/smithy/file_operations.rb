@@ -161,7 +161,7 @@ module Smithy
                 overwrite = false
                 duplicate = true
               when "d"
-                puts `diff -uw #{dest} #{source}`
+                puts `diff -u #{dest} #{source}`
               when "h"
                 indent = " "*FILE_NOTICE_COLUMNS
                 puts indent+"y - yes, overwrite"
