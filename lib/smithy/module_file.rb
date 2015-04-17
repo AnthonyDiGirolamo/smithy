@@ -111,13 +111,38 @@ module Smithy
 
       g = system_module_path+"/*#{package.name}*/*#{package.version}*"
       module_matches = Dir.glob(g)
+      module_matches.sort!
       if module_matches.size > 1
         notice_warn "Warning - multiple existing modulefiles found:"
-        puts module_matches
+        module_matches.each_with_index do |m,i|
+          puts [i+1, m].join(': ')
+        end
+
+        selected_modulefile = "unknown"
+        while selected_modulefile == "unknown" do
+          prompt = Readline.readline("Select a modulefile to deploy to (\"h\" for help \"q\" quits) [1] ")
+          response = prompt.downcase
+          case response
+          when /^[1-9]$/
+            selected_modulefile = response.to_i - 1
+          when "h"
+            indent = "  "
+            puts indent+"1-9   - select a modulefile"
+            puts indent+"ENTER - select modulefile 1"
+            puts indent+"q     - abort module deploy"
+            puts indent+"h     - help, show this help"
+          when "q"
+            raise "Abort module deploy"
+          else
+            selected_modulefile = 0
+          end
+        end
       end
 
       if module_matches.empty?
         destination = system_module_file
+      elsif selected_modulefile.present?
+        destination = module_matches[selected_modulefile]
       else
         destination = module_matches.first
       end
