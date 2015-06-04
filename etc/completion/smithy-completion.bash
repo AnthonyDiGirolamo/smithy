@@ -208,6 +208,7 @@ _smithy_module () {
   -*)
 
     __smithycomp "
+      --default
       --dry-run"
     return
     ;;

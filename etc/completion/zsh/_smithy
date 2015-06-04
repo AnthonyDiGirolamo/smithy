@@ -151,6 +151,7 @@ case "$words[1]" in
     fi
 
     _arguments \
+      '(--default)--default[Set deployed modulefile as the default via the .version file]' \
       '(-n --dry-run)'{-n,--dry-run}'[See what files will be created without creating them]' \
       '2: :->forms' &&  return 0
 
