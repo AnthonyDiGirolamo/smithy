@@ -70,6 +70,7 @@ module Smithy
     class << self
 
       def make_executable(f, options = {})
+        options.merge!(verbose: Smithy::Config.verbose?)
         unless options[:noop]
           p = File.stat(f).mode | 0111
           FileUtils.chmod p, f, options
@@ -77,6 +78,7 @@ module Smithy
       end
 
       def set_group(f, new_group, options = {})
+        options.merge!(verbose: Smithy::Config.verbose?)
         method = :chown
         if options.has_key? :recursive
           options.reject!{|k,v| k.eql?(:recursive)}
@@ -111,7 +113,7 @@ module Smithy
           end
         end
 
-        puts command if options[:verbose]
+        puts command if options[:verbose] || Smithy::Config.verbose?
         `#{command}` unless options[:noop]
       end
 
@@ -119,8 +121,8 @@ module Smithy
         if File.directory?(d)
           notice_exist d
         else
-          FileUtils.mkdir_p d, options
           notice_create d
+          FileUtils.mkdir_p d, options.merge(verbose: Smithy::Config.verbose?)
         end
       end
 
@@ -135,6 +137,7 @@ module Smithy
       end
 
       def install_file(source, dest, options = {})
+        options.merge!(verbose: Smithy::Config.verbose?)
         current_time = Time.now.to_i
         duplicate_dest = dest+"_copy_"+current_time.to_s
         installed = false
@@ -179,19 +182,20 @@ module Smithy
             if overwrite
               notice_force dest
               FileUtils.install source, dest, options
+
               installed = true
             else
               if duplicate
-                FileUtils.install source, duplicate_dest, options
                 notice_create duplicate_dest
+                FileUtils.install source, duplicate_dest, options
               else
                 notice_skip dest
               end
             end
           end
         else
-          FileUtils.install source, dest, options
           notice_create dest
+          FileUtils.install source, dest, options
           installed = true
         end
 
@@ -217,6 +221,7 @@ module Smithy
         args[:options] = {} unless args[:options]
         options = {:noop => false, :verbose => false}
         options.merge!(args[:options])
+        options.merge!(verbose: Smithy::Config.verbose?)
         erb_filename  = args[:erb]
         dest          = args[:destination]
 
@@ -235,7 +240,7 @@ module Smithy
         end
 
         FileOperations.install_file(rendered_file, dest, options)
-        FileUtils.rm_f(rendered_file) # Always remove
+        FileUtils.rm_f(rendered_file, options) # Always remove
       end
 
     end

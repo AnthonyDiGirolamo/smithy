@@ -166,11 +166,13 @@ module Smithy
     def create_modulefile
       return false if modulefile.blank?
       notice "Creating Modulefile for #{package.prefix}"
-      m = ModuleFile.new :package => package
-      FileUtils.mkdir_p(File.dirname(m.module_file))
-      FileOperations.render_erb(:erb_string => modulefile, :binding => m.get_binding, :destination => m.module_file)
-      FileOperations.make_group_writable(m.module_path, :recursive => true)
-      FileOperations.set_group(m.module_path, package.group, :recursive => true)
+      m = ModuleFile.new package: package
+      FileOperations.make_directory File.dirname(m.module_file)
+      FileOperations.render_erb erb_string: modulefile,
+                                   binding: m.get_binding,
+                               destination: m.module_file
+      FileOperations.make_group_writable m.module_path,                recursive: true
+      FileOperations.set_group           m.module_path, package.group, recursive: true
       return true
     end
 

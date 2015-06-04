@@ -46,6 +46,10 @@ module Smithy
         @global[:"disable-group-writable"] ? false : true
       end
 
+      def verbose?
+        @global[:"verbose"]
+      end
+
       def load_configuration(gli_options = {})
         @global = gli_options
         options_to_merge = {}
