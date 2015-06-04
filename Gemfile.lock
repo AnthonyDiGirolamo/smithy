@@ -102,3 +102,6 @@ DEPENDENCIES
   ronn
   rspec
   terminal-table (>= 1.4.5)
+
+BUNDLED WITH
+   1.10.3

@@ -1,6 +1,6 @@
 == smithy - Smithy will help you build, test, and install software with ease.
 
-v1.9.1
+v1.10.0
 
 === Global Options
 === --arch NAME
@@ -246,6 +246,12 @@ Generate a modulefile for a given package. This operation normally happens after
 
 ====== Command: <tt>deploy </tt>
 Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation.
+
+
+======= Options
+======= --default
+Set deployed modulefile as the default via the .version file
+
 
 
 ====== Command: <tt>edit </tt>
