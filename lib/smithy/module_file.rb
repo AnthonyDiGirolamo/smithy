@@ -112,6 +112,7 @@ module Smithy
       g = system_module_path+"/*#{package.name}*/*#{package.version}*"
       module_matches = Dir.glob(g)
       module_matches.sort!
+
       if module_matches.size > 1
         notice_warn "Warning - multiple existing modulefiles found:"
         module_matches.each_with_index do |m,i|
@@ -151,6 +152,27 @@ module Smithy
       install_dir = File.join(system_module_path, package.name)
       FileOperations.make_directory install_dir, options
       FileOperations.install_file module_file, destination, options
+
+      # determine existing modules
+      all_module_versions = Dir.glob(system_module_path+"/*#{package.name}*/*")
+      all_module_versions.sort!
+      suggested_default = File.basename all_module_versions.last
+      suggested_default = File.basename(destination) if args[:default]
+
+      # create versions file
+      version_file_path = File.join(install_dir, ".version")
+      # if we passed in default or a version file doesn't exist
+      if args[:default] || !File.exist?(version_file_path)
+        notice "Setting #{suggested_default} as the default"
+        version_file_contents = <<-EOF.strip_heredoc
+          #%Module
+          set ModulesVersion "#{suggested_default}"
+        EOF
+        FileOperations.install_from_string version_file_contents, version_file_path
+        FileOperations.make_group_writable version_file_path, options.merge(:recursive => true)
+        FileOperations.set_group           version_file_path, package.group, options.merge(:recursive => true)
+      end
+
       FileOperations.make_group_writable(install_dir, options.merge(:recursive => true))
       FileOperations.set_group(install_dir, package.group, options.merge(:recursive => true))
     end

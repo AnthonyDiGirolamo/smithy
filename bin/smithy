@@ -522,13 +522,15 @@ command ['module'] do |c|
 
   c.desc "Copy a package's modulefile to the system module path. This is typically done after you have tested a new module in isolation."
   c.command :deploy do |deploy|
+    deploy.desc "Set deployed modulefile as the default via the .version file"
+    deploy.switch "default", :negatable => false
     deploy.action do |global_options,options,args|
       raise "You must supply a package name" if args.empty?
       p = Package.new :path => args.first
       p.valid?
       m = ModuleFile.new :package => p
 
-      m.deploy :dry_run => options[:"dry-run"]
+      m.deploy :dry_run => options[:"dry-run"], :default => options[:default]
     end
   end
 

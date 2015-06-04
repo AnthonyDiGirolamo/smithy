@@ -203,6 +203,7 @@ module Smithy
       end
 
       def install_from_string(content, dest, options = {})
+        options.merge!(verbose: Smithy::Config.verbose?)
         if options[:noop]
           updated_file = File.join(Smithy::Config.homedir+"/.smithy_#{File.basename(dest)}_#{Time.now.to_i}")
         else
@@ -214,7 +215,7 @@ module Smithy
         end
 
         FileOperations.install_file updated_file, dest, options
-        FileUtils.rm_f(updated_file) # Always remove
+        FileUtils.rm_f(updated_file, options) # Always remove
       end
 
       def render_erb(args = {})
