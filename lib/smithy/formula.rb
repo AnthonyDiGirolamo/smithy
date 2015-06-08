@@ -142,6 +142,19 @@ module Smithy
       notice_success "SUCCESS #{@prefix}"
     end
 
+    def run_test
+      if self.respond_to?(:test)
+        notice "TESTING #{prefix}"
+        initialize_modules
+        if test == false
+          notice_fail "FAIL #{@prefix}"
+        else
+          notice_success "PASS #{@prefix}"
+        end
+      end
+      return true
+    end
+
     def run_install
       initialize_modules
       # install to default software root
@@ -223,6 +236,7 @@ module Smithy
         Kernel.system @module_setup + args.join(' ')
       end
       fail_command if $?.exitstatus != 0
+      return true
     end
 
     def current_python_version

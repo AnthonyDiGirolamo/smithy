@@ -215,7 +215,7 @@ module Smithy
           f.additional_software_roots = software_roots_from_command_line
         end
 
-        if f.run_install
+        if f.run_install && f.run_test
           f.package.create_valid_build_file
           f.package.set_file_permissions_recursive
 
