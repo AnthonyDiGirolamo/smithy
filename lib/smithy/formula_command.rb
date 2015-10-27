@@ -162,7 +162,7 @@ module Smithy
       packages = args.dup
       if args.empty?
         notice "Reading package names from STDIN..."
-        packages = STDIN.readlines.map{|p| p.chomp}
+        packages = STDIN.readlines.map{|p| p.strip}
       end
 
       raise "You must supply at least one package to install" if packages.empty?
