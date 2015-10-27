@@ -160,10 +160,21 @@ module Smithy
       initialize_directories(options)
 
       packages = args.dup
+      if args.empty?
+        notice "Reading package names from STDIN..."
+        packages = STDIN.readlines.map{|p| p.chomp}
+      end
+
       raise "You must supply at least one package to install" if packages.empty?
 
       packages.each do |package|
         f = build_formula(package, options[:"formula-name"])
+
+        if options["skip-installed"] && File.exists?(f.package.valid_build_file)
+          notice_success "Already Installed #{f.prefix}"
+          next
+        end
+
         f.check_supported_build_names
         f.check_dependencies
         f.package.create(:formula => true)

@@ -239,6 +239,7 @@ case "$words[1]" in
           [[ "$PREFIX" = -* ]] && _arguments \
             '(--clean)--clean[clean existing install prefix]' \
             '(--no-clean)--no-clean[leave existing install prefix files intact]' \
+            '(--skip-installed)--skip-installed[Skip already installed software (builds with a .valid file)]' \
             '(-f --formula-name=)'{-f,--formula-name=}'[Formula name]:formula:_smithy_formulas' \
             '(-m --modulefile)'{-m,--modulefile}'[Create modulefiles as well]' \
             '1: :->subcmds' &&  return 0

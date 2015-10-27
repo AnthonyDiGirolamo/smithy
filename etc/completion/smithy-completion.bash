@@ -294,6 +294,7 @@ _smithy_formula () {
       __smithycomp "
         --no-clean
         --clean
+        --skip-installed
         --formula-name=
         --modulefile"
       return

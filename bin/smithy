@@ -665,6 +665,10 @@ command ['formula'] do |c|
     subcommand.default_value false
     subcommand.switch [:c, "clean"]
 
+    subcommand.desc "Skip already installed software (builds with a .valid file)"
+    subcommand.default_value false
+    subcommand.switch ["skip-installed"], :negatable => false
+
     subcommand.action do |global_options,options,args|
       FormulaCommand.install_command(options,args)
       Smithy::Config.reindex_completion_caches
