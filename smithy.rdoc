@@ -1,6 +1,6 @@
 == smithy - Smithy will help you build, test, and install software with ease.
 
-v1.10.0
+v1.10.1
 
 === Global Options
 === --arch NAME
@@ -189,6 +189,11 @@ Clean exiting install prefix
 
 ======= -m|--modulefile
 Create modulefiles as well
+
+
+
+======= --skip-installed
+Skip already installed software (builds with a .valid file)
 
 
 
