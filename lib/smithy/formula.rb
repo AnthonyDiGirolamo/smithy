@@ -81,12 +81,12 @@ module Smithy
     end
 
     def self.modulefile(value = nil, &block)
-      @modulefile = block_given? ? block : value.strip_heredoc.lstrip unless @modulefile
+      @modulefile = block_given? ? block : value.try(:strip_heredoc).try(:lstrip) unless @modulefile
       @modulefile
     end
 
     def modulefile
-      @modulefile = self.class.modulefile.is_a?(Proc) ? instance_eval(&self.class.modulefile).strip_heredoc.lstrip : self.class.modulefile.strip_heredoc.lstrip unless @modulefile
+      @modulefile = self.class.modulefile.is_a?(Proc) ? instance_eval(&self.class.modulefile).try(:strip_heredoc).try(:lstrip) : self.class.modulefile.try(:strip_heredoc).try(:lstrip) unless @modulefile
       @modulefile
     end
 
