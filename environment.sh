@@ -13,7 +13,7 @@ smithy () {
 
 if [[ -n ${ZSH_VERSION-} ]]; then
   fpath=($SMITHY_PREFIX/lib/app/etc/completion/zsh $fpath)
-  compinit
+  compinit -i
 fi
 
 if [[ -n ${BASH_VERSION-} ]]; then
