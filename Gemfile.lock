@@ -57,7 +57,7 @@ GEM
       pry (~> 0.9)
       yard (~> 0.8)
     rainbow (1.1.4)
-    rake (10.4.2)
+    rake (12.3.3)
     rdiscount (2.0.7)
     rdoc (4.1.0)
     ronn (0.7.3)
